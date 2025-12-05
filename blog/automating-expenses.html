@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automating Your Expense Reports | Amjad & Hazli</title>
+  <meta name="description" content="Stop chasing receipts and manually entering expenses. Here's how to automate your expense management with the right tools and integrations for Malaysian businesses.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --color-primary: #253FF6;
+      --color-primary-hover: #1E35D9;
+      --color-primary-50: #EEF1FF;
+      --color-primary-100: #E0E5FF;
+      --color-primary-200: #C7CEFF;
+      --color-black: #0A0A0F;
+      --color-gray-900: #1F1F23;
+      --color-gray-700: #404047;
+      --color-gray-600: #6B6B76;
+      --color-gray-400: #AEAEB8;
+      --color-gray-300: #D1D1D8;
+      --color-gray-200: #E4E4E9;
+      --color-gray-100: #F0F0F3;
+      --color-gray-50: #F8F8FA;
+      --color-white: #FFFFFF;
+      --color-text-primary: var(--color-black);
+      --color-text-secondary: var(--color-gray-900);
+      --color-text-tertiary: var(--color-gray-600);
+      --color-border-light: #EBEBEF;
+      --color-success: #10B981;
+      --color-success-light: #D1FAE5;
+      --color-warning: #F59E0B;
+      --color-warning-light: #FEF3C7;
+      --color-danger: #EF4444;
+      --color-danger-light: #FEE2E2;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'DM Mono', 'SF Mono', monospace;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+      --container-max: 1200px;
+      --article-max: 720px;
+      --container-padding: 24px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--color-text-tertiary);
+      background: var(--color-white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-padding);
+    }
+
+    /* Reading Progress Bar */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--color-gray-100);
+      z-index: 1000;
+    }
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary) 0%, #5B6EF9 100%);
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 3px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-light);
+      z-index: 100;
+      padding: var(--space-4) 0;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: var(--space-8); list-style: none; }
+    .nav-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover { color: var(--color-primary); }
+    .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 0 var(--space-4);
+      height: 36px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
+    .btn-secondary { background: var(--color-white); color: var(--color-text-primary); border: 1px solid var(--color-gray-300); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Article Header */
+    .article-header {
+      padding: var(--space-16) 0 var(--space-12);
+      text-align: center;
+      background: linear-gradient(180deg, #FAFBFF 0%, #FFFFFF 100%);
+    }
+    .article-header .container {
+      max-width: 900px;
+    }
+    .article-category {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      background: var(--color-primary-50);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: var(--space-5);
+    }
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.15;
+      margin-bottom: var(--space-6);
+      letter-spacing: -0.5px;
+    }
+    .article-excerpt {
+      font-size: 20px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto var(--space-8);
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .article-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+    }
+    .article-meta-item i {
+      font-size: 18px;
+      color: var(--color-gray-400);
+    }
+    .article-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-primary);
+    }
+    .author-name {
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    /* Article Content Layout */
+    .article-wrapper {
+      display: grid;
+      grid-template-columns: 1fr minmax(auto, var(--article-max)) 1fr;
+      gap: var(--space-12);
+      padding: var(--space-12) var(--container-padding);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Table of Contents */
+    .toc {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .toc-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-4);
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .toc-link {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      padding: var(--space-2) 0;
+      padding-left: var(--space-4);
+      border-left: 2px solid var(--color-gray-200);
+      transition: all 0.2s ease;
+      display: block;
+    }
+    .toc-link:hover,
+    .toc-link.active {
+      color: var(--color-primary);
+      border-left-color: var(--color-primary);
+    }
+
+    /* Article Body */
+    .article-body {
+      font-size: 18px;
+      line-height: 1.85;
+      color: var(--color-gray-700);
+    }
+    .article-body h2 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-6);
+      line-height: 1.3;
+      scroll-margin-top: 100px;
+    }
+    .article-body h3 {
+      font-family: var(--font-body);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-4);
+      line-height: 1.4;
+    }
+    .article-body p {
+      margin-bottom: var(--space-6);
+    }
+    .article-body p:first-of-type {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+    }
+    .article-body a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .article-body a:hover {
+      text-decoration-color: var(--color-primary-200);
+    }
+    .article-body ul, .article-body ol {
+      margin-bottom: var(--space-6);
+      padding-left: var(--space-6);
+    }
+    .article-body li {
+      margin-bottom: var(--space-3);
+    }
+    .article-body strong {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    /* Info Box */
+    .info-box {
+      padding: var(--space-6);
+      border-radius: 16px;
+      margin: var(--space-8) 0;
+      display: flex;
+      gap: var(--space-4);
+    }
+    .info-box.tip {
+      background: var(--color-success-light);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .info-box.warning {
+      background: var(--color-warning-light);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .info-box.important {
+      background: var(--color-primary-50);
+      border: 1px solid var(--color-primary-100);
+    }
+    .info-box-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .info-box.tip .info-box-icon {
+      background: var(--color-success);
+      color: white;
+    }
+    .info-box.warning .info-box-icon {
+      background: var(--color-warning);
+      color: white;
+    }
+    .info-box.important .info-box-icon {
+      background: var(--color-primary);
+      color: white;
+    }
+    .info-box-icon i { font-size: 20px; }
+    .info-box-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .info-box-content p {
+      font-size: 15px;
+      margin: 0;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Blockquote */
+    .article-body blockquote {
+      border-left: 4px solid var(--color-primary);
+      padding-left: var(--space-6);
+      margin: var(--space-8) 0;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Code/Technical Terms */
+    .article-body code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--color-gray-100);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--color-text-secondary);
+    }
+
+    /* Tool Card */
+    .tool-card {
+      background: var(--color-gray-50);
+      border-radius: 16px;
+      padding: var(--space-6);
+      margin: var(--space-6) 0;
+      border: 1px solid var(--color-gray-200);
+    }
+    .tool-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .tool-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .tool-price {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--color-primary);
+      background: var(--color-primary-50);
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+    .tool-card p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3);
+    }
+    .tool-card p:last-child {
+      margin-bottom: 0;
+    }
+    .tool-pros {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+    }
+    .tool-pro {
+      font-size: 12px;
+      color: var(--color-success);
+      background: var(--color-success-light);
+      padding: 4px 10px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tool-pro i {
+      font-size: 14px;
+    }
+
+    /* Step Card */
+    .step-card {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-5) 0;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+    .step-card:last-child {
+      border-bottom: none;
+    }
+    .step-number {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .step-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .step-content p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* References */
+    .references {
+      margin-top: var(--space-16);
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--color-gray-200);
+    }
+    .references-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-5);
+    }
+    .references-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .reference-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-gray-50);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .reference-item:hover {
+      background: var(--color-primary-50);
+    }
+    .reference-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .reference-icon i {
+      font-size: 18px;
+      color: var(--color-gray-600);
+    }
+    .reference-content h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .reference-content p {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      margin: 0;
+    }
+
+    /* Right Sidebar */
+    .article-sidebar-right {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .share-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .share-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-2);
+    }
+    .share-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--color-gray-50);
+      border: 1px solid var(--color-gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-tertiary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .share-btn:hover {
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-200);
+      color: var(--color-primary);
+    }
+
+    /* Author Card */
+    .author-card {
+      background: var(--color-gray-50);
+      border-radius: 20px;
+      padding: var(--space-8);
+      margin-top: var(--space-16);
+      display: flex;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    .author-card-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .author-card-content h4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .author-card-content .role {
+      font-size: 14px;
+      color: var(--color-primary);
+      margin-bottom: var(--space-2);
+    }
+    .author-card-content p {
+      font-size: 15px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Related Articles */
+    .related-section {
+      padding: var(--space-20) 0;
+      background: var(--color-gray-50);
+    }
+    .related-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    .related-card {
+      background: var(--color-white);
+      border-radius: 16px;
+      padding: var(--space-6);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid var(--color-gray-100);
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    }
+    .related-card-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-meta {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #1E3AE5 0%, #4F5BD5 50%, #253FF6 100%);
+      padding: var(--space-20) 0;
+      text-align: center;
+    }
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 500;
+      color: white;
+      margin-bottom: var(--space-4);
+    }
+    .cta-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: var(--space-8);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-8);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      padding: var(--space-16) 0;
+      background: var(--color-white);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+    .footer-links { display: flex; gap: var(--space-6); list-style: none; }
+    .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
+    .footer-link:hover { color: var(--color-primary); }
+    .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .article-wrapper {
+        grid-template-columns: 1fr;
+        max-width: var(--article-max);
+      }
+      .toc, .article-sidebar-right {
+        display: none;
+      }
+    }
+    @media (max-width: 900px) {
+      .related-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-title { font-size: 36px; }
+      .article-excerpt { font-size: 18px; }
+      .article-body { font-size: 17px; }
+      .article-body h2 { font-size: 26px; }
+      .author-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-content { flex-direction: column; gap: var(--space-4); text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="../index.html" class="nav-brand">Amjad & Hazli</a>
+      <ul class="nav-links">
+        <li><a href="../index.html#services" class="nav-link">Services</a></li>
+        <li><a href="../about.html" class="nav-link">About</a></li>
+        <li><a href="../index.html#testimonials" class="nav-link">Clients</a></li>
+        <li><a href="../resources.html" class="nav-link">Resources</a></li>
+        <li><a href="../blog.html" class="nav-link">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn btn-secondary">Client Portal</button>
+        <a href="../index.html#pricing" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <div class="container">
+      <span class="article-category">Operations</span>
+      <h1 class="article-title">Automating Your Expense Reports</h1>
+      <p class="article-excerpt">Receipts in shoe boxes, expense reports in spreadsheets, hours wasted every month. There's a better way. Here's how to automate the whole process.</p>
+      <div class="article-meta">
+        <div class="article-author">
+          <div class="author-avatar">AH</div>
+          <span class="author-name">Amjad & Hazli Team</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-calendar-blank"></i>
+          <span>December 2024</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-clock"></i>
+          <span>4 min read</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <div class="article-wrapper">
+    <!-- Table of Contents -->
+    <aside class="toc">
+      <h3 class="toc-title">Contents</h3>
+      <ul class="toc-list">
+        <li><a href="#problem" class="toc-link">The Receipt Chaos Problem</a></li>
+        <li><a href="#tools" class="toc-link">Recommended Tools</a></li>
+        <li><a href="#setup" class="toc-link">Step-by-Step Setup</a></li>
+        <li><a href="#integration" class="toc-link">Accounting Integration</a></li>
+        <li><a href="#tips" class="toc-link">Tips for Success</a></li>
+      </ul>
+    </aside>
+
+    <!-- Article Body -->
+    <article class="article-body">
+      <p>How much time does your team spend on expense reports each month? For most startups, the answer is "too much." Between collecting receipts, filling out spreadsheets, getting approvals, and reconciling with accounting, expenses eat up hours that could be spent on actually building your business.</p>
+
+      <p>The good news: this is a solved problem. Modern expense management tools can reduce manual work by 80% while actually improving compliance. Here's how to set it up.</p>
+
+      <h2 id="problem">The Receipt Chaos Problem</h2>
+
+      <p>We've seen startups at all stages struggling with the same issues:</p>
+
+      <ul>
+        <li><strong>Lost receipts:</strong> That RM200 client dinner? Can't find the receipt. That's RM200 you can't claim as a business expense.</li>
+        <li><strong>Month-end scrambles:</strong> Everyone submits expenses on the last day, creating a bottleneck.</li>
+        <li><strong>Policy confusion:</strong> Did we approve Grab rides? Is that meal within policy? Nobody's sure.</li>
+        <li><strong>Accounting delays:</strong> Your accountant spends hours re-categorizing expenses that were miscoded.</li>
+        <li><strong>Audit nightmares:</strong> LHDN asks for supporting documents and you're digging through email for PDFs.</li>
+      </ul>
+
+      <p>If your expense process involves emailing receipts, manual spreadsheets, or physical paper, you're wasting time and risking compliance issues.</p>
+
+      <h2 id="tools">Recommended Expense Management Tools</h2>
+
+      <p>Here are the tools we recommend for Malaysian startups, ranked by company size and needs:</p>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <span class="tool-name">Expensify</span>
+          <span class="tool-price">From USD5/user/mo</span>
+        </div>
+        <p>The gold standard for startups. Snap a photo of your receipt, and Expensify uses OCR to extract vendor, amount, and date. Integrates with most accounting software including Xero and QuickBooks.</p>
+        <div class="tool-pros">
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> SmartScan receipt capture</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Multi-currency support</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Approval workflows</span>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <span class="tool-name">Dext (formerly Receipt Bank)</span>
+          <span class="tool-price">From RM99/mo</span>
+        </div>
+        <p>Popular with accountants for its powerful data extraction. You can forward receipts via email, WhatsApp, or the mobile app. Particularly good for high-volume receipt processing.</p>
+        <div class="tool-pros">
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Email-in receipts</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Bank statement import</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Strong Xero integration</span>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <span class="tool-name">Spenmo</span>
+          <span class="tool-price">Free tier available</span>
+        </div>
+        <p>Singapore-based, built for Southeast Asian companies. Combines expense management with corporate cards and bill payments. Good if you want an all-in-one spending solution.</p>
+        <div class="tool-pros">
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Corporate cards</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> MYR support</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Real-time spend visibility</span>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <span class="tool-name">Aspire</span>
+          <span class="tool-price">Free for basic</span>
+        </div>
+        <p>Another Southeast Asian player. Strong on corporate cards with good spending controls. Useful if you want to issue cards to team members with built-in limits.</p>
+        <div class="tool-pros">
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Virtual cards</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Spend limits per card</span>
+          <span class="tool-pro"><i class="ph-bold ph-check"></i> Invoice payments</span>
+        </div>
+      </div>
+
+      <div class="info-box tip">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-lightbulb"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>Our Recommendation</h4>
+          <p>For most Malaysian startups under 50 employees, we recommend Expensify + Xero. It's the best balance of functionality, cost, and integration quality.</p>
+        </div>
+      </div>
+
+      <h2 id="setup">Step-by-Step Setup Guide</h2>
+
+      <p>Here's how to go from receipt chaos to automated bliss:</p>
+
+      <div class="step-card">
+        <span class="step-number">1</span>
+        <div class="step-content">
+          <h4>Define Your Expense Policy</h4>
+          <p>Before implementing any tool, document your expense policy. What's reimbursable? What requires approval? What are the limits for meals, travel, and software? Write it down. Most expense tools let you encode these rules for automatic enforcement.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">2</span>
+        <div class="step-content">
+          <h4>Set Up Your Chart of Accounts</h4>
+          <p>Create expense categories that match your accounting software. Common categories: Travel, Meals & Entertainment, Software Subscriptions, Office Supplies, Professional Development. The more specific, the better your reporting.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">3</span>
+        <div class="step-content">
+          <h4>Connect Your Accounting Software</h4>
+          <p>Set up the integration between your expense tool and accounting software. For Xero: Settings → Connected Apps → Expensify. Test the sync with a few transactions before rolling out.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">4</span>
+        <div class="step-content">
+          <h4>Configure Approval Workflows</h4>
+          <p>Set up who approves what. Typical setup: expenses under RM500 auto-approve, RM500-2000 needs manager approval, above RM2000 needs finance review. Keep it simple—too many approval layers slow everything down.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">5</span>
+        <div class="step-content">
+          <h4>Train Your Team</h4>
+          <p>Do a 15-minute demo showing how to snap receipts and submit expenses. Emphasize the "do it immediately" rule—capture receipts the moment you get them. Set expectations for submission timing.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">6</span>
+        <div class="step-content">
+          <h4>Set Up Weekly Sync</h4>
+          <p>Schedule approved expenses to sync to your accounting software weekly. Review the sync log monthly for any errors or uncategorized items.</p>
+        </div>
+      </div>
+
+      <h2 id="integration">Integration with Accounting Software</h2>
+
+      <p>The magic of expense automation is the accounting integration. Here's what a good setup looks like:</p>
+
+      <ul>
+        <li><strong>Automatic categorization:</strong> The tool learns from your past categorizations. After a few weeks, most expenses auto-categorize correctly.</li>
+        <li><strong>Tax code assignment:</strong> SST-registered? Set up tax codes so expenses flow into your books with correct tax treatment.</li>
+        <li><strong>Supplier mapping:</strong> Common vendors (Grab, Petron, Starbucks) get mapped to accounting suppliers automatically.</li>
+        <li><strong>Receipt attachment:</strong> The original receipt image stays attached to the transaction—crucial for audits.</li>
+      </ul>
+
+      <div class="info-box warning">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-warning"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>Don't Double-Enter</h4>
+          <p>A common mistake: manually entering expenses in accounting software AND using an expense tool. Pick one source of truth for expenses. Usually that's the expense tool syncing to accounting software.</p>
+        </div>
+      </div>
+
+      <h2 id="tips">Tips for Long-term Success</h2>
+
+      <ul>
+        <li><strong>Enforce the "same day" rule:</strong> Receipts should be captured within 24 hours. After a week, memory fades and receipts get lost.</li>
+        <li><strong>Use corporate cards where possible:</strong> Card transactions import automatically—no receipt capture needed for most small transactions.</li>
+        <li><strong>Review monthly reports:</strong> Look at spending by category, by person, by vendor. Spot unusual patterns early.</li>
+        <li><strong>Keep physical receipts for large items:</strong> For capital expenditure above RM500, keep the physical receipt too. LHDN may ask during audits.</li>
+        <li><strong>Set up policy reminders:</strong> Most tools can flag out-of-policy expenses. Use this feature rather than manual review.</li>
+      </ul>
+
+      <p>The goal is to make expense submission so easy that people actually do it. Every minute saved on expense admin is a minute you can spend building your business.</p>
+
+      <!-- References -->
+      <div class="references">
+        <h4 class="references-title">References & Tools</h4>
+        <div class="references-list">
+          <a href="https://www.expensify.com" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-receipt"></i>
+            </div>
+            <div class="reference-content">
+              <h5>Expensify</h5>
+              <p>Expense management with SmartScan receipt capture</p>
+            </div>
+          </a>
+          <a href="https://dext.com" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-scan"></i>
+            </div>
+            <div class="reference-content">
+              <h5>Dext (Receipt Bank)</h5>
+              <p>Automated bookkeeping and receipt processing</p>
+            </div>
+          </a>
+          <a href="https://www.xero.com/my" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-cloud"></i>
+            </div>
+            <div class="reference-content">
+              <h5>Xero Malaysia</h5>
+              <p>Cloud accounting software with expense integrations</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Author Card -->
+      <div class="author-card">
+        <div class="author-card-avatar">AH</div>
+        <div class="author-card-content">
+          <h4>Amjad & Hazli</h4>
+          <p class="role">AI-Powered Accounting for Startups</p>
+          <p>We help Malaysian startups set up efficient financial operations. From expense systems to monthly close processes, we build the infrastructure you need to scale.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Share Buttons -->
+    <aside class="article-sidebar-right">
+      <div class="share-buttons">
+        <span class="share-title">Share</span>
+        <button class="share-btn" title="Share on LinkedIn">
+          <i class="ph ph-linkedin-logo"></i>
+        </button>
+        <button class="share-btn" title="Share on Twitter">
+          <i class="ph ph-x-logo"></i>
+        </button>
+        <button class="share-btn" title="Copy link">
+          <i class="ph ph-link"></i>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Related Articles -->
+  <section class="related-section">
+    <div class="container">
+      <h2 class="related-title">Related Articles</h2>
+      <div class="related-grid">
+        <a href="financial-hygiene.html" class="related-card">
+          <span class="related-card-category">Startup Finance</span>
+          <h3 class="related-card-title">The Founder's Guide to Financial Hygiene</h3>
+          <span class="related-card-meta">8 min read</span>
+        </a>
+        <a href="when-to-hire-cfo.html" class="related-card">
+          <span class="related-card-category">Finance</span>
+          <h3 class="related-card-title">When to Hire Your First CFO</h3>
+          <span class="related-card-meta">6 min read</span>
+        </a>
+        <a href="annual-return-deadlines.html" class="related-card">
+          <span class="related-card-category">Compliance</span>
+          <h3 class="related-card-title">Annual Return Deadlines You Can't Miss</h3>
+          <span class="related-card-meta">5 min read</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title">Need help setting up your systems?</h2>
+      <p class="cta-subtitle">We'll help you choose the right tools and configure everything for seamless expense management.</p>
+      <a href="../index.html#pricing" class="cta-btn">
+        <i class="ph ph-gear"></i>
+        Get setup help
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <span class="footer-brand">Amjad & Hazli</span>
+        <ul class="footer-links">
+          <li><a href="../index.html#services" class="footer-link">Services</a></li>
+          <li><a href="../index.html#pricing" class="footer-link">Pricing</a></li>
+          <li><a href="../about.html" class="footer-link">About</a></li>
+          <li><a href="../resources.html" class="footer-link">Resources</a></li>
+          <li><a href="../blog.html" class="footer-link">Blog</a></li>
+        </ul>
+        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Reading Progress Bar
+    window.addEventListener('scroll', () => {
+      const article = document.querySelector('.article-body');
+      const progressBar = document.getElementById('progress-bar');
+
+      const articleTop = article.offsetTop;
+      const articleHeight = article.offsetHeight;
+      const windowHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+
+      const progress = Math.min(
+        Math.max((scrollY - articleTop + windowHeight * 0.3) / articleHeight * 100, 0),
+        100
+      );
+
+      progressBar.style.width = progress + '%';
+    });
+
+    // Active TOC link highlighting
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sections = document.querySelectorAll('.article-body h2[id]');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 150) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

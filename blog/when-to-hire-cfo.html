@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>When to Hire Your First CFO | Amjad & Hazli</title>
+  <meta name="description" content="Signs you've outgrown DIY finance and need professional help. Learn the difference between CFO, accountant, and fractional CFO—and what each costs in Malaysia.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --color-primary: #253FF6;
+      --color-primary-hover: #1E35D9;
+      --color-primary-50: #EEF1FF;
+      --color-primary-100: #E0E5FF;
+      --color-primary-200: #C7CEFF;
+      --color-black: #0A0A0F;
+      --color-gray-900: #1F1F23;
+      --color-gray-700: #404047;
+      --color-gray-600: #6B6B76;
+      --color-gray-400: #AEAEB8;
+      --color-gray-300: #D1D1D8;
+      --color-gray-200: #E4E4E9;
+      --color-gray-100: #F0F0F3;
+      --color-gray-50: #F8F8FA;
+      --color-white: #FFFFFF;
+      --color-text-primary: var(--color-black);
+      --color-text-secondary: var(--color-gray-900);
+      --color-text-tertiary: var(--color-gray-600);
+      --color-border-light: #EBEBEF;
+      --color-success: #10B981;
+      --color-success-light: #D1FAE5;
+      --color-warning: #F59E0B;
+      --color-warning-light: #FEF3C7;
+      --color-danger: #EF4444;
+      --color-danger-light: #FEE2E2;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'DM Mono', 'SF Mono', monospace;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+      --container-max: 1200px;
+      --article-max: 720px;
+      --container-padding: 24px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--color-text-tertiary);
+      background: var(--color-white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-padding);
+    }
+
+    /* Reading Progress Bar */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--color-gray-100);
+      z-index: 1000;
+    }
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary) 0%, #5B6EF9 100%);
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 3px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-light);
+      z-index: 100;
+      padding: var(--space-4) 0;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: var(--space-8); list-style: none; }
+    .nav-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover { color: var(--color-primary); }
+    .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 0 var(--space-4);
+      height: 36px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
+    .btn-secondary { background: var(--color-white); color: var(--color-text-primary); border: 1px solid var(--color-gray-300); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Article Header */
+    .article-header {
+      padding: var(--space-16) 0 var(--space-12);
+      text-align: center;
+      background: linear-gradient(180deg, #FAFBFF 0%, #FFFFFF 100%);
+    }
+    .article-header .container {
+      max-width: 900px;
+    }
+    .article-category {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      background: var(--color-primary-50);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: var(--space-5);
+    }
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.15;
+      margin-bottom: var(--space-6);
+      letter-spacing: -0.5px;
+    }
+    .article-excerpt {
+      font-size: 20px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto var(--space-8);
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .article-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+    }
+    .article-meta-item i {
+      font-size: 18px;
+      color: var(--color-gray-400);
+    }
+    .article-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-primary);
+    }
+    .author-name {
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    /* Article Content Layout */
+    .article-wrapper {
+      display: grid;
+      grid-template-columns: 1fr minmax(auto, var(--article-max)) 1fr;
+      gap: var(--space-12);
+      padding: var(--space-12) var(--container-padding);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Table of Contents */
+    .toc {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .toc-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-4);
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .toc-link {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      padding: var(--space-2) 0;
+      padding-left: var(--space-4);
+      border-left: 2px solid var(--color-gray-200);
+      transition: all 0.2s ease;
+      display: block;
+    }
+    .toc-link:hover,
+    .toc-link.active {
+      color: var(--color-primary);
+      border-left-color: var(--color-primary);
+    }
+
+    /* Article Body */
+    .article-body {
+      font-size: 18px;
+      line-height: 1.85;
+      color: var(--color-gray-700);
+    }
+    .article-body h2 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-6);
+      line-height: 1.3;
+      scroll-margin-top: 100px;
+    }
+    .article-body h3 {
+      font-family: var(--font-body);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-4);
+      line-height: 1.4;
+    }
+    .article-body p {
+      margin-bottom: var(--space-6);
+    }
+    .article-body p:first-of-type {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+    }
+    .article-body a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .article-body a:hover {
+      text-decoration-color: var(--color-primary-200);
+    }
+    .article-body ul, .article-body ol {
+      margin-bottom: var(--space-6);
+      padding-left: var(--space-6);
+    }
+    .article-body li {
+      margin-bottom: var(--space-3);
+    }
+    .article-body strong {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    /* Info Box */
+    .info-box {
+      padding: var(--space-6);
+      border-radius: 16px;
+      margin: var(--space-8) 0;
+      display: flex;
+      gap: var(--space-4);
+    }
+    .info-box.tip {
+      background: var(--color-success-light);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .info-box.warning {
+      background: var(--color-warning-light);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .info-box.important {
+      background: var(--color-primary-50);
+      border: 1px solid var(--color-primary-100);
+    }
+    .info-box-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .info-box.tip .info-box-icon {
+      background: var(--color-success);
+      color: white;
+    }
+    .info-box.warning .info-box-icon {
+      background: var(--color-warning);
+      color: white;
+    }
+    .info-box.important .info-box-icon {
+      background: var(--color-primary);
+      color: white;
+    }
+    .info-box-icon i { font-size: 20px; }
+    .info-box-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .info-box-content p {
+      font-size: 15px;
+      margin: 0;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Blockquote */
+    .article-body blockquote {
+      border-left: 4px solid var(--color-primary);
+      padding-left: var(--space-6);
+      margin: var(--space-8) 0;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+    .article-body blockquote cite {
+      display: block;
+      font-size: 14px;
+      font-style: normal;
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-3);
+    }
+
+    /* Code/Technical Terms */
+    .article-body code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--color-gray-100);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--color-text-secondary);
+    }
+
+    /* Comparison Table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-8) 0;
+      font-size: 15px;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: var(--space-4);
+      text-align: left;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+    .comparison-table th {
+      background: var(--color-gray-50);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      font-size: 14px;
+    }
+    .comparison-table td {
+      color: var(--color-text-secondary);
+    }
+    .comparison-table tr:hover td {
+      background: var(--color-gray-50);
+    }
+    .comparison-table .role-name {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .comparison-table .price {
+      font-family: var(--font-mono);
+      color: var(--color-primary);
+      font-weight: 500;
+    }
+
+    /* Sign Card */
+    .sign-card {
+      background: var(--color-gray-50);
+      border-radius: 16px;
+      padding: var(--space-6);
+      margin: var(--space-6) 0;
+      display: flex;
+      gap: var(--space-4);
+    }
+    .sign-number {
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .sign-content h4 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .sign-content p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* References */
+    .references {
+      margin-top: var(--space-16);
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--color-gray-200);
+    }
+    .references-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-5);
+    }
+    .references-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .reference-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-gray-50);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .reference-item:hover {
+      background: var(--color-primary-50);
+    }
+    .reference-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .reference-icon i {
+      font-size: 18px;
+      color: var(--color-gray-600);
+    }
+    .reference-content h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .reference-content p {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      margin: 0;
+    }
+
+    /* Right Sidebar */
+    .article-sidebar-right {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .share-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .share-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-2);
+    }
+    .share-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--color-gray-50);
+      border: 1px solid var(--color-gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-tertiary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .share-btn:hover {
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-200);
+      color: var(--color-primary);
+    }
+
+    /* Author Card */
+    .author-card {
+      background: var(--color-gray-50);
+      border-radius: 20px;
+      padding: var(--space-8);
+      margin-top: var(--space-16);
+      display: flex;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    .author-card-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .author-card-content h4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .author-card-content .role {
+      font-size: 14px;
+      color: var(--color-primary);
+      margin-bottom: var(--space-2);
+    }
+    .author-card-content p {
+      font-size: 15px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Related Articles */
+    .related-section {
+      padding: var(--space-20) 0;
+      background: var(--color-gray-50);
+    }
+    .related-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    .related-card {
+      background: var(--color-white);
+      border-radius: 16px;
+      padding: var(--space-6);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid var(--color-gray-100);
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    }
+    .related-card-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-meta {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #1E3AE5 0%, #4F5BD5 50%, #253FF6 100%);
+      padding: var(--space-20) 0;
+      text-align: center;
+    }
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 500;
+      color: white;
+      margin-bottom: var(--space-4);
+    }
+    .cta-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: var(--space-8);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-8);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      padding: var(--space-16) 0;
+      background: var(--color-white);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+    .footer-links { display: flex; gap: var(--space-6); list-style: none; }
+    .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
+    .footer-link:hover { color: var(--color-primary); }
+    .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .article-wrapper {
+        grid-template-columns: 1fr;
+        max-width: var(--article-max);
+      }
+      .toc, .article-sidebar-right {
+        display: none;
+      }
+    }
+    @media (max-width: 900px) {
+      .related-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+      .comparison-table {
+        font-size: 13px;
+      }
+      .comparison-table th,
+      .comparison-table td {
+        padding: var(--space-3);
+      }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-title { font-size: 36px; }
+      .article-excerpt { font-size: 18px; }
+      .article-body { font-size: 17px; }
+      .article-body h2 { font-size: 26px; }
+      .author-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-content { flex-direction: column; gap: var(--space-4); text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="../index.html" class="nav-brand">Amjad & Hazli</a>
+      <ul class="nav-links">
+        <li><a href="../index.html#services" class="nav-link">Services</a></li>
+        <li><a href="../about.html" class="nav-link">About</a></li>
+        <li><a href="../index.html#testimonials" class="nav-link">Clients</a></li>
+        <li><a href="../resources.html" class="nav-link">Resources</a></li>
+        <li><a href="../blog.html" class="nav-link">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn btn-secondary">Client Portal</button>
+        <a href="../index.html#pricing" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <div class="container">
+      <span class="article-category">Finance</span>
+      <h1 class="article-title">When to Hire Your First CFO</h1>
+      <p class="article-excerpt">You've outgrown spreadsheets and gut-feel decisions. But do you need a full-time CFO, a senior accountant, or something in between? Here's how to decide.</p>
+      <div class="article-meta">
+        <div class="article-author">
+          <div class="author-avatar">AH</div>
+          <span class="author-name">Amjad & Hazli Team</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-calendar-blank"></i>
+          <span>December 2024</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-clock"></i>
+          <span>6 min read</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <div class="article-wrapper">
+    <!-- Table of Contents -->
+    <aside class="toc">
+      <h3 class="toc-title">Contents</h3>
+      <ul class="toc-list">
+        <li><a href="#signs" class="toc-link">Signs You Need Help</a></li>
+        <li><a href="#differences" class="toc-link">CFO vs Accountant vs Fractional</a></li>
+        <li><a href="#cfo-role" class="toc-link">What a CFO Actually Does</a></li>
+        <li><a href="#costs" class="toc-link">Cost Expectations in Malaysia</a></li>
+        <li><a href="#decision" class="toc-link">Making the Decision</a></li>
+      </ul>
+    </aside>
+
+    <!-- Article Body -->
+    <article class="article-body">
+      <p>Every founder reaches a point where managing finances becomes overwhelming. You're juggling cash flow, investor questions, compliance deadlines, and strategic decisions—all while trying to actually run your business. The question isn't whether you need financial help, but what kind of help you need.</p>
+
+      <p>Hiring too early wastes money. Hiring too late costs you opportunities and creates chaos. This guide will help you figure out the right timing and the right role for your situation.</p>
+
+      <h2 id="signs">5 Signs You've Outgrown DIY Finance</h2>
+
+      <p>If any of these sound familiar, it's time to get serious about financial leadership:</p>
+
+      <div class="sign-card">
+        <span class="sign-number">1</span>
+        <div class="sign-content">
+          <h4>You can't answer basic investor questions</h4>
+          <p>When a potential investor asks about your unit economics, gross margin, or customer acquisition cost, you're scrambling to calculate it. If you can't produce these numbers within a day, you're not ready for fundraising—and you need help getting there.</p>
+        </div>
+      </div>
+
+      <div class="sign-card">
+        <span class="sign-number">2</span>
+        <div class="sign-content">
+          <h4>Cash flow surprises are becoming normal</h4>
+          <p>You regularly discover you have less cash than expected. Or more. Either way, you're not in control. A founder should know their cash position within 5% at any time, without checking their bank account.</p>
+        </div>
+      </div>
+
+      <div class="sign-card">
+        <span class="sign-number">3</span>
+        <div class="sign-content">
+          <h4>Tax season is a nightmare</h4>
+          <p>Your accountant spends more time cleaning up your books than actually doing tax work. You're never quite sure if you've captured all expenses, and you suspect you're paying more tax than necessary.</p>
+        </div>
+      </div>
+
+      <div class="sign-card">
+        <span class="sign-number">4</span>
+        <div class="sign-content">
+          <h4>Pricing decisions feel like guesswork</h4>
+          <p>You're not sure if you're actually making money on each customer. You set prices based on competitor pricing or gut feel, not on your actual cost structure.</p>
+        </div>
+      </div>
+
+      <div class="sign-card">
+        <span class="sign-number">5</span>
+        <div class="sign-content">
+          <h4>You're spending too much time on finance tasks</h4>
+          <p>If you're spending more than 2-3 hours per week on bookkeeping, chasing payments, or reconciling accounts, that's time taken away from building your business.</p>
+        </div>
+      </div>
+
+      <h2 id="differences">CFO vs Senior Accountant vs Fractional CFO</h2>
+
+      <p>These roles sound similar but serve very different purposes. Understanding the distinction helps you hire for what you actually need.</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Primary Focus</th>
+            <th>Best For</th>
+            <th>Typical Cost (MY)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="role-name">Bookkeeper</td>
+            <td>Recording transactions, basic reconciliation</td>
+            <td>Early stage, &lt;50 transactions/month</td>
+            <td class="price">RM1,500-3,000/mo</td>
+          </tr>
+          <tr>
+            <td class="role-name">Senior Accountant</td>
+            <td>Financial reporting, compliance, tax prep</td>
+            <td>Growing companies, complex transactions</td>
+            <td class="price">RM6,000-12,000/mo</td>
+          </tr>
+          <tr>
+            <td class="role-name">Fractional CFO</td>
+            <td>Strategy, fundraising, financial planning</td>
+            <td>Startups needing CFO expertise part-time</td>
+            <td class="price">RM8,000-20,000/mo</td>
+          </tr>
+          <tr>
+            <td class="role-name">Full-time CFO</td>
+            <td>Complete financial leadership</td>
+            <td>Series B+, complex operations</td>
+            <td class="price">RM25,000-60,000/mo</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="info-box tip">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-lightbulb"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>The Sweet Spot for Most Startups</h4>
+          <p>Pre-Series A startups usually benefit most from an outsourced accounting firm plus a fractional CFO for strategic guidance. This gives you both execution and strategy without full-time costs.</p>
+        </div>
+      </div>
+
+      <h2 id="cfo-role">What a CFO Actually Does</h2>
+
+      <p>A common misconception: the CFO is just a senior accountant. In reality, accounting and CFO work are fundamentally different:</p>
+
+      <h3>Accounting (Backward-looking)</h3>
+      <ul>
+        <li>Recording what happened</li>
+        <li>Ensuring accuracy and compliance</li>
+        <li>Preparing financial statements</li>
+        <li>Filing taxes</li>
+      </ul>
+
+      <h3>CFO Work (Forward-looking)</h3>
+      <ul>
+        <li>Financial planning and forecasting</li>
+        <li>Cash flow management and runway planning</li>
+        <li>Fundraising strategy and investor relations</li>
+        <li>Pricing and unit economics analysis</li>
+        <li>Board reporting and strategic decision support</li>
+        <li>Financial due diligence for M&A</li>
+        <li>Building financial systems and processes</li>
+      </ul>
+
+      <blockquote>
+        "An accountant tells you what happened. A CFO tells you what it means and what to do about it."
+      </blockquote>
+
+      <p>Your CFO is a strategic partner who uses financial data to drive business decisions. They should be in product meetings, sales discussions, and strategy sessions—not just finance meetings.</p>
+
+      <h2 id="costs">Cost Expectations in Malaysia</h2>
+
+      <p>Let's talk real numbers for the Malaysian market:</p>
+
+      <h3>Full-time CFO Salary</h3>
+      <p>A qualified CFO with startup experience typically costs:</p>
+      <ul>
+        <li><strong>Junior CFO (3-5 years experience):</strong> RM15,000-25,000/month</li>
+        <li><strong>Mid-level CFO (5-10 years):</strong> RM25,000-40,000/month</li>
+        <li><strong>Senior CFO (10+ years, Big 4 background):</strong> RM40,000-60,000/month</li>
+      </ul>
+      <p>Add 15-20% for EPF, SOCSO, and other statutory contributions.</p>
+
+      <h3>Fractional CFO</h3>
+      <p>Fractional or part-time CFO arrangements typically range from:</p>
+      <ul>
+        <li><strong>Light engagement (4-8 hours/month):</strong> RM5,000-10,000/month</li>
+        <li><strong>Standard engagement (2-3 days/month):</strong> RM10,000-20,000/month</li>
+        <li><strong>Heavy engagement (1 day/week):</strong> RM15,000-30,000/month</li>
+      </ul>
+
+      <div class="info-box important">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-calculator"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>The ROI Calculation</h4>
+          <p>A good fractional CFO at RM15,000/month who helps you raise RM2M at better terms, reduces tax by RM50K annually, or prevents a cash crisis is worth many multiples of their fee.</p>
+        </div>
+      </div>
+
+      <h2 id="decision">Making the Decision</h2>
+
+      <p>Here's a simple framework for deciding what you need:</p>
+
+      <h3>Stick with Bookkeeper/Junior Accountant if:</h3>
+      <ul>
+        <li>Revenue under RM1M annually</li>
+        <li>Simple business model (1-2 revenue streams)</li>
+        <li>Not planning to raise external funding</li>
+        <li>No complex compliance requirements</li>
+      </ul>
+
+      <h3>Hire a Senior Accountant or Outsourced Firm if:</h3>
+      <ul>
+        <li>Revenue RM1-5M annually</li>
+        <li>Multiple revenue streams or pricing models</li>
+        <li>SST registered or approaching threshold</li>
+        <li>Need reliable monthly reporting</li>
+      </ul>
+
+      <h3>Add a Fractional CFO if:</h3>
+      <ul>
+        <li>Actively fundraising or planning to</li>
+        <li>Need help with financial strategy and planning</li>
+        <li>Complex cash flow management</li>
+        <li>Want board-ready financial reporting</li>
+        <li>Considering M&A or major strategic decisions</li>
+      </ul>
+
+      <h3>Hire a Full-time CFO if:</h3>
+      <ul>
+        <li>Revenue above RM10M annually</li>
+        <li>Post-Series A with board reporting requirements</li>
+        <li>Complex operations (multiple entities, international)</li>
+        <li>Financial function needs daily leadership</li>
+      </ul>
+
+      <div class="info-box warning">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-warning"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>Don't Skip Steps</h4>
+          <p>A CFO without a solid accounting foundation is building on sand. Make sure your bookkeeping and basic accounting are solid before adding strategic finance leadership.</p>
+        </div>
+      </div>
+
+      <p>The right financial support is an investment, not an expense. When you find yourself unable to answer basic questions about your business's financial health, or when financial tasks are consuming your founder time, it's time to get help. Start with what you need now, but build relationships that can grow with you.</p>
+
+      <p>The goal isn't to have the biggest finance team—it's to have the financial clarity you need to make great decisions, raise capital when needed, and build a sustainable business.</p>
+
+      <!-- References -->
+      <div class="references">
+        <h4 class="references-title">References & Further Reading</h4>
+        <div class="references-list">
+          <a href="https://www.jobstreet.com.my/career-advice/role/chief-financial-officer" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-chart-line-up"></i>
+            </div>
+            <div class="reference-content">
+              <h5>CFO Salary Guide Malaysia</h5>
+              <p>JobStreet Malaysia - CFO compensation benchmarks</p>
+            </div>
+          </a>
+          <a href="https://www.mia.org.my" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-certificate"></i>
+            </div>
+            <div class="reference-content">
+              <h5>Malaysian Institute of Accountants</h5>
+              <p>Professional qualifications and standards</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Author Card -->
+      <div class="author-card">
+        <div class="author-card-avatar">AH</div>
+        <div class="author-card-content">
+          <h4>Amjad & Hazli</h4>
+          <p class="role">AI-Powered Accounting for Startups</p>
+          <p>We provide fractional finance support for Malaysian startups—from bookkeeping to CFO-level strategy. Our team combines Big 4 training with startup experience.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Share Buttons -->
+    <aside class="article-sidebar-right">
+      <div class="share-buttons">
+        <span class="share-title">Share</span>
+        <button class="share-btn" title="Share on LinkedIn">
+          <i class="ph ph-linkedin-logo"></i>
+        </button>
+        <button class="share-btn" title="Share on Twitter">
+          <i class="ph ph-x-logo"></i>
+        </button>
+        <button class="share-btn" title="Copy link">
+          <i class="ph ph-link"></i>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Related Articles -->
+  <section class="related-section">
+    <div class="container">
+      <h2 class="related-title">Related Articles</h2>
+      <div class="related-grid">
+        <a href="financial-hygiene.html" class="related-card">
+          <span class="related-card-category">Startup Finance</span>
+          <h3 class="related-card-title">The Founder's Guide to Financial Hygiene</h3>
+          <span class="related-card-meta">8 min read</span>
+        </a>
+        <a href="investor-ready-books.html" class="related-card">
+          <span class="related-card-category">Fundraising</span>
+          <h3 class="related-card-title">Getting Your Books Investor-Ready</h3>
+          <span class="related-card-meta">6 min read</span>
+        </a>
+        <a href="automating-expenses.html" class="related-card">
+          <span class="related-card-category">Operations</span>
+          <h3 class="related-card-title">Automating Your Expense Reports</h3>
+          <span class="related-card-meta">4 min read</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title">Not sure what you need?</h2>
+      <p class="cta-subtitle">We'll assess your current setup and recommend the right level of finance support for your stage.</p>
+      <a href="../index.html#pricing" class="cta-btn">
+        <i class="ph ph-handshake"></i>
+        Get a free assessment
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <span class="footer-brand">Amjad & Hazli</span>
+        <ul class="footer-links">
+          <li><a href="../index.html#services" class="footer-link">Services</a></li>
+          <li><a href="../index.html#pricing" class="footer-link">Pricing</a></li>
+          <li><a href="../about.html" class="footer-link">About</a></li>
+          <li><a href="../resources.html" class="footer-link">Resources</a></li>
+          <li><a href="../blog.html" class="footer-link">Blog</a></li>
+        </ul>
+        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Reading Progress Bar
+    window.addEventListener('scroll', () => {
+      const article = document.querySelector('.article-body');
+      const progressBar = document.getElementById('progress-bar');
+
+      const articleTop = article.offsetTop;
+      const articleHeight = article.offsetHeight;
+      const windowHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+
+      const progress = Math.min(
+        Math.max((scrollY - articleTop + windowHeight * 0.3) / articleHeight * 100, 0),
+        100
+      );
+
+      progressBar.style.width = progress + '%';
+    });
+
+    // Active TOC link highlighting
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sections = document.querySelectorAll('.article-body h2[id]');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 150) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

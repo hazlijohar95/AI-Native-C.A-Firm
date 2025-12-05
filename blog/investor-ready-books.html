@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Your Books Investor-Ready | Amjad & Hazli</title>
+  <meta name="description" content="What VCs actually check during due diligence and how to prepare months in advance. A practical guide to getting your financial records ready for fundraising.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --color-primary: #253FF6;
+      --color-primary-hover: #1E35D9;
+      --color-primary-50: #EEF1FF;
+      --color-primary-100: #E0E5FF;
+      --color-primary-200: #C7CEFF;
+      --color-black: #0A0A0F;
+      --color-gray-900: #1F1F23;
+      --color-gray-700: #404047;
+      --color-gray-600: #6B6B76;
+      --color-gray-400: #AEAEB8;
+      --color-gray-300: #D1D1D8;
+      --color-gray-200: #E4E4E9;
+      --color-gray-100: #F0F0F3;
+      --color-gray-50: #F8F8FA;
+      --color-white: #FFFFFF;
+      --color-text-primary: var(--color-black);
+      --color-text-secondary: var(--color-gray-900);
+      --color-text-tertiary: var(--color-gray-600);
+      --color-border-light: #EBEBEF;
+      --color-success: #10B981;
+      --color-success-light: #D1FAE5;
+      --color-warning: #F59E0B;
+      --color-warning-light: #FEF3C7;
+      --color-danger: #EF4444;
+      --color-danger-light: #FEE2E2;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'DM Mono', 'SF Mono', monospace;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+      --container-max: 1200px;
+      --article-max: 720px;
+      --container-padding: 24px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--color-text-tertiary);
+      background: var(--color-white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-padding);
+    }
+
+    /* Reading Progress Bar */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--color-gray-100);
+      z-index: 1000;
+    }
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary) 0%, #5B6EF9 100%);
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 3px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-light);
+      z-index: 100;
+      padding: var(--space-4) 0;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: var(--space-8); list-style: none; }
+    .nav-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover { color: var(--color-primary); }
+    .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 0 var(--space-4);
+      height: 36px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
+    .btn-secondary { background: var(--color-white); color: var(--color-text-primary); border: 1px solid var(--color-gray-300); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Article Header */
+    .article-header {
+      padding: var(--space-16) 0 var(--space-12);
+      text-align: center;
+      background: linear-gradient(180deg, #FAFBFF 0%, #FFFFFF 100%);
+    }
+    .article-header .container {
+      max-width: 900px;
+    }
+    .article-category {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      background: var(--color-primary-50);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: var(--space-5);
+    }
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.15;
+      margin-bottom: var(--space-6);
+      letter-spacing: -0.5px;
+    }
+    .article-excerpt {
+      font-size: 20px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto var(--space-8);
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .article-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+    }
+    .article-meta-item i {
+      font-size: 18px;
+      color: var(--color-gray-400);
+    }
+    .article-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-primary);
+    }
+    .author-name {
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    /* Article Content Layout */
+    .article-wrapper {
+      display: grid;
+      grid-template-columns: 1fr minmax(auto, var(--article-max)) 1fr;
+      gap: var(--space-12);
+      padding: var(--space-12) var(--container-padding);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Table of Contents */
+    .toc {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .toc-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-4);
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .toc-link {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      padding: var(--space-2) 0;
+      padding-left: var(--space-4);
+      border-left: 2px solid var(--color-gray-200);
+      transition: all 0.2s ease;
+      display: block;
+    }
+    .toc-link:hover,
+    .toc-link.active {
+      color: var(--color-primary);
+      border-left-color: var(--color-primary);
+    }
+
+    /* Article Body */
+    .article-body {
+      font-size: 18px;
+      line-height: 1.85;
+      color: var(--color-gray-700);
+    }
+    .article-body h2 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-6);
+      line-height: 1.3;
+      scroll-margin-top: 100px;
+    }
+    .article-body h3 {
+      font-family: var(--font-body);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-4);
+      line-height: 1.4;
+    }
+    .article-body p {
+      margin-bottom: var(--space-6);
+    }
+    .article-body p:first-of-type {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+    }
+    .article-body a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .article-body a:hover {
+      text-decoration-color: var(--color-primary-200);
+    }
+    .article-body ul, .article-body ol {
+      margin-bottom: var(--space-6);
+      padding-left: var(--space-6);
+    }
+    .article-body li {
+      margin-bottom: var(--space-3);
+    }
+    .article-body strong {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    /* Info Box */
+    .info-box {
+      padding: var(--space-6);
+      border-radius: 16px;
+      margin: var(--space-8) 0;
+      display: flex;
+      gap: var(--space-4);
+    }
+    .info-box.tip {
+      background: var(--color-success-light);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .info-box.warning {
+      background: var(--color-warning-light);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .info-box.important {
+      background: var(--color-primary-50);
+      border: 1px solid var(--color-primary-100);
+    }
+    .info-box.danger {
+      background: var(--color-danger-light);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .info-box-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .info-box.tip .info-box-icon { background: var(--color-success); color: white; }
+    .info-box.warning .info-box-icon { background: var(--color-warning); color: white; }
+    .info-box.important .info-box-icon { background: var(--color-primary); color: white; }
+    .info-box.danger .info-box-icon { background: var(--color-danger); color: white; }
+    .info-box-icon i { font-size: 20px; }
+    .info-box-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .info-box-content p {
+      font-size: 15px;
+      margin: 0;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Blockquote */
+    .article-body blockquote {
+      border-left: 4px solid var(--color-primary);
+      padding-left: var(--space-6);
+      margin: var(--space-8) 0;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Code/Technical Terms */
+    .article-body code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--color-gray-100);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--color-text-secondary);
+    }
+
+    /* Checklist */
+    .checklist {
+      background: var(--color-gray-50);
+      border-radius: 16px;
+      padding: var(--space-6);
+      margin: var(--space-8) 0;
+    }
+    .checklist-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .checklist-title i {
+      color: var(--color-primary);
+    }
+    .checklist ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-gray-200);
+      font-size: 15px;
+      color: var(--color-text-secondary);
+    }
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+    .checklist li i {
+      color: var(--color-success);
+      font-size: 18px;
+      margin-top: 2px;
+    }
+
+    /* Red Flag Card */
+    .red-flag {
+      background: var(--color-danger-light);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 16px;
+      padding: var(--space-5);
+      margin: var(--space-4) 0;
+      display: flex;
+      gap: var(--space-3);
+    }
+    .red-flag i {
+      color: var(--color-danger);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .red-flag-content {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+    }
+    .red-flag-content strong {
+      display: block;
+      color: var(--color-danger);
+      margin-bottom: 4px;
+    }
+
+    /* References */
+    .references {
+      margin-top: var(--space-16);
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--color-gray-200);
+    }
+    .references-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-5);
+    }
+    .references-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .reference-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-gray-50);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .reference-item:hover {
+      background: var(--color-primary-50);
+    }
+    .reference-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .reference-icon i {
+      font-size: 18px;
+      color: var(--color-gray-600);
+    }
+    .reference-content h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .reference-content p {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      margin: 0;
+    }
+
+    /* Right Sidebar */
+    .article-sidebar-right {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .share-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .share-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-2);
+    }
+    .share-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--color-gray-50);
+      border: 1px solid var(--color-gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-tertiary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .share-btn:hover {
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-200);
+      color: var(--color-primary);
+    }
+
+    /* Author Card */
+    .author-card {
+      background: var(--color-gray-50);
+      border-radius: 20px;
+      padding: var(--space-8);
+      margin-top: var(--space-16);
+      display: flex;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    .author-card-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .author-card-content h4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .author-card-content .role {
+      font-size: 14px;
+      color: var(--color-primary);
+      margin-bottom: var(--space-2);
+    }
+    .author-card-content p {
+      font-size: 15px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Related Articles */
+    .related-section {
+      padding: var(--space-20) 0;
+      background: var(--color-gray-50);
+    }
+    .related-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    .related-card {
+      background: var(--color-white);
+      border-radius: 16px;
+      padding: var(--space-6);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid var(--color-gray-100);
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    }
+    .related-card-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-meta {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #1E3AE5 0%, #4F5BD5 50%, #253FF6 100%);
+      padding: var(--space-20) 0;
+      text-align: center;
+    }
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 500;
+      color: white;
+      margin-bottom: var(--space-4);
+    }
+    .cta-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: var(--space-8);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-8);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      padding: var(--space-16) 0;
+      background: var(--color-white);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+    .footer-links { display: flex; gap: var(--space-6); list-style: none; }
+    .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
+    .footer-link:hover { color: var(--color-primary); }
+    .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .article-wrapper {
+        grid-template-columns: 1fr;
+        max-width: var(--article-max);
+      }
+      .toc, .article-sidebar-right {
+        display: none;
+      }
+    }
+    @media (max-width: 900px) {
+      .related-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-title { font-size: 36px; }
+      .article-excerpt { font-size: 18px; }
+      .article-body { font-size: 17px; }
+      .article-body h2 { font-size: 26px; }
+      .author-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-content { flex-direction: column; gap: var(--space-4); text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="../index.html" class="nav-brand">Amjad & Hazli</a>
+      <ul class="nav-links">
+        <li><a href="../index.html#services" class="nav-link">Services</a></li>
+        <li><a href="../about.html" class="nav-link">About</a></li>
+        <li><a href="../index.html#testimonials" class="nav-link">Clients</a></li>
+        <li><a href="../resources.html" class="nav-link">Resources</a></li>
+        <li><a href="../blog.html" class="nav-link">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn btn-secondary">Client Portal</button>
+        <a href="../index.html#pricing" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <div class="container">
+      <span class="article-category">Fundraising</span>
+      <h1 class="article-title">Getting Your Books Investor-Ready</h1>
+      <p class="article-excerpt">VCs will dig into your financials during due diligence. Messy books kill deals. Here's exactly what investors look for and how to prepare months in advance.</p>
+      <div class="article-meta">
+        <div class="article-author">
+          <div class="author-avatar">AH</div>
+          <span class="author-name">Amjad & Hazli Team</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-calendar-blank"></i>
+          <span>December 2024</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-clock"></i>
+          <span>6 min read</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <div class="article-wrapper">
+    <!-- Table of Contents -->
+    <aside class="toc">
+      <h3 class="toc-title">Contents</h3>
+      <ul class="toc-list">
+        <li><a href="#what-vcs-check" class="toc-link">What VCs Actually Check</a></li>
+        <li><a href="#red-flags" class="toc-link">Common Red Flags</a></li>
+        <li><a href="#timeline" class="toc-link">6-Month Prep Timeline</a></li>
+        <li><a href="#documents" class="toc-link">Documents to Prepare</a></li>
+        <li><a href="#tips" class="toc-link">Pro Tips</a></li>
+      </ul>
+    </aside>
+
+    <!-- Article Body -->
+    <article class="article-body">
+      <p>You've nailed the pitch, the VC is excited, and they want to proceed. Then comes due diligence—and suddenly your messy financial records become the thing standing between you and that term sheet. We've seen promising deals fall apart because founders couldn't produce clean financials.</p>
+
+      <p>The good news: preparing for due diligence doesn't require heroic effort if you start early. Here's what VCs actually look at and how to make sure you pass with flying colors.</p>
+
+      <h2 id="what-vcs-check">What VCs Actually Check</h2>
+
+      <p>Financial due diligence isn't just about verifying your numbers match what you said in the pitch. Investors are looking for patterns that reveal how you run the business:</p>
+
+      <h3>Revenue Recognition</h3>
+      <p>VCs want to understand how you book revenue. Do you recognize it when the contract is signed, when the service is delivered, or when cash is collected? Is it consistent month over month? Startups sometimes accidentally inflate numbers by recognizing revenue too early—investors will catch this.</p>
+
+      <h3>Unit Economics</h3>
+      <p>They'll calculate your true customer acquisition cost (CAC) and lifetime value (LTV). This means they need clean data on:</p>
+      <ul>
+        <li>Marketing spend by channel</li>
+        <li>Sales team costs</li>
+        <li>Customer churn rates</li>
+        <li>Revenue per customer over time</li>
+      </ul>
+
+      <h3>Burn Rate & Runway</h3>
+      <p>How fast are you spending? How many months until you run out? Investors want to see that you understand these numbers and that they're consistent with what you told them.</p>
+
+      <h3>Cap Table Cleanliness</h3>
+      <p>Is your cap table accurate? Are there any unusual arrangements, undisclosed shareholders, or messy convertible notes? A complicated cap table can delay or kill a deal.</p>
+
+      <div class="info-box important">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-magnifying-glass"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>The Trust Factor</h4>
+          <p>Due diligence isn't just about the numbers. It's about whether the VC can trust you. If your books are messy, they'll wonder what else is messy. Clean books signal professional management.</p>
+        </div>
+      </div>
+
+      <h2 id="red-flags">Red Flags That Kill Deals</h2>
+
+      <p>These issues don't just slow down due diligence—they can kill deals entirely:</p>
+
+      <div class="red-flag">
+        <i class="ph-bold ph-x-circle"></i>
+        <div class="red-flag-content">
+          <strong>Numbers don't reconcile</strong>
+          Revenue in your pitch deck doesn't match revenue in your P&L which doesn't match your bank statements. This destroys credibility instantly.
+        </div>
+      </div>
+
+      <div class="red-flag">
+        <i class="ph-bold ph-x-circle"></i>
+        <div class="red-flag-content">
+          <strong>Missing documentation</strong>
+          Can't produce contracts for your largest customers. No documentation for major expenses. This suggests poor record-keeping or worse.
+        </div>
+      </div>
+
+      <div class="red-flag">
+        <i class="ph-bold ph-x-circle"></i>
+        <div class="red-flag-content">
+          <strong>Co-mingled personal and business expenses</strong>
+          Founder's personal expenses running through the company. Personal car, personal trips, family meals. VCs hate this—it suggests poor governance.
+        </div>
+      </div>
+
+      <div class="red-flag">
+        <i class="ph-bold ph-x-circle"></i>
+        <div class="red-flag-content">
+          <strong>Related party transactions</strong>
+          Payments to family members or companies owned by founders without proper documentation. Even if legitimate, these need clear paper trails.
+        </div>
+      </div>
+
+      <div class="red-flag">
+        <i class="ph-bold ph-x-circle"></i>
+        <div class="red-flag-content">
+          <strong>Tax non-compliance</strong>
+          Late filings, unpaid taxes, or penalties. This creates liability that could transfer to new investors.
+        </div>
+      </div>
+
+      <div class="red-flag">
+        <i class="ph-bold ph-x-circle"></i>
+        <div class="red-flag-content">
+          <strong>Outstanding legal issues</strong>
+          Unresolved disputes with former employees, vendors, or customers. These need to be disclosed and ideally resolved.
+        </div>
+      </div>
+
+      <h2 id="timeline">6-Month Preparation Timeline</h2>
+
+      <p>If you're planning to raise, start preparation at least six months in advance:</p>
+
+      <h3>Months 6-5: Foundation</h3>
+      <ul>
+        <li>Get on proper accounting software (Xero/QuickBooks) if not already</li>
+        <li>Clean up historical transactions and categorization</li>
+        <li>Set up monthly close process</li>
+        <li>Engage an accountant if you don't have one</li>
+      </ul>
+
+      <h3>Months 4-3: Documentation</h3>
+      <ul>
+        <li>Collect and organize all customer contracts</li>
+        <li>Gather employment agreements and option grants</li>
+        <li>Compile corporate documents (Form 9, Form 24, constitution)</li>
+        <li>Create cap table in proper software (Carta, Pulley, or spreadsheet)</li>
+      </ul>
+
+      <h3>Months 2-1: Polish</h3>
+      <ul>
+        <li>Run a mock due diligence with your accountant</li>
+        <li>Create a financial model with projections</li>
+        <li>Prepare monthly management reporting package</li>
+        <li>Resolve any outstanding compliance issues</li>
+      </ul>
+
+      <div class="info-box tip">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-lightbulb"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>Set Up a Data Room Early</h4>
+          <p>Create a secure folder (Google Drive, Dropbox) with all your key documents organized by category. When a VC asks for due diligence materials, you can share access immediately.</p>
+        </div>
+      </div>
+
+      <h2 id="documents">Documents to Have Ready</h2>
+
+      <div class="checklist">
+        <h4 class="checklist-title">
+          <i class="ph-duotone ph-folder-open"></i>
+          Financial Documents
+        </h4>
+        <ul>
+          <li><i class="ph-bold ph-check-circle"></i> Monthly P&L statements (last 24 months)</li>
+          <li><i class="ph-bold ph-check-circle"></i> Balance sheet (current and historical)</li>
+          <li><i class="ph-bold ph-check-circle"></i> Cash flow statement</li>
+          <li><i class="ph-bold ph-check-circle"></i> Bank statements (last 12 months)</li>
+          <li><i class="ph-bold ph-check-circle"></i> Accounts receivable aging report</li>
+          <li><i class="ph-bold ph-check-circle"></i> Accounts payable aging report</li>
+          <li><i class="ph-bold ph-check-circle"></i> Revenue by customer breakdown</li>
+          <li><i class="ph-bold ph-check-circle"></i> Monthly recurring revenue (MRR) history</li>
+        </ul>
+      </div>
+
+      <div class="checklist">
+        <h4 class="checklist-title">
+          <i class="ph-duotone ph-file-text"></i>
+          Corporate Documents
+        </h4>
+        <ul>
+          <li><i class="ph-bold ph-check-circle"></i> Certificate of incorporation (Form 9)</li>
+          <li><i class="ph-bold ph-check-circle"></i> Company constitution</li>
+          <li><i class="ph-bold ph-check-circle"></i> Shareholder list (Form 24)</li>
+          <li><i class="ph-bold ph-check-circle"></i> Board resolutions</li>
+          <li><i class="ph-bold ph-check-circle"></i> Previous investment agreements (if any)</li>
+          <li><i class="ph-bold ph-check-circle"></i> Cap table with all option grants</li>
+        </ul>
+      </div>
+
+      <div class="checklist">
+        <h4 class="checklist-title">
+          <i class="ph-duotone ph-users"></i>
+          HR & Contracts
+        </h4>
+        <ul>
+          <li><i class="ph-bold ph-check-circle"></i> Employment agreements for key staff</li>
+          <li><i class="ph-bold ph-check-circle"></i> ESOP scheme documentation</li>
+          <li><i class="ph-bold ph-check-circle"></i> Contractor agreements</li>
+          <li><i class="ph-bold ph-check-circle"></i> Key customer contracts</li>
+          <li><i class="ph-bold ph-check-circle"></i> Key vendor/supplier contracts</li>
+        </ul>
+      </div>
+
+      <div class="checklist">
+        <h4 class="checklist-title">
+          <i class="ph-duotone ph-file-search"></i>
+          Compliance
+        </h4>
+        <ul>
+          <li><i class="ph-bold ph-check-circle"></i> Tax filings (Form C, Form E)</li>
+          <li><i class="ph-bold ph-check-circle"></i> SST registration and filings (if applicable)</li>
+          <li><i class="ph-bold ph-check-circle"></i> EPF, SOCSO, EIS compliance records</li>
+          <li><i class="ph-bold ph-check-circle"></i> Annual returns filed with SSM</li>
+          <li><i class="ph-bold ph-check-circle"></i> Any licenses or permits</li>
+        </ul>
+      </div>
+
+      <h2 id="tips">Pro Tips from the Trenches</h2>
+
+      <ul>
+        <li><strong>Consistency is key:</strong> Make sure the numbers in your pitch deck, financial model, and accounting records all match. VCs will cross-reference.</li>
+        <li><strong>Explain anomalies proactively:</strong> Had a weird quarter? Lost a big customer? Explain it in a memo before they ask. This shows self-awareness.</li>
+        <li><strong>Don't hide bad news:</strong> VCs will find it. Better they hear it from you with context than discover it themselves.</li>
+        <li><strong>Have a financial narrative:</strong> Be able to walk through your financials and explain the story. Why did revenue spike in March? Why did burn increase in Q3?</li>
+        <li><strong>Know your numbers cold:</strong> If you can't answer basic questions about your financials without looking them up, investors worry about how closely you're managing the business.</li>
+      </ul>
+
+      <blockquote>
+        "The due diligence process doesn't start when the VC says they're interested. It starts the day you incorporate."
+      </blockquote>
+
+      <p>Investor-ready books aren't just about passing due diligence—they're about running a better business. The discipline required to maintain clean financial records is the same discipline required to build a successful company. Start early, stay consistent, and when that term sheet comes, you'll be ready.</p>
+
+      <!-- References -->
+      <div class="references">
+        <h4 class="references-title">Further Reading</h4>
+        <div class="references-list">
+          <a href="https://www.cradle.com.my" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-rocket-launch"></i>
+            </div>
+            <div class="reference-content">
+              <h5>Cradle Fund</h5>
+              <p>Malaysian government fund for tech startups - grant and investment resources</p>
+            </div>
+          </a>
+          <a href="https://www.mavcap.com" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-chart-line-up"></i>
+            </div>
+            <div class="reference-content">
+              <h5>MAVCAP</h5>
+              <p>Malaysia Venture Capital Management - VC investment guidelines</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Author Card -->
+      <div class="author-card">
+        <div class="author-card-avatar">AH</div>
+        <div class="author-card-content">
+          <h4>Amjad & Hazli</h4>
+          <p class="role">AI-Powered Accounting for Startups</p>
+          <p>We've helped dozens of Malaysian startups prepare for fundraising. From cleaning up historical books to building investor-ready reporting, we know what VCs want to see.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Share Buttons -->
+    <aside class="article-sidebar-right">
+      <div class="share-buttons">
+        <span class="share-title">Share</span>
+        <button class="share-btn" title="Share on LinkedIn">
+          <i class="ph ph-linkedin-logo"></i>
+        </button>
+        <button class="share-btn" title="Share on Twitter">
+          <i class="ph ph-x-logo"></i>
+        </button>
+        <button class="share-btn" title="Copy link">
+          <i class="ph ph-link"></i>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Related Articles -->
+  <section class="related-section">
+    <div class="container">
+      <h2 class="related-title">Related Articles</h2>
+      <div class="related-grid">
+        <a href="financial-hygiene.html" class="related-card">
+          <span class="related-card-category">Startup Finance</span>
+          <h3 class="related-card-title">The Founder's Guide to Financial Hygiene</h3>
+          <span class="related-card-meta">8 min read</span>
+        </a>
+        <a href="when-to-hire-cfo.html" class="related-card">
+          <span class="related-card-category">Finance</span>
+          <h3 class="related-card-title">When to Hire Your First CFO</h3>
+          <span class="related-card-meta">6 min read</span>
+        </a>
+        <a href="tech-tax-incentives.html" class="related-card">
+          <span class="related-card-category">Tax</span>
+          <h3 class="related-card-title">Tax Incentives for Malaysian Tech Companies</h3>
+          <span class="related-card-meta">6 min read</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title">Planning to raise?</h2>
+      <p class="cta-subtitle">Let us help you get your financials investor-ready. We'll clean up your books and prepare everything VCs want to see.</p>
+      <a href="../index.html#pricing" class="cta-btn">
+        <i class="ph ph-handshake"></i>
+        Get fundraising ready
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <span class="footer-brand">Amjad & Hazli</span>
+        <ul class="footer-links">
+          <li><a href="../index.html#services" class="footer-link">Services</a></li>
+          <li><a href="../index.html#pricing" class="footer-link">Pricing</a></li>
+          <li><a href="../about.html" class="footer-link">About</a></li>
+          <li><a href="../resources.html" class="footer-link">Resources</a></li>
+          <li><a href="../blog.html" class="footer-link">Blog</a></li>
+        </ul>
+        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Reading Progress Bar
+    window.addEventListener('scroll', () => {
+      const article = document.querySelector('.article-body');
+      const progressBar = document.getElementById('progress-bar');
+
+      const articleTop = article.offsetTop;
+      const articleHeight = article.offsetHeight;
+      const windowHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+
+      const progress = Math.min(
+        Math.max((scrollY - articleTop + windowHeight * 0.3) / articleHeight * 100, 0),
+        100
+      );
+
+      progressBar.style.width = progress + '%';
+    });
+
+    // Active TOC link highlighting
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sections = document.querySelectorAll('.article-body h2[id]');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 150) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

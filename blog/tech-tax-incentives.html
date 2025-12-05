@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tax Incentives for Malaysian Tech Companies | Amjad & Hazli</title>
+  <meta name="description" content="MSC status, Pioneer Status, R&D deductions, and more. A complete guide to tax incentives available for Malaysian tech startups—and how to actually get them.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --color-primary: #253FF6;
+      --color-primary-hover: #1E35D9;
+      --color-primary-50: #EEF1FF;
+      --color-primary-100: #E0E5FF;
+      --color-primary-200: #C7CEFF;
+      --color-black: #0A0A0F;
+      --color-gray-900: #1F1F23;
+      --color-gray-700: #404047;
+      --color-gray-600: #6B6B76;
+      --color-gray-400: #AEAEB8;
+      --color-gray-300: #D1D1D8;
+      --color-gray-200: #E4E4E9;
+      --color-gray-100: #F0F0F3;
+      --color-gray-50: #F8F8FA;
+      --color-white: #FFFFFF;
+      --color-text-primary: var(--color-black);
+      --color-text-secondary: var(--color-gray-900);
+      --color-text-tertiary: var(--color-gray-600);
+      --color-border-light: #EBEBEF;
+      --color-success: #10B981;
+      --color-success-light: #D1FAE5;
+      --color-warning: #F59E0B;
+      --color-warning-light: #FEF3C7;
+      --color-danger: #EF4444;
+      --color-danger-light: #FEE2E2;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'DM Mono', 'SF Mono', monospace;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+      --container-max: 1200px;
+      --article-max: 720px;
+      --container-padding: 24px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--color-text-tertiary);
+      background: var(--color-white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-padding);
+    }
+
+    /* Reading Progress Bar */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--color-gray-100);
+      z-index: 1000;
+    }
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary) 0%, #5B6EF9 100%);
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 3px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-light);
+      z-index: 100;
+      padding: var(--space-4) 0;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: var(--space-8); list-style: none; }
+    .nav-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover { color: var(--color-primary); }
+    .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 0 var(--space-4);
+      height: 36px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
+    .btn-secondary { background: var(--color-white); color: var(--color-text-primary); border: 1px solid var(--color-gray-300); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Article Header */
+    .article-header {
+      padding: var(--space-16) 0 var(--space-12);
+      text-align: center;
+      background: linear-gradient(180deg, #FAFBFF 0%, #FFFFFF 100%);
+    }
+    .article-header .container {
+      max-width: 900px;
+    }
+    .article-category {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      background: var(--color-primary-50);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: var(--space-5);
+    }
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.15;
+      margin-bottom: var(--space-6);
+      letter-spacing: -0.5px;
+    }
+    .article-excerpt {
+      font-size: 20px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto var(--space-8);
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .article-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+    }
+    .article-meta-item i {
+      font-size: 18px;
+      color: var(--color-gray-400);
+    }
+    .article-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-primary);
+    }
+    .author-name {
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    /* Article Content Layout */
+    .article-wrapper {
+      display: grid;
+      grid-template-columns: 1fr minmax(auto, var(--article-max)) 1fr;
+      gap: var(--space-12);
+      padding: var(--space-12) var(--container-padding);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Table of Contents */
+    .toc {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .toc-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-4);
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .toc-link {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      padding: var(--space-2) 0;
+      padding-left: var(--space-4);
+      border-left: 2px solid var(--color-gray-200);
+      transition: all 0.2s ease;
+      display: block;
+    }
+    .toc-link:hover,
+    .toc-link.active {
+      color: var(--color-primary);
+      border-left-color: var(--color-primary);
+    }
+
+    /* Article Body */
+    .article-body {
+      font-size: 18px;
+      line-height: 1.85;
+      color: var(--color-gray-700);
+    }
+    .article-body h2 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-top: var(--space-16);
+      margin-bottom: var(--space-6);
+      line-height: 1.3;
+      scroll-margin-top: 100px;
+    }
+    .article-body h3 {
+      font-family: var(--font-body);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-4);
+      line-height: 1.4;
+    }
+    .article-body p {
+      margin-bottom: var(--space-6);
+    }
+    .article-body p:first-of-type {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+    }
+    .article-body a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .article-body a:hover {
+      text-decoration-color: var(--color-primary-200);
+    }
+    .article-body ul, .article-body ol {
+      margin-bottom: var(--space-6);
+      padding-left: var(--space-6);
+    }
+    .article-body li {
+      margin-bottom: var(--space-3);
+    }
+    .article-body strong {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    /* Info Box */
+    .info-box {
+      padding: var(--space-6);
+      border-radius: 16px;
+      margin: var(--space-8) 0;
+      display: flex;
+      gap: var(--space-4);
+    }
+    .info-box.tip {
+      background: var(--color-success-light);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .info-box.warning {
+      background: var(--color-warning-light);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .info-box.important {
+      background: var(--color-primary-50);
+      border: 1px solid var(--color-primary-100);
+    }
+    .info-box-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .info-box.tip .info-box-icon { background: var(--color-success); color: white; }
+    .info-box.warning .info-box-icon { background: var(--color-warning); color: white; }
+    .info-box.important .info-box-icon { background: var(--color-primary); color: white; }
+    .info-box-icon i { font-size: 20px; }
+    .info-box-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .info-box-content p {
+      font-size: 15px;
+      margin: 0;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Blockquote */
+    .article-body blockquote {
+      border-left: 4px solid var(--color-primary);
+      padding-left: var(--space-6);
+      margin: var(--space-8) 0;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Code/Technical Terms */
+    .article-body code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--color-gray-100);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--color-text-secondary);
+    }
+
+    /* Incentive Card */
+    .incentive-card {
+      background: linear-gradient(135deg, var(--color-primary-50) 0%, #F8F9FF 100%);
+      border: 1px solid var(--color-primary-100);
+      border-radius: 20px;
+      padding: var(--space-8);
+      margin: var(--space-8) 0;
+    }
+    .incentive-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+    .incentive-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--color-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+    }
+    .incentive-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .incentive-subtitle {
+      font-size: 14px;
+      color: var(--color-primary);
+    }
+    .incentive-body p {
+      font-size: 16px;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-4);
+    }
+    .incentive-benefits {
+      background: white;
+      border-radius: 12px;
+      padding: var(--space-5);
+      margin-top: var(--space-4);
+    }
+    .incentive-benefits h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-3);
+    }
+    .incentive-benefits ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .incentive-benefits li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      padding: var(--space-2) 0;
+    }
+    .incentive-benefits li i {
+      color: var(--color-success);
+      font-size: 16px;
+      margin-top: 2px;
+    }
+
+    /* References */
+    .references {
+      margin-top: var(--space-16);
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--color-gray-200);
+    }
+    .references-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-5);
+    }
+    .references-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .reference-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-gray-50);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .reference-item:hover {
+      background: var(--color-primary-50);
+    }
+    .reference-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .reference-icon i {
+      font-size: 18px;
+      color: var(--color-gray-600);
+    }
+    .reference-content h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .reference-content p {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      margin: 0;
+    }
+
+    /* Right Sidebar */
+    .article-sidebar-right {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .share-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .share-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-2);
+    }
+    .share-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--color-gray-50);
+      border: 1px solid var(--color-gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-tertiary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .share-btn:hover {
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-200);
+      color: var(--color-primary);
+    }
+
+    /* Author Card */
+    .author-card {
+      background: var(--color-gray-50);
+      border-radius: 20px;
+      padding: var(--space-8);
+      margin-top: var(--space-16);
+      display: flex;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    .author-card-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--color-primary-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .author-card-content h4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .author-card-content .role {
+      font-size: 14px;
+      color: var(--color-primary);
+      margin-bottom: var(--space-2);
+    }
+    .author-card-content p {
+      font-size: 15px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Related Articles */
+    .related-section {
+      padding: var(--space-20) 0;
+      background: var(--color-gray-50);
+    }
+    .related-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    .related-card {
+      background: var(--color-white);
+      border-radius: 16px;
+      padding: var(--space-6);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid var(--color-gray-100);
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    }
+    .related-card-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+      margin-bottom: var(--space-3);
+    }
+    .related-card-meta {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #1E3AE5 0%, #4F5BD5 50%, #253FF6 100%);
+      padding: var(--space-20) 0;
+      text-align: center;
+    }
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 500;
+      color: white;
+      margin-bottom: var(--space-4);
+    }
+    .cta-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: var(--space-8);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-8);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      padding: var(--space-16) 0;
+      background: var(--color-white);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+    .footer-links { display: flex; gap: var(--space-6); list-style: none; }
+    .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
+    .footer-link:hover { color: var(--color-primary); }
+    .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .article-wrapper {
+        grid-template-columns: 1fr;
+        max-width: var(--article-max);
+      }
+      .toc, .article-sidebar-right {
+        display: none;
+      }
+    }
+    @media (max-width: 900px) {
+      .related-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-title { font-size: 36px; }
+      .article-excerpt { font-size: 18px; }
+      .article-body { font-size: 17px; }
+      .article-body h2 { font-size: 26px; }
+      .author-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-content { flex-direction: column; gap: var(--space-4); text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="../index.html" class="nav-brand">Amjad & Hazli</a>
+      <ul class="nav-links">
+        <li><a href="../index.html#services" class="nav-link">Services</a></li>
+        <li><a href="../about.html" class="nav-link">About</a></li>
+        <li><a href="../index.html#testimonials" class="nav-link">Clients</a></li>
+        <li><a href="../resources.html" class="nav-link">Resources</a></li>
+        <li><a href="../blog.html" class="nav-link">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn btn-secondary">Client Portal</button>
+        <a href="../index.html#pricing" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <div class="container">
+      <span class="article-category">Tax</span>
+      <h1 class="article-title">Tax Incentives for Malaysian Tech Companies</h1>
+      <p class="article-excerpt">Malaysia offers generous tax incentives for tech companies. MSC status, Pioneer Status, R&D deductions—here's what's available and how to actually qualify.</p>
+      <div class="article-meta">
+        <div class="article-author">
+          <div class="author-avatar">AH</div>
+          <span class="author-name">Amjad & Hazli Team</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-calendar-blank"></i>
+          <span>December 2024</span>
+        </div>
+        <div class="article-meta-item">
+          <i class="ph ph-clock"></i>
+          <span>6 min read</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <div class="article-wrapper">
+    <!-- Table of Contents -->
+    <aside class="toc">
+      <h3 class="toc-title">Contents</h3>
+      <ul class="toc-list">
+        <li><a href="#msc-status" class="toc-link">MSC Malaysia Status</a></li>
+        <li><a href="#pioneer-status" class="toc-link">Pioneer Status</a></li>
+        <li><a href="#rd-deduction" class="toc-link">R&D Double Deduction</a></li>
+        <li><a href="#other-incentives" class="toc-link">Other Incentives</a></li>
+        <li><a href="#getting-started" class="toc-link">Getting Started</a></li>
+      </ul>
+    </aside>
+
+    <!-- Article Body -->
+    <article class="article-body">
+      <p>Malaysia actively encourages technology companies through a range of tax incentives. The right incentive can mean the difference between paying 24% corporate tax and paying almost nothing for up to 10 years. But navigating the options requires understanding what's available and whether you qualify.</p>
+
+      <p>This guide covers the major tech incentives: what they offer, who qualifies, and how to apply. Most startups leave money on the table simply because they don't know these programs exist.</p>
+
+      <h2 id="msc-status">MSC Malaysia Status</h2>
+
+      <p>The Malaysia Digital (MD) status (formerly MSC Malaysia status) is the flagship tech incentive program administered by MDEC. It's designed for companies developing or using multimedia and ICT technologies.</p>
+
+      <div class="incentive-card">
+        <div class="incentive-header">
+          <div class="incentive-icon">
+            <i class="ph-bold ph-certificate"></i>
+          </div>
+          <div>
+            <h3 class="incentive-title">Malaysia Digital Status</h3>
+            <p class="incentive-subtitle">Administered by MDEC</p>
+          </div>
+        </div>
+        <div class="incentive-body">
+          <p>Malaysia Digital status grants access to a suite of tax incentives and non-tax benefits. The program targets companies developing digital products or services, or companies using digital technologies as core to their business.</p>
+        </div>
+        <div class="incentive-benefits">
+          <h4>Key Benefits</h4>
+          <ul>
+            <li><i class="ph-bold ph-check-circle"></i> Pioneer Status (0% tax) or Investment Tax Allowance (100%)</li>
+            <li><i class="ph-bold ph-check-circle"></i> Duty-free import of multimedia equipment</li>
+            <li><i class="ph-bold ph-check-circle"></i> No restrictions on foreign ownership</li>
+            <li><i class="ph-bold ph-check-circle"></i> Freedom to employ foreign knowledge workers</li>
+            <li><i class="ph-bold ph-check-circle"></i> Access to MDEC grants and programs</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Who Qualifies?</h3>
+      <p>To be eligible for Malaysia Digital status, your company must:</p>
+      <ul>
+        <li>Be incorporated in Malaysia (Sdn Bhd or LLP)</li>
+        <li>Be a technology or digital-enabled business</li>
+        <li>Have minimum 15% local full-time employees</li>
+        <li>Meet minimum expenditure requirements (usually RM250,000+ operating expenditure)</li>
+        <li>Maintain substantive activities in Malaysia</li>
+      </ul>
+
+      <p>Eligible activities include software development, cloud services, e-commerce platforms, fintech, AI/ML development, IoT solutions, and most B2B/B2C tech products.</p>
+
+      <div class="info-box tip">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-lightbulb"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>Application Process</h4>
+          <p>Apply through MDEC's portal at mdec.my. Processing typically takes 3-6 weeks. You'll need a business profile, financial projections, and evidence of your tech activities.</p>
+        </div>
+      </div>
+
+      <h2 id="pioneer-status">Pioneer Status</h2>
+
+      <p>Pioneer Status grants partial or full income tax exemption for companies in promoted activities or producing promoted products. For tech companies, this typically comes through Malaysia Digital status.</p>
+
+      <div class="incentive-card">
+        <div class="incentive-header">
+          <div class="incentive-icon">
+            <i class="ph-bold ph-star"></i>
+          </div>
+          <div>
+            <h3 class="incentive-title">Pioneer Status</h3>
+            <p class="incentive-subtitle">Up to 10 years tax exemption</p>
+          </div>
+        </div>
+        <div class="incentive-body">
+          <p>Pioneer Status offers income tax exemption of 70-100% for 5-10 years. The exact benefit depends on your activity and location. Tech companies in designated areas can qualify for 100% exemption for up to 10 years.</p>
+        </div>
+        <div class="incentive-benefits">
+          <h4>Tax Impact</h4>
+          <ul>
+            <li><i class="ph-bold ph-check-circle"></i> 100% tax exemption: Pay 0% corporate tax (vs 24% standard)</li>
+            <li><i class="ph-bold ph-check-circle"></i> Duration: 5 years (standard) or up to 10 years (strategic activities)</li>
+            <li><i class="ph-bold ph-check-circle"></i> Exemption is on statutory income, not gross revenue</li>
+            <li><i class="ph-bold ph-check-circle"></i> Can carry forward unabsorbed losses</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Pioneer Status vs Investment Tax Allowance</h3>
+      <p>You typically choose between Pioneer Status and Investment Tax Allowance (ITA):</p>
+      <ul>
+        <li><strong>Pioneer Status</strong> is better if you expect profits early—you pay zero tax on those profits.</li>
+        <li><strong>ITA</strong> is better if you have high capital expenditure—you get 60-100% allowance on qualifying capital spend.</li>
+      </ul>
+      <p>For most software startups with low capital needs and early profitability, Pioneer Status is usually the better choice.</p>
+
+      <h2 id="rd-deduction">R&D Double Deduction</h2>
+
+      <p>Malaysia allows double tax deduction for qualifying R&D expenditure. This means if you spend RM100,000 on R&D, you can deduct RM200,000 from your taxable income.</p>
+
+      <div class="incentive-card">
+        <div class="incentive-header">
+          <div class="incentive-icon">
+            <i class="ph-bold ph-flask"></i>
+          </div>
+          <div>
+            <h3 class="incentive-title">R&D Double Deduction</h3>
+            <p class="incentive-subtitle">200% deduction on qualifying R&D spend</p>
+          </div>
+        </div>
+        <div class="incentive-body">
+          <p>For every RM1 spent on qualifying R&D, you deduct RM2 from taxable income. At 24% tax rate, this effectively means the government is subsidizing 24% of your R&D costs.</p>
+        </div>
+        <div class="incentive-benefits">
+          <h4>What Qualifies as R&D</h4>
+          <ul>
+            <li><i class="ph-bold ph-check-circle"></i> Development of new products or processes</li>
+            <li><i class="ph-bold ph-check-circle"></i> Improvement of existing products or processes</li>
+            <li><i class="ph-bold ph-check-circle"></i> R&D staff salaries and wages</li>
+            <li><i class="ph-bold ph-check-circle"></i> Materials consumed in R&D</li>
+            <li><i class="ph-bold ph-check-circle"></i> Payments to approved research institutions</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>What Doesn't Qualify</h3>
+      <ul>
+        <li>Market research or sales promotion</li>
+        <li>Quality control or routine testing</li>
+        <li>Routine software maintenance or updates</li>
+        <li>Adaptation of existing products for new clients (without substantial innovation)</li>
+      </ul>
+
+      <div class="info-box warning">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-warning"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>Documentation Required</h4>
+          <p>LHDN may ask for evidence of R&D activity during audits. Keep detailed records of projects, staff time allocation, technical documentation, and how activities meet the R&D definition.</p>
+        </div>
+      </div>
+
+      <h2 id="other-incentives">Other Notable Incentives</h2>
+
+      <h3>Angel Investor Tax Deduction</h3>
+      <p>Investors in approved tech startups can claim a tax deduction equal to their investment amount, up to RM500,000 per year. This makes it more attractive for angels to invest in Malaysian startups. Your company needs to be registered with Cradle Fund.</p>
+
+      <h3>Grants and Matching Funds</h3>
+      <p>While not tax incentives, these programs provide direct funding:</p>
+      <ul>
+        <li><strong>Cradle Fund:</strong> Pre-seed and seed grants up to RM500,000</li>
+        <li><strong>MTDC:</strong> Technology commercialization funding</li>
+        <li><strong>MDEC Grants:</strong> Various programs for Malaysia Digital companies</li>
+      </ul>
+
+      <h3>Green Technology Tax Incentives</h3>
+      <p>If your tech product has environmental benefits, you may qualify for Green Technology incentives:</p>
+      <ul>
+        <li>Pioneer Status with 100% tax exemption for 10 years</li>
+        <li>Investment Tax Allowance of 100% on qualifying capital expenditure</li>
+      </ul>
+
+      <h3>Principal Hub Incentive</h3>
+      <p>For regional headquarters that provide certain services to related companies. Offers 0-10% tax rates for 5-10 years. Requires substantial business activities in Malaysia and minimum employee headcount.</p>
+
+      <h2 id="getting-started">Getting Started</h2>
+
+      <p>Here's a practical approach to claiming these incentives:</p>
+
+      <ol>
+        <li><strong>Start with Malaysia Digital status.</strong> If you're a tech company, this is the foundation. Apply through MDEC early—even before you're profitable.</li>
+        <li><strong>Choose Pioneer Status or ITA.</strong> Once approved for Malaysia Digital, you can apply for Pioneer Status. Most software companies choose this over ITA.</li>
+        <li><strong>Track R&D from day one.</strong> Even if you don't have Pioneer Status, R&D double deduction is available immediately. Document your R&D activities and costs.</li>
+        <li><strong>Explore grants.</strong> Cradle Fund and other programs provide non-dilutive funding that can extend your runway.</li>
+        <li><strong>Work with qualified advisors.</strong> The application processes can be complex. Consider working with consultants who specialize in MDEC applications.</li>
+      </ol>
+
+      <div class="info-box important">
+        <div class="info-box-icon">
+          <i class="ph-bold ph-calculator"></i>
+        </div>
+        <div class="info-box-content">
+          <h4>The Numbers</h4>
+          <p>A startup with RM1M profit pays RM240,000 in tax at standard rates. With Pioneer Status, that's RM0. Over 5 years of profitability, the difference could be RM1M+ in tax savings.</p>
+        </div>
+      </div>
+
+      <p>These incentives exist to make Malaysia competitive for tech companies. They're not loopholes—they're deliberate policy to grow the digital economy. Don't leave money on the table. If you're building tech in Malaysia, these incentives should be part of your financial strategy from day one.</p>
+
+      <!-- References -->
+      <div class="references">
+        <h4 class="references-title">Official Resources</h4>
+        <div class="references-list">
+          <a href="https://mdec.my" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-globe"></i>
+            </div>
+            <div class="reference-content">
+              <h5>MDEC</h5>
+              <p>Malaysia Digital Economy Corporation - MD status applications</p>
+            </div>
+          </a>
+          <a href="https://www.mida.gov.my" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-buildings"></i>
+            </div>
+            <div class="reference-content">
+              <h5>MIDA</h5>
+              <p>Malaysian Investment Development Authority - Pioneer Status</p>
+            </div>
+          </a>
+          <a href="https://www.cradle.com.my" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-rocket-launch"></i>
+            </div>
+            <div class="reference-content">
+              <h5>Cradle Fund</h5>
+              <p>Technology startup grants and angel tax incentive registration</p>
+            </div>
+          </a>
+          <a href="https://www.hasil.gov.my" target="_blank" class="reference-item">
+            <div class="reference-icon">
+              <i class="ph ph-bank"></i>
+            </div>
+            <div class="reference-content">
+              <h5>LHDN</h5>
+              <p>R&D tax deduction guidelines and rulings</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Author Card -->
+      <div class="author-card">
+        <div class="author-card-avatar">AH</div>
+        <div class="author-card-content">
+          <h4>Amjad & Hazli</h4>
+          <p class="role">AI-Powered Accounting for Startups</p>
+          <p>We help Malaysian tech startups navigate tax incentives and optimize their tax position. From MDEC applications to R&D documentation, we ensure you capture every available benefit.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Share Buttons -->
+    <aside class="article-sidebar-right">
+      <div class="share-buttons">
+        <span class="share-title">Share</span>
+        <button class="share-btn" title="Share on LinkedIn">
+          <i class="ph ph-linkedin-logo"></i>
+        </button>
+        <button class="share-btn" title="Share on Twitter">
+          <i class="ph ph-x-logo"></i>
+        </button>
+        <button class="share-btn" title="Copy link">
+          <i class="ph ph-link"></i>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Related Articles -->
+  <section class="related-section">
+    <div class="container">
+      <h2 class="related-title">Related Articles</h2>
+      <div class="related-grid">
+        <a href="sst-mistakes.html" class="related-card">
+          <span class="related-card-category">Tax</span>
+          <h3 class="related-card-title">5 SST Mistakes Malaysian Startups Make</h3>
+          <span class="related-card-meta">5 min read</span>
+        </a>
+        <a href="financial-hygiene.html" class="related-card">
+          <span class="related-card-category">Startup Finance</span>
+          <h3 class="related-card-title">The Founder's Guide to Financial Hygiene</h3>
+          <span class="related-card-meta">8 min read</span>
+        </a>
+        <a href="annual-return-deadlines.html" class="related-card">
+          <span class="related-card-category">Compliance</span>
+          <h3 class="related-card-title">Annual Return Deadlines You Can't Miss</h3>
+          <span class="related-card-meta">5 min read</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title">Want help with tax incentives?</h2>
+      <p class="cta-subtitle">We'll review your eligibility and help you apply for the incentives that matter most to your business.</p>
+      <a href="../index.html#pricing" class="cta-btn">
+        <i class="ph ph-calculator"></i>
+        Get tax advice
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <span class="footer-brand">Amjad & Hazli</span>
+        <ul class="footer-links">
+          <li><a href="../index.html#services" class="footer-link">Services</a></li>
+          <li><a href="../index.html#pricing" class="footer-link">Pricing</a></li>
+          <li><a href="../about.html" class="footer-link">About</a></li>
+          <li><a href="../resources.html" class="footer-link">Resources</a></li>
+          <li><a href="../blog.html" class="footer-link">Blog</a></li>
+        </ul>
+        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Reading Progress Bar
+    window.addEventListener('scroll', () => {
+      const article = document.querySelector('.article-body');
+      const progressBar = document.getElementById('progress-bar');
+
+      const articleTop = article.offsetTop;
+      const articleHeight = article.offsetHeight;
+      const windowHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+
+      const progress = Math.min(
+        Math.max((scrollY - articleTop + windowHeight * 0.3) / articleHeight * 100, 0),
+        100
+      );
+
+      progressBar.style.width = progress + '%';
+    });
+
+    // Active TOC link highlighting
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sections = document.querySelectorAll('.article-body h2[id]');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 150) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

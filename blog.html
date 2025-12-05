@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | Amjad & Hazli</title>
+  <meta name="description" content="Practical advice for Malaysian businesses on accounting, tax, and financial management.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --color-primary: #253FF6;
+      --color-primary-hover: #293ED5;
+      --color-primary-50: #EEF0FF;
+      --color-primary-100: #E0E4FF;
+      --color-primary-200: #C7CDFF;
+      --color-black: #090516;
+      --color-gray-900: #3A3A3A;
+      --color-gray-600: #737373;
+      --color-gray-500: #8A8A8A;
+      --color-gray-400: #D7D7D7;
+      --color-gray-100: #F0F0F0;
+      --color-gray-50: #F8F8F8;
+      --color-white: #FFFFFF;
+      --color-text-primary: var(--color-black);
+      --color-text-secondary: var(--color-gray-900);
+      --color-text-tertiary: var(--color-gray-600);
+      --color-text-muted: var(--color-gray-500);
+      --color-border-light: #F1F1F1;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'DM Mono', 'SF Mono', monospace;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+      --container-max: 1440px;
+      --container-padding: 51px;
+      --transition-slow: 300ms ease;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--color-text-tertiary);
+      background: var(--color-white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-padding);
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--color-border-light);
+      z-index: 100;
+      padding: var(--space-4) 0;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: var(--space-8); list-style: none; }
+    .nav-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color var(--transition-slow);
+    }
+    .nav-link:hover, .nav-link.active { color: var(--color-primary); }
+    .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 0 var(--space-4);
+      height: 36px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition-slow);
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-secondary { background: var(--color-white); color: var(--color-text-primary); border: 1px solid var(--color-gray-400); }
+
+    /* Page Header */
+    .page-header {
+      padding: var(--space-20) 0 var(--space-16);
+      text-align: center;
+      background: linear-gradient(180deg, #FAFBFF 0%, #FFFFFF 100%);
+    }
+    .page-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-3);
+      display: block;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+      letter-spacing: -0.5px;
+    }
+    .page-subtitle {
+      font-family: var(--font-body);
+      font-size: 18px;
+      color: var(--color-text-tertiary);
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Blog Grid */
+    .blog-section {
+      padding: var(--space-16) 0 var(--space-24);
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .blog-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border-light);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-card:hover {
+      border-color: transparent;
+      box-shadow: 0 12px 48px rgba(37, 63, 246, 0.1);
+      transform: translateY(-4px);
+    }
+    .blog-image {
+      width: 100%;
+      height: 200px;
+      background: var(--color-gray-50);
+      border-bottom: 1px solid var(--color-gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .blog-image i {
+      font-size: 48px;
+      color: var(--color-gray-400);
+      transition: color 0.3s ease;
+    }
+    .blog-card:hover .blog-image {
+      background: var(--color-primary-50);
+    }
+    .blog-card:hover .blog-image i {
+      color: var(--color-primary);
+    }
+    .blog-content {
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .blog-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--color-primary-50);
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: var(--space-3);
+      width: fit-content;
+    }
+    .blog-card-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-3);
+      line-height: 1.3;
+    }
+    .blog-excerpt {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+      margin-bottom: var(--space-5);
+      flex-grow: 1;
+    }
+    .blog-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-gray-100);
+    }
+    .blog-read-time {
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    .blog-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      transition: gap 0.2s ease;
+    }
+    .blog-link:hover { gap: var(--space-2); }
+
+    /* Featured Post */
+    .featured-post {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 48px;
+      align-items: center;
+      margin-bottom: var(--space-16);
+      padding-bottom: var(--space-16);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .featured-image {
+      width: 100%;
+      height: 360px;
+      background: var(--color-gray-50);
+      border: 1px solid var(--color-gray-100);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .featured-image i {
+      font-size: 72px;
+      color: var(--color-gray-400);
+      transition: color 0.3s ease;
+    }
+    .featured-post:hover .featured-image {
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-200);
+    }
+    .featured-post:hover .featured-image i {
+      color: var(--color-primary);
+    }
+    .featured-content {}
+    .featured-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-white);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--color-primary);
+      padding: 5px 12px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: var(--space-4);
+    }
+    .featured-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+      line-height: 1.2;
+    }
+    .featured-excerpt {
+      font-family: var(--font-body);
+      font-size: 17px;
+      color: var(--color-text-tertiary);
+      line-height: 1.7;
+      margin-bottom: var(--space-6);
+    }
+    .featured-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+    }
+    .featured-read-time {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    /* Section Title */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-8);
+    }
+
+    /* Footer */
+    .footer {
+      padding: var(--space-16) 0;
+      background: var(--color-gray-50);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+    .footer-links { display: flex; gap: var(--space-6); list-style: none; }
+    .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
+    .footer-link:hover { color: var(--color-primary); }
+    .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
+
+    @media (max-width: 1024px) {
+      .blog-grid { grid-template-columns: repeat(2, 1fr); }
+      .featured-post { grid-template-columns: 1fr; gap: 32px; }
+      .featured-image { height: 280px; }
+    }
+    @media (max-width: 768px) {
+      .container { padding: 0 24px; }
+      .nav-links { display: none; }
+      .page-title { font-size: 36px; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .featured-title { font-size: 28px; }
+      .footer-content { flex-direction: column; gap: var(--space-4); text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-brand">Amjad & Hazli</a>
+      <ul class="nav-links">
+        <li><a href="index.html#services" class="nav-link">Services</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="index.html#testimonials" class="nav-link">Clients</a></li>
+        <li><a href="resources.html" class="nav-link">Resources</a></li>
+        <li><a href="blog.html" class="nav-link active">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn btn-secondary">Client Portal</button>
+        <a href="index.html#pricing" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <span class="page-eyebrow">Insights</span>
+      <h1 class="page-title">From our desk</h1>
+      <p class="page-subtitle">Practical advice for growing businesses in Malaysia.</p>
+    </div>
+  </header>
+
+  <!-- Blog Section -->
+  <section class="blog-section">
+    <div class="container">
+      <!-- Featured Post -->
+      <article class="featured-post">
+        <div class="featured-image">
+          <i class="ph-duotone ph-article"></i>
+        </div>
+        <div class="featured-content">
+          <span class="featured-badge">Featured</span>
+          <h2 class="featured-title">The Founder's Guide to Financial Hygiene</h2>
+          <p class="featured-excerpt">Most startup failures aren't about bad ideas—they're about running out of money without seeing it coming. Here's how to build financial systems that give you clarity and control from day one.</p>
+          <div class="featured-meta">
+            <a href="blog/financial-hygiene.html" class="blog-link">Read article <i class="ph ph-arrow-right"></i></a>
+            <span class="featured-read-time">8 min read</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Recent Posts -->
+      <h2 class="section-title">Recent Articles</h2>
+      <div class="blog-grid">
+        <article class="blog-card">
+          <div class="blog-image">
+            <i class="ph-duotone ph-receipt"></i>
+          </div>
+          <div class="blog-content">
+            <span class="blog-category">Tax</span>
+            <h3 class="blog-card-title">5 SST mistakes Malaysian startups make</h3>
+            <p class="blog-excerpt">From late registration to incorrect classification—here's what we see founders getting wrong, and how to avoid costly penalties.</p>
+            <div class="blog-meta">
+              <span class="blog-read-time">5 min read</span>
+              <a href="blog/sst-mistakes.html" class="blog-link">Read more <i class="ph ph-arrow-right"></i></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-image">
+            <i class="ph-duotone ph-chart-line-up"></i>
+          </div>
+          <div class="blog-content">
+            <span class="blog-category">Finance</span>
+            <h3 class="blog-card-title">When to hire your first CFO</h3>
+            <p class="blog-excerpt">Hint: sooner than you think. We break down the signals that indicate your startup has outgrown DIY financial management.</p>
+            <div class="blog-meta">
+              <span class="blog-read-time">6 min read</span>
+              <a href="blog/when-to-hire-cfo.html" class="blog-link">Read more <i class="ph ph-arrow-right"></i></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-image">
+            <i class="ph-duotone ph-gear"></i>
+          </div>
+          <div class="blog-content">
+            <span class="blog-category">Operations</span>
+            <h3 class="blog-card-title">Automating expense reports</h3>
+            <p class="blog-excerpt">Stop chasing receipts. Modern tools can capture, categorize, and reconcile expenses automatically. Here's our recommended stack.</p>
+            <div class="blog-meta">
+              <span class="blog-read-time">4 min read</span>
+              <a href="blog/automating-expenses.html" class="blog-link">Read more <i class="ph ph-arrow-right"></i></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-image">
+            <i class="ph-duotone ph-scales"></i>
+          </div>
+          <div class="blog-content">
+            <span class="blog-category">Compliance</span>
+            <h3 class="blog-card-title">Annual return deadlines you can't miss</h3>
+            <p class="blog-excerpt">A complete guide to SSM annual returns, tax filing deadlines, and audit requirements for Malaysian Sdn Bhd companies.</p>
+            <div class="blog-meta">
+              <span class="blog-read-time">5 min read</span>
+              <a href="blog/annual-return-deadlines.html" class="blog-link">Read more <i class="ph ph-arrow-right"></i></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-image">
+            <i class="ph-duotone ph-currency-circle-dollar"></i>
+          </div>
+          <div class="blog-content">
+            <span class="blog-category">Fundraising</span>
+            <h3 class="blog-card-title">Getting your books investor-ready</h3>
+            <p class="blog-excerpt">What VCs actually look for in your financials during due diligence—and how to prepare months before you start raising.</p>
+            <div class="blog-meta">
+              <span class="blog-read-time">6 min read</span>
+              <a href="blog/investor-ready-books.html" class="blog-link">Read more <i class="ph ph-arrow-right"></i></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-image">
+            <i class="ph-duotone ph-calculator"></i>
+          </div>
+          <div class="blog-content">
+            <span class="blog-category">Tax</span>
+            <h3 class="blog-card-title">Tax incentives for Malaysian tech companies</h3>
+            <p class="blog-excerpt">From MSC status to R&D deductions—here are the incentives most founders don't know about (but should).</p>
+            <div class="blog-meta">
+              <span class="blog-read-time">6 min read</span>
+              <a href="blog/tech-tax-incentives.html" class="blog-link">Read more <i class="ph ph-arrow-right"></i></a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <span class="footer-brand">Amjad & Hazli</span>
+        <ul class="footer-links">
+          <li><a href="index.html#services" class="footer-link">Services</a></li>
+          <li><a href="index.html#pricing" class="footer-link">Pricing</a></li>
+          <li><a href="about.html" class="footer-link">About</a></li>
+          <li><a href="resources.html" class="footer-link">Resources</a></li>
+          <li><a href="blog.html" class="footer-link">Blog</a></li>
+        </ul>
+        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
