@@ -1,0 +1,7 @@
+# robots.txt for amjadhazli.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://amjadhazli.com/sitemap.xml

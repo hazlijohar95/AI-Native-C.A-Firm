@@ -43,7 +43,10 @@
       "Bash(xcode-select:*)",
       "Bash(xcodebuild:*)",
       "Bash(cmake --version:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git commit -m \"Initial commit - website files\")",
+      "Bash(cd:*)",
+      "Bash(sips:*)"
     ],
     "deny": [],
     "ask": []
