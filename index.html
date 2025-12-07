@@ -362,7 +362,9 @@
     }
 
     .nav-links {
-      display: none; /* Hidden on mobile by default */
+      display: flex; /* Visible by default for desktop */
+      align-items: center;
+      gap: var(--space-6);
       list-style: none;
     }
 
@@ -387,14 +389,14 @@
     }
 
     .nav-actions {
-      display: none; /* Hidden on mobile */
+      display: flex; /* Visible by default for desktop */
       align-items: center;
       gap: var(--space-2);
     }
 
-    /* Mobile Menu Button - Always visible on mobile */
+    /* Mobile Menu Button - Hidden by default, shown on mobile only */
     .mobile-menu-btn {
-      display: flex;
+      display: none; /* Hidden by default - shown in mobile media query */
       flex-direction: column;
       justify-content: center;
       gap: 5px;
@@ -437,6 +439,7 @@
         min-height: 44px;
       }
       .nav-links {
+        display: none; /* Hidden by default on mobile */
         position: fixed;
         top: 0;
         left: 0;
@@ -486,7 +489,7 @@
         min-height: var(--space-4);
       }
       .nav-actions {
-        display: none;
+        display: none !important;
       }
       .nav {
         position: sticky;
@@ -516,8 +519,37 @@
       }
     }
     
-    /* Hide mobile CTAs on desktop */
+    /* Desktop Navigation - Show on desktop */
     @media (min-width: 1025px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+
+      .nav-links {
+        position: static;
+        display: flex !important;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-6);
+        padding: 0;
+        transform: none;
+        opacity: 1;
+        visibility: visible;
+        background: transparent;
+        overflow: visible;
+      }
+
+      .nav-links .nav-link {
+        font-size: 14px;
+        font-weight: 400;
+        padding: var(--space-2) var(--space-3);
+        min-height: auto;
+      }
+
+      .nav-actions {
+        display: flex;
+      }
+
       .nav-mobile-cta {
         display: none !important;
       }
@@ -634,6 +666,27 @@
       width: 16px;
       height: 16px;
       flex-shrink: 0;
+    }
+
+    /* Coming Soon Badge */
+    .badge-coming-soon {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-primary);
+      background: linear-gradient(135deg, rgba(37, 63, 246, 0.08) 0%, rgba(37, 63, 246, 0.12) 100%);
+      border: 1px solid rgba(37, 63, 246, 0.15);
+      border-radius: 4px;
+      margin-left: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-with-badge {
+      position: relative;
     }
 
     /* Keyboard Badge */
@@ -5118,23 +5171,24 @@
         <li><a href="blog.html" class="nav-link">Blog</a></li>
         <!-- Mobile-only CTA buttons -->
         <li class="nav-mobile-cta">
-          <a href="#pricing" class="btn btn-primary btn-lg nav-mobile-btn">Get Started</a>
-          <a href="#" class="btn btn-secondary btn-lg nav-mobile-btn">Client Portal</a>
+          <a href="#services" class="btn btn-primary btn-lg nav-mobile-btn">Get Started</a>
+          <a href="#" class="btn btn-secondary btn-lg nav-mobile-btn">
+            <span>Client Portal</span>
+            <span class="badge-coming-soon">Soon</span>
+          </a>
         </li>
       </ul>
       <div class="nav-actions">
-        <button class="btn btn-secondary">
+        <button class="btn btn-secondary btn-with-badge">
           <span>Client Portal</span>
-          <kbd class="kbd kbd-light">
-            <span>P</span>
-          </kbd>
+          <span class="badge-coming-soon">Soon</span>
         </button>
-        <button class="btn btn-primary">
+        <a href="#services" class="btn btn-primary">
           <span>Get Started</span>
           <kbd class="kbd kbd-dark">
             <span>S</span>
           </kbd>
-        </button>
+        </a>
       </div>
     </div>
   </nav>

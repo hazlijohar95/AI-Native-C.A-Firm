@@ -1205,7 +1205,7 @@
     <div class="container">
       <h2 class="cta-title">Need help with your financials?</h2>
       <p class="cta-subtitle">Let's set up the right foundation for your startup. Book a free 15-minute consultation.</p>
-      <a href="../schedule.html" class="cta-btn">
+      <a href="#" class="cta-btn" data-schedule>
         <i class="ph ph-calendar-check"></i>
         Book a free call
       </a>
@@ -1294,6 +1294,164 @@
         }
       });
     });
+
+    // Schedule Modal
+    const scheduleModal = document.getElementById('schedule-modal');
+    const modalClose = document.getElementById('modal-close');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+
+    function openScheduleModal() {
+      scheduleModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeScheduleModal() {
+      scheduleModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-schedule]').forEach(element => {
+      element.addEventListener('click', (e) => {
+        e.preventDefault();
+        openScheduleModal();
+      });
+    });
+
+    if (modalClose) modalClose.addEventListener('click', closeScheduleModal);
+    if (modalBackdrop) modalBackdrop.addEventListener('click', closeScheduleModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && scheduleModal.classList.contains('active')) {
+        closeScheduleModal();
+      }
+    });
   </script>
+
+  <!-- Schedule Modal -->
+  <div id="schedule-modal" class="schedule-modal">
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+    <div class="modal-container">
+      <button id="modal-close" class="modal-close" aria-label="Close modal">
+        <i class="ph ph-x"></i>
+      </button>
+      <div class="modal-header">
+        <h3 class="modal-title">Schedule a free consultation</h3>
+        <p class="modal-subtitle">Choose a time that works for you</p>
+      </div>
+      <div class="modal-body">
+        <div id="cal-inline" style="width:100%;height:100%;overflow:auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+    Cal("init", "30min", {origin:"https://app.cal.com"});
+    Cal.ns["30min"]("inline", {
+      elementOrSelector:"#cal-inline",
+      config: {"layout":"month_view"},
+      calLink: "hazlijohar/30min",
+    });
+    Cal.ns["30min"]("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"#253FF6"}},"hideEventTypeDetails":false,"layout":"month_view"});
+  </script>
+
+  <style>
+    .schedule-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .schedule-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    .modal-container {
+      position: relative;
+      background: var(--color-white);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transform: scale(0.95) translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .schedule-modal.active .modal-container {
+      transform: scale(1) translateY(0);
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--color-gray-100);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background 0.2s ease;
+    }
+    .modal-close:hover {
+      background: var(--color-gray-200);
+    }
+    .modal-close i {
+      font-size: 18px;
+      color: var(--color-text-secondary);
+    }
+    .modal-header {
+      padding: 24px 24px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+    }
+    .modal-subtitle {
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+    }
+    .modal-body {
+      height: 500px;
+      overflow: auto;
+    }
+    @media (max-width: 768px) {
+      .modal-container {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 0;
+      }
+      .modal-body {
+        height: calc(100vh - 100px);
+      }
+    }
+  </style>
 </body>
 </html>
