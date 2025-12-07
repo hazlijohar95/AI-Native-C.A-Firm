@@ -6,6 +6,13 @@
   <title>The Founder's Guide to Financial Hygiene | Amjad & Hazli</title>
   <meta name="description" content="Build financial systems that give you clarity and control from day one. Learn how to avoid cash flow blindness and set up proper financial foundations for your Malaysian startup.">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="The Founder's Guide to Financial Hygiene | Amjad & Hazli">
+  <meta property="og:site_name" content="Amjad & Hazli">
+  <meta name="twitter:card" content="summary">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,7 +58,10 @@
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { 
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
     body {
       font-family: var(--font-body);
       font-size: 16px;
@@ -59,6 +69,15 @@
       color: var(--color-text-tertiary);
       background: var(--color-white);
       -webkit-font-smoothing: antialiased;
+      overscroll-behavior-y: contain;
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+    
+    /* Touch-friendly targets */
+    a, button { touch-action: manipulation; }
+    @media (hover: none) and (pointer: coarse) {
+      * { -webkit-tap-highlight-color: transparent; }
     }
 
     .container {
@@ -675,12 +694,77 @@
       background: var(--color-white);
       border-top: 1px solid var(--color-border-light);
     }
-    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-content { display: flex; flex-direction: column; gap: var(--space-8); }
+    .footer-main { display: flex; justify-content: space-between; align-items: center; }
     .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
     .footer-links { display: flex; gap: var(--space-6); list-style: none; }
     .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
     .footer-link:hover { color: var(--color-primary); }
     .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
+
+    /* Footer Credentials */
+    .footer-credentials {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer-credentials-title {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-tertiary);
+    }
+    .footer-credentials-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .credential-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-gray-50);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 50px;
+    }
+    .credential-badge-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .credential-badge-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .credential-badge-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .credential-badge-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+    .credential-badge-desc {
+      font-family: var(--font-body);
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      line-height: 1.2;
+    }
 
     /* Responsive */
     @media (max-width: 1100px) {
@@ -700,15 +784,93 @@
     }
     @media (max-width: 768px) {
       .nav-links { display: none; }
-      .article-title { font-size: 36px; }
-      .article-excerpt { font-size: 18px; }
-      .article-body { font-size: 17px; }
-      .article-body h2 { font-size: 26px; }
+      .nav-actions { display: none; }
+      .article-header { padding: var(--space-10) 0 var(--space-8); }
+      .article-title { font-size: 28px; line-height: 1.2; }
+      .article-excerpt { font-size: 16px; margin-bottom: var(--space-6); }
+      .article-category { font-size: 10px; padding: 5px 12px; margin-bottom: var(--space-4); }
+      .article-meta { gap: var(--space-4); }
+      .article-wrapper { padding: var(--space-8) 16px; }
+      .article-body { font-size: 16px; line-height: 1.8; }
+      .article-body p:first-of-type { font-size: 18px; }
+      .article-body h2 { font-size: 24px; margin-top: var(--space-12); }
+      .article-body h3 { font-size: 20px; }
+      .info-box { 
+        padding: var(--space-5); 
+        border-radius: 12px;
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+      .info-box-icon { width: 36px; height: 36px; border-radius: 8px; }
+      .checklist { padding: var(--space-5); border-radius: 12px; }
+      .checklist li { padding: var(--space-2) 0; }
       .author-card {
         flex-direction: column;
         text-align: center;
+        padding: var(--space-6);
+        border-radius: 16px;
       }
-      .footer-content { flex-direction: column; gap: var(--space-4); text-align: center; }
+      .author-card-avatar { width: 64px; height: 64px; font-size: 22px; }
+      .related-section { padding: var(--space-12) 0; }
+      .related-title { font-size: 24px; margin-bottom: var(--space-6); }
+      .related-card { padding: var(--space-5); border-radius: 12px; }
+      .related-card-title { font-size: 18px; }
+      .cta-section { padding: var(--space-12) 0; }
+      .cta-title { font-size: 26px; }
+      .cta-subtitle { font-size: 16px; }
+      .cta-btn { 
+        width: 100%; 
+        max-width: 280px; 
+        height: 52px; 
+        font-size: 16px;
+        border-radius: 12px;
+      }
+      .footer-content { 
+        flex-direction: column; 
+        gap: var(--space-4); 
+        text-align: center;
+        padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+      }
+      .footer-main {
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .footer-credentials-badges {
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+      .credential-badge {
+        width: 100%;
+        max-width: 280px;
+        justify-content: flex-start;
+      }
+      .footer-link {
+        padding: var(--space-2);
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .article-title { font-size: 26px; }
+      .article-body { font-size: 15px; }
+      .article-body h2 { font-size: 22px; }
+      .article-body blockquote { 
+        font-size: 18px; 
+        padding-left: var(--space-4);
+        margin: var(--space-6) 0;
+      }
+      .reference-item { 
+        flex-direction: column; 
+        gap: var(--space-3); 
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -1053,15 +1215,40 @@
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
-        <span class="footer-brand">Amjad & Hazli</span>
-        <ul class="footer-links">
-          <li><a href="../index.html#services" class="footer-link">Services</a></li>
-          <li><a href="../index.html#pricing" class="footer-link">Pricing</a></li>
-          <li><a href="../about.html" class="footer-link">About</a></li>
-          <li><a href="../resources.html" class="footer-link">Resources</a></li>
-          <li><a href="../blog.html" class="footer-link">Blog</a></li>
-        </ul>
-        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+        <div class="footer-main">
+          <span class="footer-brand">Amjad & Hazli</span>
+          <ul class="footer-links">
+            <li><a href="../index.html#services" class="footer-link">Services</a></li>
+            <li><a href="../index.html#pricing" class="footer-link">Pricing</a></li>
+            <li><a href="../about.html" class="footer-link">About</a></li>
+            <li><a href="../resources.html" class="footer-link">Resources</a></li>
+            <li><a href="../blog.html" class="footer-link">Blog</a></li>
+          </ul>
+          <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+        </div>
+        <div class="footer-credentials">
+          <span class="footer-credentials-title">Licensed & Registered</span>
+          <div class="footer-credentials-badges">
+            <div class="credential-badge">
+              <div class="credential-badge-icon">
+                <img src="../Public/logo for licensed/MIA logo colour.jpg" alt="MIA - Malaysian Institute of Accountants">
+              </div>
+              <div class="credential-badge-text">
+                <span class="credential-badge-label">Chartered Accountants</span>
+                <span class="credential-badge-desc">Malaysian Institute of Accountants</span>
+              </div>
+            </div>
+            <div class="credential-badge">
+              <div class="credential-badge-icon">
+                <img src="../Public/logo for licensed/SSM logo colour.webp" alt="SSM - Companies Commission of Malaysia">
+              </div>
+              <div class="credential-badge-text">
+                <span class="credential-badge-label">Licensed Company Secretary</span>
+                <span class="credential-badge-desc">Companies Commission of Malaysia</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </footer>

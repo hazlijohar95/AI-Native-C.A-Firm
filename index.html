@@ -6,6 +6,21 @@
   <title>Amjad & Hazli | AI-Native Chartered Accountants</title>
   <meta name="description" content="An AI-native chartered accounting firm designed for high-growth businesses. Bookkeeping, tax, CFO services—powered by intelligence.">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Amjad & Hazli | AI-Native Chartered Accountants">
+  <meta property="og:description" content="An AI-native chartered accounting firm designed for high-growth businesses. Bookkeeping, tax, CFO services—powered by intelligence.">
+  <meta property="og:url" content="https://amjadhazli.com">
+  <meta property="og:site_name" content="Amjad & Hazli">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Amjad & Hazli | AI-Native Chartered Accountants">
+  <meta name="twitter:description" content="An AI-native chartered accounting firm designed for high-growth businesses.">
+
   <!-- Fonts: Cynco Design System -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -99,6 +114,8 @@
 
     html {
       scroll-behavior: smooth;
+      /* Native iOS momentum scrolling */
+      -webkit-overflow-scrolling: touch;
     }
 
     body {
@@ -109,11 +126,45 @@
       background: var(--color-white);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      /* Prevent pull-to-refresh on mobile */
+      overscroll-behavior-y: contain;
+      /* Safe area support for notched devices */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
 
     img {
       max-width: 100%;
       height: auto;
+      /* Prevent image dragging on mobile */
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    /* ========================================
+       MOBILE-NATIVE ENHANCEMENTS
+       ======================================== */
+    /* Prevent text selection while scrolling */
+    @media (hover: none) and (pointer: coarse) {
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
+
+    /* Touch-friendly minimum tap targets */
+    a, button, [role="button"], input, select, textarea {
+      touch-action: manipulation;
+    }
+
+    /* Better focus states for accessibility */
+    :focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    /* Remove default focus outline for mouse users */
+    :focus:not(:focus-visible) {
+      outline: none;
     }
 
     /* Noise Texture Overlay */
@@ -270,9 +321,128 @@
       gap: var(--space-2);
     }
 
+    /* Mobile Menu */
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 32px;
+      height: 32px;
+      padding: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .mobile-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--color-text-primary);
+      border-radius: 1px;
+      transition: all 0.3s ease;
+    }
+    .mobile-menu-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .mobile-menu-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .mobile-menu-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
     @media (max-width: 1024px) {
+      .mobile-menu-btn {
+        display: flex;
+        /* Touch-friendly size */
+        min-width: 44px;
+        min-height: 44px;
+      }
       .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--color-white);
+        padding: 80px var(--space-6) var(--space-8);
+        padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+        flex-direction: column;
+        gap: var(--space-1);
+        z-index: 99;
+        /* Mobile-native slide animation */
+        transform: translateX(100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+                    opacity 0.25s ease,
+                    visibility 0.35s;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .nav-links.active {
+        display: flex;
+        transform: translateX(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .nav-links .nav-link {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        padding: var(--space-4) var(--space-4);
+        border-radius: 12px;
+        /* Touch-friendly tap targets */
+        min-height: 52px;
+        transition: background 0.15s ease, color 0.15s ease;
+      }
+      .nav-links .nav-link:active {
+        background: var(--color-gray-100);
+      }
+      /* Mobile menu CTA buttons */
+      .nav-links::after {
+        content: '';
+        display: block;
+        flex: 1;
+        min-height: var(--space-4);
+      }
+      .nav-actions {
         display: none;
+      }
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      /* Lock body scroll when menu is open */
+      body.menu-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+      }
+      
+      /* Mobile CTA buttons in nav */
+      .nav-mobile-cta {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        margin-top: auto;
+        padding-top: var(--space-6);
+        border-top: 1px solid var(--color-gray-200);
+      }
+      .nav-mobile-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    /* Hide mobile CTAs on desktop */
+    @media (min-width: 1025px) {
+      .nav-mobile-cta {
+        display: none !important;
       }
     }
 
@@ -445,13 +615,61 @@
 
     @media (max-width: 768px) {
       .hero {
-        padding: var(--space-12) 0;
+        padding: var(--space-10) 0 var(--space-8);
+      }
+      .hero-content {
+        margin-bottom: var(--space-10);
       }
       .hero-title {
-        font-size: 36px;
+        font-size: 32px;
+        line-height: 1.15;
+        letter-spacing: -0.5px;
+      }
+      .hero-description {
+        font-size: 15px;
       }
       .hero-actions {
         flex-direction: column;
+        gap: var(--space-3);
+        width: 100%;
+      }
+      .hero-actions .btn {
+        width: 100%;
+        justify-content: center;
+        /* Touch-friendly height */
+        height: 52px;
+        font-size: 16px;
+        border-radius: 12px;
+      }
+      .hero-note {
+        font-size: 12px;
+      }
+    }
+
+    /* Mobile-optimized buttons with active states */
+    @media (max-width: 768px) {
+      .btn {
+        /* Minimum touch target */
+        min-height: 44px;
+        border-radius: 10px;
+      }
+      .btn-lg {
+        height: 52px;
+        font-size: 16px;
+        border-radius: 12px;
+      }
+      /* Active state for touch feedback */
+      .btn-primary:active {
+        transform: scale(0.98);
+        background: var(--color-primary-hover);
+      }
+      .btn-secondary:active {
+        background: var(--color-gray-100);
+        transform: scale(0.98);
+      }
+      /* Hide keyboard shortcuts on mobile */
+      .kbd {
+        display: none;
       }
     }
 
@@ -1420,6 +1638,44 @@
       }
       .panel-tasks, .panel-chat {
         display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-preview {
+        border-radius: 16px;
+        margin: 0 -8px;
+      }
+      .app-chrome {
+        padding: 10px 12px;
+      }
+      .chrome-title {
+        font-size: 11px;
+      }
+      .chrome-dots {
+        gap: 6px;
+      }
+      .chrome-dot {
+        width: 10px;
+        height: 10px;
+      }
+      .chrome-timer, .chrome-avatars, .chrome-btn {
+        display: none;
+      }
+      .app-body {
+        height: 320px;
+        max-height: 320px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-preview {
+        margin: 0 -12px;
+        border-radius: 12px;
+      }
+      .app-body {
+        height: 280px;
+        max-height: 280px;
       }
     }
 
@@ -3566,26 +3822,97 @@
     }
 
     /* ========================================
-       FOOTER CREDENTIALS
+       FOOTER CREDENTIALS - Licensed Badges
        ======================================== */
     .footer-credentials {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: var(--space-3);
-      padding: var(--space-6) 0;
+      gap: var(--space-6);
+      padding: var(--space-8) 0;
       border-top: 1px solid var(--color-border-light);
       margin-top: var(--space-8);
     }
 
-    .footer-credentials span {
+    .footer-credentials-title {
       font-family: var(--font-body);
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       color: var(--color-text-tertiary);
     }
 
-    .footer-credentials-divider {
-      color: var(--color-border);
+    .footer-credentials-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .credential-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 50px;
+      transition: all 0.2s ease;
+    }
+
+    .credential-badge:hover {
+      border-color: var(--color-gray-300);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .credential-badge-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .credential-badge-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .credential-badge-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .credential-badge-label {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+
+    .credential-badge-desc {
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      line-height: 1.2;
+    }
+
+    @media (max-width: 640px) {
+      .footer-credentials-badges {
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+      .credential-badge {
+        width: 100%;
+        max-width: 280px;
+        justify-content: flex-start;
+      }
     }
 
     /* ========================================
@@ -3699,6 +4026,51 @@
         flex-direction: column;
         gap: var(--space-4);
         text-align: center;
+        padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+      }
+      .footer-column a {
+        /* Touch-friendly links */
+        display: block;
+        padding: var(--space-2) 0;
+        min-height: 40px;
+        line-height: 1.8;
+      }
+    }
+
+    /* Very small screens - single column footer */
+    @media (max-width: 400px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .footer-column {
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--color-gray-200);
+      }
+      .footer-column:last-child {
+        border-bottom: none;
+      }
+    }
+
+    /* Mobile-optimized container padding */
+    @media (max-width: 480px) {
+      .container {
+        padding: 0 16px;
+      }
+    }
+
+    /* Mobile banner optimization */
+    @media (max-width: 768px) {
+      .banner {
+        padding: 8px 0;
+      }
+      .banner-content {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-1);
+      }
+      .banner-label, .banner-text {
+        font-size: 13px;
       }
     }
 
@@ -4366,12 +4738,22 @@
   <nav class="nav">
     <div class="container nav-inner">
       <a href="#" class="nav-brand">Amjad & Hazli</a>
+      <button class="mobile-menu-btn" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <ul class="nav-links">
         <li><a href="#services" class="nav-link">Services</a></li>
         <li><a href="about.html" class="nav-link">About</a></li>
         <li><a href="#testimonials" class="nav-link">Clients</a></li>
         <li><a href="resources.html" class="nav-link">Resources</a></li>
         <li><a href="blog.html" class="nav-link">Blog</a></li>
+        <!-- Mobile-only CTA buttons -->
+        <li class="nav-mobile-cta">
+          <a href="#pricing" class="btn btn-primary btn-lg nav-mobile-btn">Get Started</a>
+          <a href="#" class="btn btn-secondary btn-lg nav-mobile-btn">Client Portal</a>
+        </li>
       </ul>
       <div class="nav-actions">
         <button class="btn btn-secondary">
@@ -5109,15 +5491,33 @@
         <div class="footer-column">
           <h4>Legal</h4>
           <ul>
-            <li><a href="#">Privacy</a></li>
-            <li><a href="#">Terms</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+            <li><a href="terms.html">Terms</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-credentials">
-        <span>MIA Licensed</span>
-        <span class="footer-credentials-divider">|</span>
-        <span>SSM Registered</span>
+        <span class="footer-credentials-title">Licensed & Registered</span>
+        <div class="footer-credentials-badges">
+          <div class="credential-badge">
+            <div class="credential-badge-icon">
+              <img src="Public/logo for licensed/MIA logo colour.jpg" alt="MIA - Malaysian Institute of Accountants">
+            </div>
+            <div class="credential-badge-text">
+              <span class="credential-badge-label">Chartered Accountants</span>
+              <span class="credential-badge-desc">Malaysian Institute of Accountants</span>
+            </div>
+          </div>
+          <div class="credential-badge">
+            <div class="credential-badge-icon">
+              <img src="Public/logo for licensed/SSM logo colour.webp" alt="SSM - Companies Commission of Malaysia">
+            </div>
+            <div class="credential-badge-text">
+              <span class="credential-badge-label">Licensed Company Secretary</span>
+              <span class="credential-badge-desc">Companies Commission of Malaysia</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2025 Amjad & Hazli. All rights reserved.</p>
@@ -5143,6 +5543,45 @@
   </div>
 
   <script>
+    // Mobile Menu Toggle with scroll lock
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    let scrollPosition = 0;
+    
+    if (mobileMenuBtn && navLinks) {
+      mobileMenuBtn.addEventListener('click', () => {
+        const isOpening = !navLinks.classList.contains('active');
+        
+        if (isOpening) {
+          // Save scroll position and lock body
+          scrollPosition = window.scrollY;
+          document.body.classList.add('menu-open');
+          document.body.style.top = `-${scrollPosition}px`;
+        } else {
+          // Restore scroll position and unlock body
+          document.body.classList.remove('menu-open');
+          document.body.style.top = '';
+          window.scrollTo(0, scrollPosition);
+        }
+        
+        mobileMenuBtn.classList.toggle('active');
+        navLinks.classList.toggle('active');
+      });
+      
+      // Close menu when clicking a link
+      navLinks.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          if (navLinks.classList.contains('active')) {
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+            mobileMenuBtn.classList.remove('active');
+            navLinks.classList.remove('active');
+          }
+        });
+      });
+    }
+
     // ========================================
     // INTERACTIVE DASHBOARD APPLICATION
     // ========================================

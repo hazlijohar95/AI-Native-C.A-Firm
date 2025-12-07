@@ -6,6 +6,17 @@
   <title>Blog | Amjad & Hazli</title>
   <meta name="description" content="Practical advice for Malaysian businesses on accounting, tax, and financial management.">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog | Amjad & Hazli">
+  <meta property="og:description" content="Practical advice for Malaysian businesses on accounting, tax, and financial management.">
+  <meta property="og:url" content="https://amjadhazli.com/blog">
+  <meta property="og:site_name" content="Amjad & Hazli">
+  <meta name="twitter:card" content="summary">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +55,10 @@
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { 
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
     body {
       font-family: var(--font-body);
       font-size: 16px;
@@ -52,6 +66,15 @@
       color: var(--color-text-tertiary);
       background: var(--color-white);
       -webkit-font-smoothing: antialiased;
+      overscroll-behavior-y: contain;
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+    
+    /* Touch-friendly targets */
+    a, button { touch-action: manipulation; }
+    @media (hover: none) and (pointer: coarse) {
+      * { -webkit-tap-highlight-color: transparent; }
     }
 
     .container {
@@ -88,6 +111,14 @@
     }
     .nav-link:hover, .nav-link.active { color: var(--color-primary); }
     .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+
+    /* Mobile Menu */
+    .mobile-menu-btn { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 32px; height: 32px; padding: 6px; background: none; border: none; cursor: pointer; }
+    .mobile-menu-btn span { display: block; width: 100%; height: 2px; background: var(--color-text-primary); border-radius: 1px; transition: all 0.3s ease; }
+    .mobile-menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .mobile-menu-btn.active span:nth-child(2) { opacity: 0; }
+    .mobile-menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -332,25 +363,190 @@
       background: var(--color-gray-50);
       border-top: 1px solid var(--color-border-light);
     }
-    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-content { display: flex; flex-direction: column; gap: var(--space-8); }
+    .footer-main { display: flex; justify-content: space-between; align-items: center; }
     .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
     .footer-links { display: flex; gap: var(--space-6); list-style: none; }
     .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
     .footer-link:hover { color: var(--color-primary); }
     .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
 
+    /* Footer Credentials */
+    .footer-credentials {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer-credentials-title {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-tertiary);
+    }
+    .footer-credentials-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .credential-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 50px;
+    }
+    .credential-badge-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .credential-badge-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .credential-badge-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .credential-badge-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+    .credential-badge-desc {
+      font-family: var(--font-body);
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      line-height: 1.2;
+    }
+
     @media (max-width: 1024px) {
       .blog-grid { grid-template-columns: repeat(2, 1fr); }
       .featured-post { grid-template-columns: 1fr; gap: 32px; }
       .featured-image { height: 280px; }
+      .mobile-menu-btn { 
+        display: flex;
+        min-width: 44px;
+        min-height: 44px;
+      }
+      .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--color-white);
+        padding: 80px var(--space-6) var(--space-8);
+        padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+        flex-direction: column;
+        gap: var(--space-1);
+        z-index: 99;
+        transform: translateX(100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+                    opacity 0.25s ease,
+                    visibility 0.35s;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .nav-links.active {
+        display: flex;
+        transform: translateX(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .nav-links .nav-link {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        padding: var(--space-4);
+        border-radius: 12px;
+        min-height: 52px;
+      }
+      .nav-links .nav-link:active {
+        background: var(--color-gray-100);
+      }
+      .nav-actions { display: none; }
+      .nav { position: sticky; top: 0; z-index: 100; }
+      body.menu-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+      }
     }
     @media (max-width: 768px) {
-      .container { padding: 0 24px; }
-      .nav-links { display: none; }
-      .page-title { font-size: 36px; }
-      .blog-grid { grid-template-columns: 1fr; }
-      .featured-title { font-size: 28px; }
-      .footer-content { flex-direction: column; gap: var(--space-4); text-align: center; }
+      .container { padding: 0 20px; }
+      .page-header { padding: var(--space-12) 0 var(--space-10); }
+      .page-title { font-size: 32px; }
+      .page-subtitle { font-size: 16px; }
+      .blog-grid { grid-template-columns: 1fr; gap: 20px; }
+      .featured-post { gap: 24px; padding-bottom: var(--space-10); margin-bottom: var(--space-10); }
+      .featured-title { font-size: 26px; }
+      .featured-excerpt { font-size: 16px; }
+      .featured-image { height: 200px; border-radius: 16px; }
+      .section-title { font-size: 24px; margin-bottom: var(--space-6); }
+      .blog-card { border-radius: 16px; }
+      .blog-image { height: 160px; }
+      .blog-content { padding: var(--space-5); }
+      .blog-card-title { font-size: 20px; }
+      .blog-link {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .footer-content { 
+        flex-direction: column; 
+        gap: var(--space-4); 
+        text-align: center;
+        padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+      }
+      .footer-main {
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-3);
+      }
+      .footer-credentials-badges {
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+      .credential-badge {
+        width: 100%;
+        max-width: 280px;
+        justify-content: flex-start;
+      }
+      .footer-link {
+        padding: var(--space-2);
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+      }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .page-title { font-size: 28px; }
+      .featured-badge { font-size: 9px; padding: 4px 10px; }
+      .blog-category { font-size: 9px; }
     }
   </style>
 </head>
@@ -359,6 +555,7 @@
   <nav class="nav">
     <div class="container nav-inner">
       <a href="index.html" class="nav-brand">Amjad & Hazli</a>
+      <button class="mobile-menu-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
       <ul class="nav-links">
         <li><a href="index.html#services" class="nav-link">Services</a></li>
         <li><a href="about.html" class="nav-link">About</a></li>
@@ -501,17 +698,82 @@
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
-        <span class="footer-brand">Amjad & Hazli</span>
-        <ul class="footer-links">
-          <li><a href="index.html#services" class="footer-link">Services</a></li>
-          <li><a href="index.html#pricing" class="footer-link">Pricing</a></li>
-          <li><a href="about.html" class="footer-link">About</a></li>
-          <li><a href="resources.html" class="footer-link">Resources</a></li>
-          <li><a href="blog.html" class="footer-link">Blog</a></li>
-        </ul>
-        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+        <div class="footer-main">
+          <span class="footer-brand">Amjad & Hazli</span>
+          <ul class="footer-links">
+            <li><a href="index.html#services" class="footer-link">Services</a></li>
+            <li><a href="index.html#pricing" class="footer-link">Pricing</a></li>
+            <li><a href="about.html" class="footer-link">About</a></li>
+            <li><a href="resources.html" class="footer-link">Resources</a></li>
+            <li><a href="blog.html" class="footer-link">Blog</a></li>
+            <li><a href="privacy.html" class="footer-link">Privacy</a></li>
+            <li><a href="terms.html" class="footer-link">Terms</a></li>
+          </ul>
+          <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+        </div>
+        <div class="footer-credentials">
+          <span class="footer-credentials-title">Licensed & Registered</span>
+          <div class="footer-credentials-badges">
+            <div class="credential-badge">
+              <div class="credential-badge-icon">
+                <img src="Public/logo for licensed/MIA logo colour.jpg" alt="MIA - Malaysian Institute of Accountants">
+              </div>
+              <div class="credential-badge-text">
+                <span class="credential-badge-label">Chartered Accountants</span>
+                <span class="credential-badge-desc">Malaysian Institute of Accountants</span>
+              </div>
+            </div>
+            <div class="credential-badge">
+              <div class="credential-badge-icon">
+                <img src="Public/logo for licensed/SSM logo colour.webp" alt="SSM - Companies Commission of Malaysia">
+              </div>
+              <div class="credential-badge-text">
+                <span class="credential-badge-label">Licensed Company Secretary</span>
+                <span class="credential-badge-desc">Companies Commission of Malaysia</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </footer>
+  <script>
+    // Mobile Menu Toggle with scroll lock
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    let scrollPosition = 0;
+    
+    if (mobileMenuBtn && navLinks) {
+      mobileMenuBtn.addEventListener('click', () => {
+        const isOpening = !navLinks.classList.contains('active');
+        
+        if (isOpening) {
+          scrollPosition = window.scrollY;
+          document.body.classList.add('menu-open');
+          document.body.style.top = `-${scrollPosition}px`;
+        } else {
+          document.body.classList.remove('menu-open');
+          document.body.style.top = '';
+          window.scrollTo(0, scrollPosition);
+        }
+        
+        mobileMenuBtn.classList.toggle('active');
+        navLinks.classList.toggle('active');
+      });
+      
+      // Close menu when clicking a link
+      navLinks.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          if (navLinks.classList.contains('active')) {
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+            mobileMenuBtn.classList.remove('active');
+            navLinks.classList.remove('active');
+          }
+        });
+      });
+    }
+  </script>
 </body>
 </html>
