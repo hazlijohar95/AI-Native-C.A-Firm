@@ -205,7 +205,7 @@
        ======================================== */
     .container {
       width: 100%;
-      max-width: 100%;
+      max-width: var(--container-max);
       margin: 0 auto;
       padding: 0 var(--container-padding);
     }
@@ -219,17 +219,14 @@
 
     @media (min-width: 1024px) {
       :root {
-        --container-padding: 40px;
+        --container-padding: 48px;
         --container-max: 1200px;
-      }
-      .container {
-        max-width: var(--container-max);
       }
     }
 
     @media (min-width: 1440px) {
       :root {
-        --container-padding: 51px;
+        --container-padding: 56px;
         --container-max: 1440px;
       }
     }
@@ -347,7 +344,6 @@
       align-items: center;
       justify-content: space-between;
       min-height: var(--tap-target-min); /* Mobile: larger tap target */
-      padding: var(--space-3) 0;
     }
 
     .nav-brand {
@@ -5171,20 +5167,20 @@
         <li><a href="blog.html" class="nav-link">Blog</a></li>
         <!-- Mobile-only CTA buttons -->
         <li class="nav-mobile-cta">
-          <a href="#services" class="btn btn-primary btn-lg nav-mobile-btn">Get Started</a>
+          <a href="#services" class="btn btn-primary btn-lg nav-mobile-btn"><i class="ph-duotone ph-rocket-launch"></i> Get Started</a>
           <a href="#" class="btn btn-secondary btn-lg nav-mobile-btn">
-            <span>Client Portal</span>
+            <i class="ph-duotone ph-sign-in"></i> <span>Client Portal</span>
             <span class="badge-coming-soon">Soon</span>
           </a>
         </li>
       </ul>
       <div class="nav-actions">
         <button class="btn btn-secondary btn-with-badge">
-          <span>Client Portal</span>
+          <i class="ph-duotone ph-sign-in"></i> <span>Client Portal</span>
           <span class="badge-coming-soon">Soon</span>
         </button>
         <a href="#services" class="btn btn-primary">
-          <span>Get Started</span>
+          <i class="ph-duotone ph-rocket-launch"></i> <span>Get Started</span>
           <kbd class="kbd kbd-dark">
             <span>S</span>
           </kbd>

@@ -46,7 +46,8 @@
       "Bash(rm:*)",
       "Bash(git commit -m \"Initial commit - website files\")",
       "Bash(cd:*)",
-      "Bash(sips:*)"
+      "Bash(sips:*)",
+      "Bash(xargs kill:*)"
     ],
     "deny": [],
     "ask": []
