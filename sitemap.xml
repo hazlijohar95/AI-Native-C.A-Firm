@@ -2,103 +2,115 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://amjadhazli.com/</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/about.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/resources.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/services/bookkeeping.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/services/tax.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/services/cfo.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/services/technology.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://amjadhazli.com/services/incorporation.html</loc>
+    <lastmod>2026-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://amjadhazli.com/schedule.html</loc>
+    <lastmod>2026-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://amjadhazli.com/privacy.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/terms.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog/financial-hygiene.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog/sst-mistakes.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog/when-to-hire-cfo.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog/automating-expenses.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog/annual-return-deadlines.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog/investor-ready-books.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://amjadhazli.com/blog/tech-tax-incentives.html</loc>
-    <lastmod>2024-12-07</lastmod>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
