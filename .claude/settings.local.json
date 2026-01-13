@@ -47,7 +47,13 @@
       "Bash(git commit -m \"Initial commit - website files\")",
       "Bash(cd:*)",
       "Bash(sips:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(bash:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:amjadhazli.com)"
     ],
     "deny": [],
     "ask": []
