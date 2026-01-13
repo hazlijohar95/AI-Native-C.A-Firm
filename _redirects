@@ -1,0 +1,26 @@
+# Cloudflare Pages Redirects
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Pretty URLs - serve .html files without extension
+/about /about.html 200
+/blog /blog.html 200
+/resources /resources.html 200
+/privacy /privacy.html 200
+/terms /terms.html 200
+/schedule /schedule.html 200
+
+# Services pages
+/services/bookkeeping /services/bookkeeping.html 200
+/services/tax /services/tax.html 200
+/services/cfo /services/cfo.html 200
+/services/incorporation /services/incorporation.html 200
+/services/technology /services/technology.html 200
+
+# Blog posts
+/blog/financial-hygiene /blog/financial-hygiene.html 200
+/blog/sst-mistakes /blog/sst-mistakes.html 200
+/blog/when-to-hire-cfo /blog/when-to-hire-cfo.html 200
+/blog/automating-expenses /blog/automating-expenses.html 200
+/blog/annual-return-deadlines /blog/annual-return-deadlines.html 200
+/blog/investor-ready-books /blog/investor-ready-books.html 200
+/blog/tech-tax-incentives /blog/tech-tax-incentives.html 200
