@@ -53,7 +53,19 @@
       "Bash(git rm:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "WebFetch(domain:amjadhazli.com)"
+      "WebFetch(domain:amjadhazli.com)",
+      "Bash(wrangler --version:*)",
+      "Bash(wrangler whoami:*)",
+      "Bash(wrangler pages project:*)",
+      "Bash(wrangler logout:*)",
+      "Bash(wrangler login:*)",
+      "Bash(CLOUDFLARE_ACCOUNT_ID=ddf258a6f23596199fb73357f9dea56c wrangler pages project list:*)",
+      "Bash(CLOUDFLARE_ACCOUNT_ID=1ea225aa94de84c6406d3c119a2ed078 wrangler pages project list:*)",
+      "Bash(CLOUDFLARE_ACCOUNT_ID=ddf258a6f23596199fb73357f9dea56c wrangler pages deployment:*)",
+      "mcp__plugin_serena_serena__list_dir",
+      "Bash(done)",
+      "Skill(frontend-design)",
+      "Skill(frontend-design:*)"
     ],
     "deny": [],
     "ask": []

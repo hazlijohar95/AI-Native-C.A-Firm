@@ -4205,100 +4205,6 @@
     }
 
     /* ========================================
-       FOOTER CREDENTIALS - Licensed Badges
-       ======================================== */
-    .footer-credentials {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-6);
-      padding: var(--space-8) 0;
-      border-top: 1px solid var(--color-border-light);
-      margin-top: var(--space-8);
-    }
-
-    .footer-credentials-title {
-      font-family: var(--font-body);
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--color-text-tertiary);
-    }
-
-    .footer-credentials-badges {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-6);
-      flex-wrap: wrap;
-    }
-
-    .credential-badge {
-      display: flex;
-      align-items: center;
-      gap: var(--space-5);
-      padding: var(--space-4) var(--space-6);
-      background: var(--color-white);
-      border: 1px solid var(--color-gray-200);
-      border-radius: 4px;
-      transition: all 0.2s ease;
-    }
-
-    .credential-badge:hover {
-      border-color: var(--color-gray-300);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-
-    .credential-badge-icon {
-      width: 56px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .credential-badge-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .credential-badge-text {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-1);
-    }
-
-    .credential-badge-label {
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--color-text-primary);
-      line-height: 1.2;
-    }
-
-    .credential-badge-desc {
-      font-family: var(--font-body);
-      font-size: 11px;
-      color: var(--color-text-tertiary);
-      line-height: 1.2;
-    }
-
-    @media (max-width: 640px) {
-      .footer-credentials-badges {
-        flex-direction: column;
-        gap: var(--space-3);
-      }
-      .credential-badge {
-        width: 100%;
-        max-width: 280px;
-        justify-content: flex-start;
-      }
-    }
-
-    /* ========================================
        SCHEDULE MODAL
        ======================================== */
     .schedule-modal {
@@ -4335,8 +4241,8 @@
     .schedule-modal-content {
       position: relative;
       width: 100%;
-      max-width: 1000px;
-      max-height: 90vh;
+      max-width: 1100px;
+      height: 90vh;
       background: var(--color-white);
       border-radius: var(--radius-md);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
@@ -4387,13 +4293,19 @@
     }
     .schedule-modal-body {
       flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: var(--space-6);
+      overflow: hidden;
+      padding: 0;
+      position: relative;
     }
     #schedule-cal-inline {
       width: 100%;
-      min-height: 600px;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: auto;
     }
     @media (max-width: 768px) {
       .schedule-modal {
@@ -4402,7 +4314,7 @@
       }
       .schedule-modal-content {
         max-width: 100%;
-        max-height: 95vh;
+        height: 95vh;
         border-radius: var(--radius-md) var(--radius-md) 0 0;
         transform: translateY(100%);
       }
@@ -4415,67 +4327,105 @@
       .schedule-modal-title {
         font-size: 20px;
       }
-      .schedule-modal-body {
-        padding: var(--space-4);
-      }
-      #schedule-cal-inline {
-        min-height: 500px;
-      }
-    }
-    @media (max-width: 480px) {
-      #schedule-cal-inline {
-        min-height: 400px;
-      }
     }
     body.modal-open {
       overflow: hidden;
     }
 
     /* ========================================
-       FOOTER
+       FOOTER — Unified Design
        ======================================== */
+    .footer {
+      background: var(--color-gray-50);
+      border-top: 1px solid var(--color-gray-200);
+    }
+
+    .footer-inner {
+      padding: var(--space-16) 0 var(--space-12);
+    }
+
     .footer-grid {
       display: grid;
-      grid-template-columns: 2fr repeat(4, 1fr);
-      gap: var(--space-8);
+      grid-template-columns: 1.5fr repeat(4, 1fr);
+      gap: var(--space-12);
       margin-bottom: var(--space-12);
     }
 
+    /* Brand Column */
     .footer-brand {
-      padding-right: var(--space-10);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
     }
 
     .footer-logo {
       font-family: var(--font-display);
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 500;
       color: var(--color-text-primary);
-      margin-bottom: var(--space-4);
+      letter-spacing: -0.02em;
     }
 
-    .footer-description {
+    .footer-tagline {
       font-family: var(--font-body);
       font-size: 14px;
       color: var(--color-text-tertiary);
       line-height: 1.7;
+      max-width: 280px;
     }
 
+    /* Contact Info */
+    .footer-contact {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-top: var(--space-2);
+    }
+
+    .footer-contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+
+    .footer-contact-item i {
+      font-size: 18px;
+      color: var(--color-primary);
+      margin-top: 1px;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+
+    .footer-contact-item a,
+    .footer-contact-item span {
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      line-height: 1.5;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-contact-item a:hover {
+      color: var(--color-primary);
+    }
+
+    /* Navigation Columns */
     .footer-column h4 {
       font-family: var(--font-body);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--color-text-tertiary);
-      margin-bottom: var(--space-4);
+      letter-spacing: 0.08em;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-5);
     }
 
     .footer-column ul {
       list-style: none;
-    }
-
-    .footer-column li {
-      margin-bottom: var(--space-2);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
     }
 
     .footer-column a {
@@ -4484,15 +4434,79 @@
       color: var(--color-text-tertiary);
       text-decoration: none;
       transition: color var(--transition-fast);
+      display: inline-block;
     }
 
     .footer-column a:hover {
       color: var(--color-primary);
     }
 
-    .footer-bottom {
-      padding-top: var(--space-8);
+    /* Credentials Section */
+    .footer-credentials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-8);
+      padding: var(--space-8) 0;
       border-top: 1px solid var(--color-gray-200);
+      border-bottom: 1px solid var(--color-gray-200);
+      margin-bottom: var(--space-8);
+    }
+
+    .credential-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 6px;
+      transition: all var(--transition-fast);
+    }
+
+    .credential-badge:hover {
+      border-color: var(--color-gray-400);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .credential-badge-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .credential-badge-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .credential-badge-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .credential-badge-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+    }
+
+    .credential-badge-desc {
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      line-height: 1.3;
+    }
+
+    /* Bottom Bar */
+    .footer-bottom {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -4506,65 +4520,105 @@
 
     .footer-social {
       display: flex;
-      gap: var(--space-4);
+      gap: var(--space-3);
     }
 
     .footer-social a {
-      color: var(--color-gray-400);
-      transition: color var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      color: var(--color-text-tertiary);
+      transition: all var(--transition-fast);
     }
 
     .footer-social a:hover {
+      border-color: var(--color-primary);
       color: var(--color-primary);
+      background: rgba(37, 63, 246, 0.04);
     }
 
     .footer-social i {
-      font-size: 18px;
+      font-size: 16px;
     }
 
+    /* Responsive */
     @media (max-width: 1024px) {
       .footer-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-10) var(--space-8);
       }
       .footer-brand {
         grid-column: 1 / -1;
-        padding-right: 0;
-        margin-bottom: var(--space-4);
+        max-width: 400px;
+      }
+      .footer-credentials {
+        flex-wrap: wrap;
+        gap: var(--space-4);
       }
     }
 
     @media (max-width: 640px) {
+      .footer-inner {
+        padding: var(--space-12) 0 var(--space-8);
+      }
       .footer-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-6);
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-8) var(--space-6);
+      }
+      .footer-brand {
+        grid-column: 1 / -1;
+      }
+      .footer-tagline {
+        max-width: 100%;
+      }
+      .footer-credentials {
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+      .credential-badge {
+        width: 100%;
+        max-width: 300px;
       }
       .footer-bottom {
         flex-direction: column;
         gap: var(--space-4);
         text-align: center;
-        padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+        padding-bottom: env(safe-area-inset-bottom);
       }
       .footer-column a {
-        /* Touch-friendly links */
-        display: block;
-        padding: var(--space-2) 0;
-        min-height: 40px;
-        line-height: 1.8;
+        padding: var(--space-1) 0;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
       }
     }
 
-    /* Very small screens - single column footer */
     @media (max-width: 400px) {
       .footer-grid {
         grid-template-columns: 1fr;
+        gap: var(--space-6);
         text-align: center;
       }
-      .footer-column {
-        padding-bottom: var(--space-4);
-        border-bottom: 1px solid var(--color-gray-200);
+      .footer-brand {
+        align-items: center;
       }
-      .footer-column:last-child {
-        border-bottom: none;
+      .footer-contact {
+        align-items: center;
+      }
+      .footer-contact-item {
+        justify-content: center;
+        text-align: left;
+      }
+      .footer-column ul {
+        align-items: center;
+      }
+      .footer-column a {
+        justify-content: center;
       }
     }
 
@@ -5974,47 +6028,58 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <div class="footer-logo">Amjad & Hazli</div>
-          <p class="footer-description">AI-native chartered accountants. We handle your books, tax, and finances so you can focus on what matters—growing your business.</p>
+      <div class="footer-inner">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="footer-logo">Amjad & Hazli</div>
+            <p class="footer-tagline">AI-native chartered accountants for high-growth Malaysian businesses.</p>
+            <div class="footer-contact">
+              <div class="footer-contact-item">
+                <i class="ph ph-map-pin"></i>
+                <a href="https://maps.google.com/?q=Plaza+Azalea+13A-12+Shah+Alam+Selangor" target="_blank" rel="noopener noreferrer">
+                  13A-12, Plaza Azalea, Persiaran Bandaraya,<br>
+                  Seksyen 14, 40000 Shah Alam, Selangor
+                </a>
+              </div>
+              <div class="footer-contact-item">
+                <i class="ph ph-envelope"></i>
+                <a href="mailto:work@amjadhazli.com">work@amjadhazli.com</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-column">
+            <h4>Services</h4>
+            <ul>
+              <li><a href="services/bookkeeping.html">Bookkeeping</a></li>
+              <li><a href="services/tax.html">Tax</a></li>
+              <li><a href="services/cfo.html">CFO Advisory</a></li>
+              <li><a href="services/technology.html">Technology</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Resources</h4>
+            <ul>
+              <li><a href="blog.html">Blog</a></li>
+              <li><a href="resources.html">Guides</a></li>
+              <li><a href="resources.html#faq">FAQ</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="schedule.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Legal</h4>
+            <ul>
+              <li><a href="privacy.html">Privacy</a></li>
+              <li><a href="terms.html">Terms</a></li>
+            </ul>
+          </div>
         </div>
-        <div class="footer-column">
-          <h4>Services</h4>
-          <ul>
-            <li><a href="services/bookkeeping.html">Bookkeeping</a></li>
-            <li><a href="services/tax.html">Tax</a></li>
-            <li><a href="services/cfo.html">CFO Advisory</a></li>
-            <li><a href="services/technology.html">Technology</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>Resources</h4>
-          <ul>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="resources.html">Guides</a></li>
-            <li><a href="resources.html#faq">FAQ</a></li>
-            <li><a href="resources.html">Support</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>Company</h4>
-          <ul>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="schedule.html">Contact</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>Legal</h4>
-          <ul>
-            <li><a href="privacy.html">Privacy</a></li>
-            <li><a href="terms.html">Terms</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-credentials">
-        <span class="footer-credentials-title">Licensed & Registered</span>
-        <div class="footer-credentials-badges">
+        <div class="footer-credentials">
           <div class="credential-badge">
             <div class="credential-badge-icon">
               <img src="assets/logos/mia-logo.jpg" alt="MIA - Malaysian Institute of Accountants" loading="lazy">
@@ -6034,16 +6099,16 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2025 Amjad & Hazli. All rights reserved.</p>
-        <div class="footer-social">
-          <a href="https://linkedin.com/company/amjadhazli" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
-            <i class="ph ph-linkedin-logo"></i>
-          </a>
-          <a href="https://x.com/amjadhazli" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer">
-            <i class="ph ph-x-logo"></i>
-          </a>
+        <div class="footer-bottom">
+          <p>&copy; 2025 Amjad & Hazli. All rights reserved.</p>
+          <div class="footer-social">
+            <a href="https://linkedin.com/company/amjadhazli" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+              <i class="ph ph-linkedin-logo"></i>
+            </a>
+            <a href="https://x.com/amjadhazli" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer">
+              <i class="ph ph-x-logo"></i>
+            </a>
+          </div>
         </div>
       </div>
     </div>

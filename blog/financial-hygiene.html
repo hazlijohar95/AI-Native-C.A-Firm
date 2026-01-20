@@ -742,6 +742,11 @@
     .footer-link { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; }
     .footer-link:hover { color: var(--color-primary); }
     .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
+    .footer-contact { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--color-gray-200); }
+    .footer-contact-item { display: flex; align-items: center; gap: var(--space-3); font-size: 13px; color: var(--color-text-tertiary); }
+    .footer-contact-item i { font-size: 16px; color: var(--color-primary); }
+    .footer-contact-item a { color: var(--color-text-tertiary); text-decoration: none; }
+    .footer-contact-item a:hover { color: var(--color-primary); }
 
     /* Footer Credentials */
     .footer-credentials {
@@ -914,6 +919,203 @@
         text-align: center;
       }
     }
+      /* ========================================
+       FOOTER — Unified Design
+       ======================================== */
+    .footer {
+      background: var(--color-gray-50);
+      border-top: 1px solid var(--color-gray-200);
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-12) var(--container-padding);
+    }
+    .footer-main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-8);
+      padding-bottom: var(--space-8);
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+    .footer-brand-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      max-width: 280px;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      letter-spacing: -0.02em;
+    }
+    .footer-tagline {
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+      line-height: 1.6;
+    }
+    .footer-contact {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-top: var(--space-2);
+    }
+    .footer-contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+    .footer-contact-item i {
+      font-size: 16px;
+      color: var(--color-primary);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .footer-contact-item a {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      line-height: 1.5;
+      transition: color 0.15s ease;
+    }
+    .footer-contact-item a:hover {
+      color: var(--color-primary);
+    }
+    .footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-10);
+    }
+    .footer-nav-group h4 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+    }
+    .footer-nav-group ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .footer-nav-group a {
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    .footer-nav-group a:hover {
+      color: var(--color-primary);
+    }
+    .footer-credentials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-6);
+      padding: var(--space-6) 0;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+    .credential-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      border-radius: 6px;
+    }
+    .credential-badge-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+    }
+    .credential-badge-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .credential-badge-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .credential-badge-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+    }
+    .credential-badge-desc {
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      line-height: 1.3;
+    }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-6);
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+    }
+    .footer-social {
+      display: flex;
+      gap: var(--space-2);
+    }
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-200);
+      color: var(--color-text-tertiary);
+      transition: all 0.15s ease;
+    }
+    .footer-social a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .footer-social i {
+      font-size: 15px;
+    }
+    @media (max-width: 768px) {
+      .footer-main {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .footer-brand-section {
+        max-width: 100%;
+      }
+      .footer-nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .footer-credentials {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+      }
+      .credential-badge {
+        flex: 1;
+        min-width: 200px;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-4);
+        text-align: center;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1253,43 +1455,81 @@
     </div>
   </section>
 
-  <!-- Footer -->
+    <!-- Footer -->
   <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-main">
-          <span class="footer-brand">Amjad & Hazli</span>
-          <ul class="footer-links">
-            <li><a href="../index.html#services" class="footer-link">Services</a></li>
-            <li><a href="../index.html#pricing" class="footer-link">Pricing</a></li>
-            <li><a href="../about.html" class="footer-link">About</a></li>
-            <li><a href="../resources.html" class="footer-link">Resources</a></li>
-            <li><a href="../blog.html" class="footer-link">Blog</a></li>
-          </ul>
-          <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
-        </div>
-        <div class="footer-credentials">
-          <span class="footer-credentials-title">Licensed & Registered</span>
-          <div class="footer-credentials-badges">
-            <div class="credential-badge">
-              <div class="credential-badge-icon">
-                <img src="../assets/logos/mia-logo.jpg" alt="MIA - Malaysian Institute of Accountants" loading="lazy">
-              </div>
-              <div class="credential-badge-text">
-                <span class="credential-badge-label">Chartered Accountants</span>
-                <span class="credential-badge-desc">Malaysian Institute of Accountants</span>
-              </div>
+    <div class="footer-inner">
+      <div class="footer-main">
+        <div class="footer-brand-section">
+          <div class="footer-logo">Amjad & Hazli</div>
+          <p class="footer-tagline">AI-native chartered accountants for high-growth Malaysian businesses.</p>
+          <div class="footer-contact">
+            <div class="footer-contact-item">
+              <i class="ph ph-map-pin"></i>
+              <a href="https://maps.google.com/?q=Plaza+Azalea+13A-12+Shah+Alam+Selangor" target="_blank" rel="noopener noreferrer">13A-12, Plaza Azalea, Persiaran Bandaraya,<br>Seksyen 14, 40000 Shah Alam, Selangor</a>
             </div>
-            <div class="credential-badge">
-              <div class="credential-badge-icon">
-                <img src="../assets/logos/ssm-logo.webp" alt="SSM - Companies Commission of Malaysia" loading="lazy">
-              </div>
-              <div class="credential-badge-text">
-                <span class="credential-badge-label">Licensed Company Secretary</span>
-                <span class="credential-badge-desc">Companies Commission of Malaysia</span>
-              </div>
+            <div class="footer-contact-item">
+              <i class="ph ph-envelope"></i>
+              <a href="mailto:work@amjadhazli.com">work@amjadhazli.com</a>
             </div>
           </div>
+        </div>
+        <nav class="footer-nav">
+          <div class="footer-nav-group">
+            <h4>Services</h4>
+            <ul>
+              <li><a href="../services/bookkeeping.html">Bookkeeping</a></li>
+              <li><a href="../services/tax.html">Tax</a></li>
+              <li><a href="../services/cfo.html">CFO Advisory</a></li>
+              <li><a href="../services/technology.html">Technology</a></li>
+            </ul>
+          </div>
+          <div class="footer-nav-group">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="../about.html">About Us</a></li>
+              <li><a href="../blog.html">Blog</a></li>
+              <li><a href="../resources.html">Resources</a></li>
+              <li><a href="../schedule.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-nav-group">
+            <h4>Legal</h4>
+            <ul>
+              <li><a href="../privacy.html">Privacy</a></li>
+              <li><a href="../terms.html">Terms</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer-credentials">
+        <div class="credential-badge">
+          <div class="credential-badge-icon">
+            <img src="../assets/logos/mia-logo.jpg" alt="MIA" loading="lazy">
+          </div>
+          <div class="credential-badge-text">
+            <span class="credential-badge-label">Chartered Accountants</span>
+            <span class="credential-badge-desc">Malaysian Institute of Accountants</span>
+          </div>
+        </div>
+        <div class="credential-badge">
+          <div class="credential-badge-icon">
+            <img src="../assets/logos/ssm-logo.webp" alt="SSM" loading="lazy">
+          </div>
+          <div class="credential-badge-text">
+            <span class="credential-badge-label">Licensed Company Secretary</span>
+            <span class="credential-badge-desc">Companies Commission of Malaysia</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2025 Amjad & Hazli. All rights reserved.</span>
+        <div class="footer-social">
+          <a href="https://linkedin.com/company/amjadhazli" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+            <i class="ph ph-linkedin-logo"></i>
+          </a>
+          <a href="https://x.com/amjadhazli" aria-label="X" target="_blank" rel="noopener noreferrer">
+            <i class="ph ph-x-logo"></i>
+          </a>
         </div>
       </div>
     </div>
