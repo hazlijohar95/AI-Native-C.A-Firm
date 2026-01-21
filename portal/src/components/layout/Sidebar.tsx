@@ -50,21 +50,26 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   return (
     <>
       {/* Mobile sidebar */}
-      <div
+      <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out lg:hidden",
           open ? "translate-x-0" : "-translate-x-full"
         )}
+        aria-label="Mobile navigation"
+        aria-hidden={!open}
       >
         <SidebarContent onClose={onClose} showCloseButton />
-      </div>
+      </aside>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex lg:w-64 lg:flex-col">
+      <aside 
+        className="hidden lg:flex lg:w-64 lg:flex-col"
+        aria-label="Main navigation"
+      >
         <div className="flex min-h-0 flex-1 flex-col border-r bg-white">
           <SidebarContent />
         </div>
-      </div>
+      </aside>
     </>
   );
 }
@@ -89,14 +94,19 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
           <span className="font-semibold">Amjad & Hazli</span>
         </div>
         {showCloseButton && (
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            aria-label="Close navigation menu"
+          >
             <X className="h-5 w-5" />
           </Button>
         )}
       </div>
 
       {/* Client Navigation */}
-      <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
+      <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto" aria-label="Portal navigation">
         <div className="mb-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Portal
         </div>
@@ -114,7 +124,7 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
               )
             }
           >
-            <item.icon className="h-5 w-5" />
+            <item.icon className="h-5 w-5" aria-hidden="true" />
             {item.name}
           </NavLink>
         ))}
@@ -139,7 +149,7 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
                   )
                 }
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-5 w-5" aria-hidden="true" />
                 {item.name}
               </NavLink>
             ))}

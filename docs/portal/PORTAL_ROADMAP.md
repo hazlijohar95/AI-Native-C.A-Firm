@@ -3,7 +3,7 @@
 
 > **Status:** In Progress  
 > **Last Updated:** 2026-01-21  
-> **Current Phase:** Phase 5 - Polish & Security
+> **Current Phase:** Phase 5 Complete - Ready for Deployment
 
 ---
 
@@ -110,17 +110,47 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 ---
 
 ### Phase 5: Polish & Security
+**Status:** Complete
+
+- [x] Security audit (rate limiting on sensitive mutations, input sanitization)
+- [x] User deactivation workflow (soft delete with proper handling)
+- [x] Block deactivated users from portal access
+- [x] Filter deactivated users from client-facing queries
+- [x] Performance optimization (pagination for activity log, lazy loading admin pages)
+- [x] Error boundaries and global error handling
+- [x] 404 Not Found page
+- [x] E2E tests (Playwright setup with auth, navigation, visual tests)
+- [x] Accessibility improvements (skip link, ARIA labels, semantic HTML)
+- [x] Confirmation dialogs for destructive actions
+- [ ] Onboarding flow for new clients (deferred to Phase 6)
+- [ ] User documentation / help pages (deferred to Phase 6)
+- [ ] Bulk actions for admin lists (deferred to Phase 6)
+- [ ] Export functionality (CSV/Excel) (deferred to Phase 6)
+
+**Deliverable:** Production-ready portal with security hardening and testing
+
+**Key Security Features:**
+- Rate limiting on payment recording and document signing
+- User deactivation (soft delete) preserving referential integrity
+- Deactivated users blocked from all authenticated actions
+- Input validation and sanitization throughout
+
+**Testing:**
+- Playwright E2E tests for auth flow, navigation, and visual elements
+- Run with `npm run test` or `npm run test:ui` for interactive mode
+
+---
+
+### Phase 6: Final Polish (Future)
 **Status:** Not Started
 
-- [ ] Security audit (rate limiting, input sanitization review)
-- [ ] Performance optimization (pagination for large lists, code splitting)
-- [ ] Error boundaries and global error handling
 - [ ] Onboarding flow for new clients
-- [ ] E2E tests (Playwright)
 - [ ] User documentation / help pages
 - [ ] Bulk actions for admin lists
 - [ ] Export functionality (CSV/Excel)
-- [ ] User deactivation workflow (soft delete with proper handling)
+- [ ] File upload to Cloudflare R2 (currently placeholder)
+- [ ] Stripe payment integration (API key required)
+- [ ] Resend email integration (API key required)
 
 ---
 
@@ -128,6 +158,10 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 
 | Date | Phase | Changes |
 |------|-------|---------|
+| 2026-01-21 | Phase 5 | Added Playwright E2E testing setup with auth and navigation tests |
+| 2026-01-21 | Phase 5 | Added accessibility: skip link, ARIA labels, semantic HTML |
+| 2026-01-21 | Phase 5 | Added cursor-based pagination for activity log |
+| 2026-01-21 | Phase 5 | Added user deactivation with admin UI, rate limiting, error handling |
 | 2026-01-21 | Phase 4 | Phase 4 review fixes: edit drafts, delete orgs, activity links, proper checkboxes |
 | 2026-01-21 | Phase 4 | Phase 4 security fixes: admin route protection, email validation, form state management |
 | 2026-01-21 | Phase 4 | Completed Phase 4: Admin dashboard, clients, users, invoices, announcements, activity log |
