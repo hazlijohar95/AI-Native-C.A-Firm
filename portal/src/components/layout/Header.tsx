@@ -1,6 +1,7 @@
 import { useAuth } from "@workos-inc/authkit-react";
 import { Button } from "@/components/ui/button";
-import { Menu, Bell, LogOut, User } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { Menu, LogOut, User } from "lucide-react";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -26,11 +27,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       {/* Right side - Notifications & User */}
       <div className="flex items-center gap-2">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          {/* Notification badge - uncomment when there are notifications */}
-          {/* <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" /> */}
-        </Button>
+        <NotificationBell />
 
         {/* User Menu */}
         <div className="flex items-center gap-3 border-l pl-3">

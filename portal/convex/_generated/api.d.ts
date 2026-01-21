@@ -8,10 +8,16 @@
  * @module
  */
 
+import type * as activity from "../activity.js";
+import type * as announcements from "../announcements.js";
 import type * as auth from "../auth.js";
+import type * as documents from "../documents.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as lib_auth from "../lib/auth.js";
+import type * as notifications from "../notifications.js";
 import type * as organizations from "../organizations.js";
+import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
 
 import type {
@@ -21,10 +27,16 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  activity: typeof activity;
+  announcements: typeof announcements;
   auth: typeof auth;
+  documents: typeof documents;
   files: typeof files;
   http: typeof http;
+  "lib/auth": typeof lib_auth;
+  notifications: typeof notifications;
   organizations: typeof organizations;
+  tasks: typeof tasks;
   users: typeof users;
 }>;
 

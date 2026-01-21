@@ -5,6 +5,9 @@ import { Shell } from "@/components/layout/Shell";
 import { Login } from "@/pages/Login";
 import { Callback } from "@/pages/Callback";
 import { Dashboard } from "@/pages/Dashboard";
+import { Documents } from "@/pages/Documents";
+import { Tasks } from "@/pages/Tasks";
+import { Announcements } from "@/pages/Announcements";
 
 function App() {
   return (
@@ -31,9 +34,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/documents" element={<ComingSoon title="Documents" />} />
-            <Route path="/tasks" element={<ComingSoon title="Tasks" />} />
-            <Route path="/announcements" element={<ComingSoon title="Announcements" />} />
+            <Route path="/documents" element={<Documents />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/announcements" element={<Announcements />} />
             <Route path="/invoices" element={<ComingSoon title="Invoices" />} />
             <Route path="/settings" element={<ComingSoon title="Settings" />} />
             <Route path="/callback" element={<Navigate to="/dashboard" replace />} />
@@ -50,7 +53,7 @@ function ComingSoon({ title }: { title: string }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="text-muted-foreground">Coming soon in Phase 2</p>
+      <p className="text-muted-foreground">Coming soon in Phase 3</p>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { useAuth } from "@workos-inc/authkit-react";
+import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,13 +13,20 @@ import {
   Upload, 
   ArrowRight,
   Clock,
-  TrendingUp
+  User,
 } from "lucide-react";
+import { formatDistanceToNow } from "@/lib/utils";
 
 export function Dashboard() {
   const { user } = useAuth();
   const currentUser = useQuery(api.users.getCurrentUser);
   const syncUser = useMutation(api.users.syncUser);
+
+  // Real data from Convex
+  const documentCount = useQuery(api.documents.count);
+  const pendingTaskCount = useQuery(api.tasks.countPending);
+  const unreadAnnouncementCount = useQuery(api.announcements.countUnread);
+  const recentActivity = useQuery(api.activity.list, { limit: 5 });
 
   // Sync user to database on first load (fallback if webhook hasn't fired)
   useEffect(() => {
@@ -43,45 +51,47 @@ export function Dashboard() {
             Here's what's happening with your account
           </p>
         </div>
-        <Button className="gap-2 self-start sm:self-center">
-          <Upload className="h-4 w-4" />
-          Upload Document
-        </Button>
+        <Link to="/documents">
+          <Button className="gap-2 self-start sm:self-center">
+            <Upload className="h-4 w-4" />
+            Upload Document
+          </Button>
+        </Link>
       </div>
 
       {/* Status Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatusCard
           title="Documents"
-          value="0"
-          description="Awaiting review"
+          value={documentCount?.toString() ?? "0"}
+          description="Total documents"
           icon={FileText}
-          trend="+0 this month"
+          href="/documents"
           color="blue"
         />
         <StatusCard
           title="Tasks"
-          value="0"
-          description="Pending action"
+          value={pendingTaskCount?.toString() ?? "0"}
+          description="Pending tasks"
           icon={CheckSquare}
-          trend="All caught up"
-          color="green"
-        />
-        <StatusCard
-          title="Announcements"
-          value="0"
-          description="Unread updates"
-          icon={Bell}
-          trend="Nothing new"
+          href="/tasks"
           color="amber"
         />
         <StatusCard
-          title="Outstanding"
-          value="RM 0"
-          description="Invoices due"
+          title="Announcements"
+          value={unreadAnnouncementCount?.toString() ?? "0"}
+          description="Unread updates"
+          icon={Bell}
+          href="/announcements"
+          color="purple"
+        />
+        <StatusCard
+          title="Invoices"
+          value="0"
+          description="Outstanding"
           icon={Receipt}
-          trend="All paid"
-          color="emerald"
+          href="/invoices"
+          color="green"
         />
       </div>
 
@@ -91,7 +101,7 @@ export function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
+              <ArrowRight className="h-5 w-5 text-primary" />
               Quick Actions
             </CardTitle>
             <CardDescription>
@@ -103,19 +113,19 @@ export function Dashboard() {
               icon={Upload}
               title="Upload Documents"
               description="Share files securely with your accountant"
-              disabled
+              href="/documents"
             />
             <QuickActionItem
               icon={CheckSquare}
               title="View Tasks"
               description="See what needs your attention"
-              disabled
+              href="/tasks"
             />
             <QuickActionItem
-              icon={Receipt}
-              title="Pay Invoice"
-              description="View and pay outstanding invoices"
-              disabled
+              icon={Bell}
+              title="Read Announcements"
+              description="Stay updated with the latest news"
+              href="/announcements"
             />
           </CardContent>
         </Card>
@@ -132,15 +142,51 @@ export function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <Clock className="h-6 w-6 text-muted-foreground" />
+            {recentActivity === undefined ? (
+              <div className="flex h-48 items-center justify-center text-muted-foreground">
+                Loading...
               </div>
-              <p className="mt-4 text-sm font-medium">No recent activity</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Your activity will appear here once you start using the portal
-              </p>
-            </div>
+            ) : recentActivity.length === 0 ? (
+              <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <Clock className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="mt-4 text-sm font-medium">No recent activity</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Your activity will appear here
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((activity) => (
+                  <div key={activity._id} className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                      {activity.userAvatar ? (
+                        <img
+                          src={activity.userAvatar}
+                          alt={activity.userName}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm">
+                        <span className="font-medium">{activity.userName}</span>{" "}
+                        {formatActivityAction(activity.action)}
+                        {activity.resourceName && (
+                          <span className="font-medium"> "{activity.resourceName}"</span>
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(activity.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -151,14 +197,15 @@ export function Dashboard() {
           <div>
             <h3 className="font-semibold">Welcome to your Client Portal</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              We're rolling out new features in Phase 2. Soon you'll be able to upload documents, 
-              track tasks, and pay invoices directly from here.
+              Upload documents, track tasks, and stay updated with announcements from Amjad & Hazli.
             </p>
           </div>
-          <Button variant="outline" className="shrink-0 gap-2" disabled>
-            Learn More
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          <Link to="/documents">
+            <Button variant="outline" className="shrink-0 gap-2">
+              Get Started
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>
@@ -170,36 +217,33 @@ interface StatusCardProps {
   value: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  trend?: string;
-  color?: "blue" | "green" | "amber" | "emerald";
+  href: string;
+  color?: "blue" | "green" | "amber" | "purple";
 }
 
 const colorMap = {
   blue: "bg-blue-50 text-blue-600",
   green: "bg-green-50 text-green-600",
   amber: "bg-amber-50 text-amber-600",
-  emerald: "bg-emerald-50 text-emerald-600",
+  purple: "bg-purple-50 text-purple-600",
 };
 
-function StatusCard({ title, value, description, icon: Icon, trend, color = "blue" }: StatusCardProps) {
+function StatusCard({ title, value, description, icon: Icon, href, color = "blue" }: StatusCardProps) {
   return (
-    <Card className="transition-shadow hover:shadow-md">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <div className={`rounded-lg p-2 ${colorMap[color]}`}>
-          <Icon className="h-4 w-4" />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
-        {trend && (
-          <p className="mt-2 text-xs text-muted-foreground/70">
-            {trend}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+    <Link to={href}>
+      <Card className="transition-shadow hover:shadow-md cursor-pointer">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+          <div className={`rounded-lg p-2 ${colorMap[color]}`}>
+            <Icon className="h-4 w-4" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{value}</div>
+          <p className="text-xs text-muted-foreground">{description}</p>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 
@@ -207,23 +251,36 @@ interface QuickActionItemProps {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
-  disabled?: boolean;
+  href: string;
 }
 
-function QuickActionItem({ icon: Icon, title, description, disabled }: QuickActionItemProps) {
+function QuickActionItem({ icon: Icon, title, description, href }: QuickActionItemProps) {
   return (
-    <button
-      disabled={disabled}
-      className="flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-        <Icon className="h-5 w-5 text-primary" />
-      </div>
-      <div className="flex-1">
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </div>
-      <ArrowRight className="h-4 w-4 text-muted-foreground" />
-    </button>
+    <Link to={href}>
+      <button
+        className="flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+          <Icon className="h-5 w-5 text-primary" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium">{title}</p>
+          <p className="text-xs text-muted-foreground">{description}</p>
+        </div>
+        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+      </button>
+    </Link>
   );
+}
+
+function formatActivityAction(action: string): string {
+  const actions: Record<string, string> = {
+    uploaded_document: "uploaded",
+    deleted_document: "deleted",
+    created_task: "created task",
+    completed_task: "completed task",
+    updated_task: "updated task",
+    deleted_task: "deleted task",
+  };
+  return actions[action] || action.replace(/_/g, " ");
 }
