@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,15 +60,18 @@ export function AdminInvoices() {
   const [selectedInvoice, setSelectedInvoice] = useState<(typeof invoices extends (infer T)[] | undefined ? T : never) | null>(null);
   const [editingInvoice, setEditingInvoice] = useState<(typeof invoices extends (infer T)[] | undefined ? T : never) | null>(null);
 
-  // Filter invoices
-  const filteredInvoices = invoices?.filter((invoice) => {
-    const matchesSearch = 
-      invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invoice.organizationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invoice.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || invoice.displayStatus === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Filter invoices with memoization
+  const filteredInvoices = useMemo(() => 
+    invoices?.filter((invoice) => {
+      const matchesSearch = 
+        invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        invoice.organizationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        invoice.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || invoice.displayStatus === statusFilter;
+      return matchesSearch && matchesStatus;
+    }),
+    [invoices, searchQuery, statusFilter]
+  );
 
   const handleExportInvoices = () => {
     if (!filteredInvoices) return;
