@@ -259,12 +259,78 @@ export const remove = mutation({
 // ACTIONS (for file storage)
 // ============================================
 
+// Allowed file types for document uploads
+const ALLOWED_FILE_TYPES = [
+  // Documents
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  // Spreadsheets
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/csv",
+  // Images
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  // Text
+  "text/plain",
+] as const;
+
+// Max file size: 25MB
+const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+
+/**
+ * Validate file type against allowed list
+ */
+function validateFileType(contentType: string): { valid: boolean; error?: string } {
+  const normalizedType = contentType.toLowerCase().trim();
+  
+  if (!normalizedType) {
+    return { valid: false, error: "File type is required" };
+  }
+  
+  if (!ALLOWED_FILE_TYPES.includes(normalizedType as typeof ALLOWED_FILE_TYPES[number])) {
+    return { 
+      valid: false, 
+      error: `File type "${contentType}" is not allowed. Allowed types: PDF, Word, Excel, CSV, images (JPEG, PNG, GIF, WebP), and plain text.` 
+    };
+  }
+  
+  return { valid: true };
+}
+
+/**
+ * Validate filename
+ */
+function validateFilename(filename: string): { valid: boolean; error?: string; sanitized: string } {
+  if (!filename || !filename.trim()) {
+    return { valid: false, error: "Filename is required", sanitized: "" };
+  }
+  
+  if (filename.length > 255) {
+    return { valid: false, error: "Filename too long (max 255 characters)", sanitized: "" };
+  }
+  
+  // Check for path traversal attempts
+  if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
+    return { valid: false, error: "Invalid filename", sanitized: "" };
+  }
+  
+  // Sanitize: replace non-alphanumeric chars (except . and -) with underscore
+  const sanitized = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
+  
+  return { valid: true, sanitized };
+}
+
 // Generate upload URL using Convex storage
 export const generateUploadUrl = action({
   args: {
     filename: v.string(),
     contentType: v.string(),
     organizationId: v.string(),
+    fileSize: v.optional(v.number()), // Optional file size for validation
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -272,11 +338,32 @@ export const generateUploadUrl = action({
       throw new Error("Unauthorized");
     }
 
+    // Validate file type
+    const typeValidation = validateFileType(args.contentType);
+    if (!typeValidation.valid) {
+      throw new Error(typeValidation.error);
+    }
+
+    // Validate filename
+    const filenameValidation = validateFilename(args.filename);
+    if (!filenameValidation.valid) {
+      throw new Error(filenameValidation.error);
+    }
+
+    // Validate file size if provided
+    if (args.fileSize !== undefined) {
+      if (args.fileSize <= 0) {
+        throw new Error("Invalid file size");
+      }
+      if (args.fileSize > MAX_FILE_SIZE_BYTES) {
+        throw new Error(`File too large. Maximum size is ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB`);
+      }
+    }
+
     // Generate a unique storage key
     const timestamp = Date.now();
     const randomSuffix = Math.random().toString(36).substring(2, 8);
-    const sanitizedFilename = args.filename.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const storageKey = `documents/${args.organizationId}/${timestamp}-${randomSuffix}-${sanitizedFilename}`;
+    const storageKey = `documents/${args.organizationId}/${timestamp}-${randomSuffix}-${filenameValidation.sanitized}`;
 
     // Use Convex's built-in storage (R2 integration can be added later)
     const uploadUrl = await ctx.storage.generateUploadUrl();

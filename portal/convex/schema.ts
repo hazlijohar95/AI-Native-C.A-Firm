@@ -323,4 +323,14 @@ export default defineSchema({
   })
     .index("by_key", ["key"])
     .index("by_window_start", ["windowStart"]),
+
+  // ============================================
+  // COUNTERS (for atomic sequential IDs)
+  // ============================================
+
+  counters: defineTable({
+    name: v.string(), // e.g., "invoice_2026"
+    value: v.number(),
+  })
+    .index("by_name", ["name"]),
 });

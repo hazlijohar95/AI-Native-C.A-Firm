@@ -292,57 +292,48 @@ export async function notifyAdmins(
 }
 
 /**
- * Generate a unique invoice number using the year and a sequential counter
- * Includes uniqueness check to handle race conditions
+ * Get the next value from an atomic counter
+ * Uses database-level atomicity to prevent race conditions
+ */
+async function getNextCounterValue(ctx: MutationCtx, counterName: string): Promise<number> {
+  const existing = await ctx.db
+    .query("counters")
+    .withIndex("by_name", (q) => q.eq("name", counterName))
+    .unique();
+
+  if (existing) {
+    const nextValue = existing.value + 1;
+    await ctx.db.patch(existing._id, { value: nextValue });
+    return nextValue;
+  }
+
+  // Counter doesn't exist, create it starting at 1
+  await ctx.db.insert("counters", {
+    name: counterName,
+    value: 1,
+  });
+  return 1;
+}
+
+/**
+ * Generate a unique invoice number using atomic counter
+ * Format: INV-YYYY-XXXX (e.g., INV-2026-0001)
+ * 
+ * Uses a database counter to guarantee uniqueness even under concurrent requests.
+ * Each year has its own counter that resets.
  */
 export async function generateInvoiceNumber(ctx: MutationCtx): Promise<string> {
   const year = new Date().getFullYear();
-  const prefix = `INV-${year}-`;
+  const counterName = `invoice_${year}`;
   
-  // Get all invoices for this year using index
-  const yearInvoices = await ctx.db
-    .query("invoices")
-    .withIndex("by_invoice_number")
-    .filter((q) => q.gte(q.field("invoiceNumber"), prefix))
-    .collect();
+  // Get next number atomically from counter
+  const nextNumber = await getNextCounterValue(ctx, counterName);
   
-  // Find the highest number
-  let maxNumber = 0;
-  const existingNumbers = new Set<string>();
+  // Format with 4-digit padding (supports up to 9999 invoices per year)
+  // If more needed, padding auto-expands (e.g., 10000 becomes INV-2026-10000)
+  const paddedNumber = String(nextNumber).padStart(4, "0");
   
-  for (const inv of yearInvoices) {
-    existingNumbers.add(inv.invoiceNumber);
-    const match = inv.invoiceNumber.match(/INV-\d{4}-(\d+)/);
-    if (match) {
-      const num = parseInt(match[1], 10);
-      if (num > maxNumber) {
-        maxNumber = num;
-      }
-    }
-  }
-  
-  // Generate next number with padding, retry if collision detected
-  // This handles race conditions by checking existing numbers
-  let nextNumber = maxNumber + 1;
-  let invoiceNumber = `${prefix}${String(nextNumber).padStart(4, "0")}`;
-  
-  // Safety check: if number already exists (race condition), increment until unique
-  // Limit retries to prevent infinite loop
-  let retries = 0;
-  const maxRetries = 10;
-  
-  while (existingNumbers.has(invoiceNumber) && retries < maxRetries) {
-    nextNumber++;
-    invoiceNumber = `${prefix}${String(nextNumber).padStart(4, "0")}`;
-    retries++;
-  }
-  
-  if (retries >= maxRetries) {
-    // Fallback: add timestamp suffix to guarantee uniqueness
-    invoiceNumber = `${prefix}${String(nextNumber).padStart(4, "0")}-${Date.now().toString(36)}`;
-  }
-  
-  return invoiceNumber;
+  return `INV-${year}-${paddedNumber}`;
 }
 
 /**
