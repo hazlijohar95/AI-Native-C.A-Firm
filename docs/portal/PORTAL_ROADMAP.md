@@ -1,9 +1,9 @@
 # Client Portal Roadmap
 ## Amjad & Hazli - AI-Native Chartered Accounting Firm
 
-> **Status:** In Progress  
+> **Status:** Phase 6 Complete  
 > **Last Updated:** 2026-01-21  
-> **Current Phase:** Phase 5 Complete - Ready for Deployment
+> **Current Phase:** Ready for Production
 
 ---
 
@@ -26,9 +26,9 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 | **Backend** | Convex | Real-time, serverless, TypeScript-native |
 | **Auth** | WorkOS AuthKit | Google OAuth, email/password, enterprise SSO ready |
 | **Auth Integration** | @convex-dev/workos-authkit | Official Convex component for user sync |
-| **File Storage** | Cloudflare R2 | S3-compatible, no egress fees |
-| **Email** | Resend | Developer-friendly, React templates |
-| **Payments** | Stripe | Industry standard |
+| **File Storage** | Convex Storage (R2 ready) | Built-in storage, R2 integration scaffolded |
+| **Email** | Resend (scaffolded) | Developer-friendly, React templates |
+| **Payments** | Stripe (scaffolded) | Industry standard |
 | **Hosting** | Cloudflare Pages | Fast edge network, generous free tier |
 
 ---
@@ -141,16 +141,37 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 
 ---
 
-### Phase 6: Final Polish (Future)
-**Status:** Not Started
+### Phase 6: Final Polish
+**Status:** Complete
 
-- [ ] Onboarding flow for new clients
-- [ ] User documentation / help pages
-- [ ] Bulk actions for admin lists
-- [ ] Export functionality (CSV/Excel)
-- [ ] File upload to Cloudflare R2 (currently placeholder)
-- [ ] Stripe payment integration (API key required)
-- [ ] Resend email integration (API key required)
+- [x] Onboarding flow for new clients (multi-step wizard)
+- [x] Help & documentation pages with FAQ
+- [x] Bulk actions for admin lists (select, deactivate multiple)
+- [x] CSV export functionality for users and invoices
+- [x] File upload using Convex storage (R2 integration ready)
+- [x] Stripe payment placeholder (scaffolded, needs API key)
+- [x] Accordion component for FAQ
+- [x] Improved schema with onboarding fields
+
+**Key Features:**
+- New client onboarding: Welcome screen, profile setup, org info, completion
+- Help page: Searchable FAQ, categorized by feature, contact info
+- Bulk actions: Multi-select in admin users table, bulk deactivate
+- CSV export: Export users and invoices with custom column mapping
+- File storage: Convex storage with unique keys, ready for R2 migration
+
+---
+
+## Future Enhancements
+
+- [ ] R2 direct upload with presigned URLs (when bucket configured)
+- [ ] Stripe checkout integration (when API key configured)
+- [ ] Resend email notifications (when API key configured)
+- [ ] Dark mode support
+- [ ] Mobile app (React Native)
+- [ ] Advanced reporting / analytics dashboard
+- [ ] Client document requests workflow
+- [ ] Two-factor authentication
 
 ---
 
@@ -158,6 +179,7 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 
 | Date | Phase | Changes |
 |------|-------|---------|
+| 2026-01-21 | Phase 6 | Added onboarding wizard, help pages, bulk actions, CSV export |
 | 2026-01-21 | Phase 5 | Added Playwright E2E testing setup with auth and navigation tests |
 | 2026-01-21 | Phase 5 | Added accessibility: skip link, ARIA labels, semantic HTML |
 | 2026-01-21 | Phase 5 | Added cursor-based pagination for activity log |
