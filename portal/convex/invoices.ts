@@ -1,6 +1,13 @@
 import { query, mutation, action } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
+import { 
+  logActivity, 
+  notifyOrgUsers, 
+  generateInvoiceNumber, 
+  validateLineItems,
+  validatePaymentAmount 
+} from "./lib/helpers";
 import { api } from "./_generated/api";
 
 // ============================================
@@ -20,14 +27,13 @@ export const list = query({
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
+    const now = Date.now();
 
     let invoices;
 
     if (user.role === "admin" || user.role === "staff") {
-      // Admin/staff see all invoices
       invoices = await ctx.db.query("invoices").collect();
     } else if (user.organizationId) {
-      // Clients see their organization's invoices (exclude drafts)
       invoices = await ctx.db
         .query("invoices")
         .withIndex("by_organization", (q) => q.eq("organizationId", user.organizationId!))
@@ -38,38 +44,31 @@ export const list = query({
       return [];
     }
 
-    // Filter by status if specified
-    if (args.status) {
+    // Filter by status if specified (handle overdue as computed status)
+    if (args.status === "overdue") {
+      invoices = invoices.filter((inv) => 
+        (inv.status === "pending" || inv.status === "overdue") && inv.dueDate < now
+      );
+    } else if (args.status) {
       invoices = invoices.filter((inv) => inv.status === args.status);
-    }
-
-    // Check for overdue invoices and update status
-    const now = Date.now();
-    for (const inv of invoices) {
-      if (inv.status === "pending" && inv.dueDate < now) {
-        // Mark as overdue (this is a side effect, but acceptable for status sync)
-        inv.status = "overdue";
-      }
     }
 
     // Sort by issued date descending
     invoices.sort((a, b) => b.issuedDate - a.issuedDate);
 
-    // Fetch organization names for admin view
-    if (user.role === "admin" || user.role === "staff") {
-      const orgIds = [...new Set(invoices.map((inv) => inv.organizationId))];
-      const orgs = await Promise.all(orgIds.map((id) => ctx.db.get(id)));
-      const orgMap = new Map(
-        orgs.filter(Boolean).map((org) => [org!._id.toString(), org!.name])
-      );
+    // Compute display status and fetch org names
+    const orgIds = [...new Set(invoices.map((inv) => inv.organizationId))];
+    const orgs = await Promise.all(orgIds.map((id) => ctx.db.get(id)));
+    const orgMap = new Map(
+      orgs.filter(Boolean).map((org) => [org!._id.toString(), org!.name])
+    );
 
-      return invoices.map((inv) => ({
-        ...inv,
-        organizationName: orgMap.get(inv.organizationId.toString()) || "Unknown",
-      }));
-    }
-
-    return invoices;
+    return invoices.map((inv) => ({
+      ...inv,
+      // Compute overdue status for display (don't mutate DB status)
+      displayStatus: inv.status === "pending" && inv.dueDate < now ? "overdue" : inv.status,
+      organizationName: orgMap.get(inv.organizationId.toString()) || "Unknown",
+    }));
   },
 });
 
@@ -89,17 +88,17 @@ export const get = query({
       if (invoice.organizationId.toString() !== user.organizationId?.toString()) {
         throw new Error("Access denied");
       }
-      // Clients can't see draft invoices
       if (invoice.status === "draft") {
         throw new Error("Access denied");
       }
     }
 
-    // Get organization info
     const org = await ctx.db.get(invoice.organizationId);
+    const now = Date.now();
 
     return {
       ...invoice,
+      displayStatus: invoice.status === "pending" && invoice.dueDate < now ? "overdue" : invoice.status,
       organizationName: org?.name || "Unknown",
     };
   },
@@ -125,17 +124,14 @@ export const countPending = query({
       return { pending: 0, overdue: 0, total: 0 };
     }
 
-    const pending = invoices.filter(
-      (inv) => inv.status === "pending" && inv.dueDate >= now
-    ).length;
+    // Exclude drafts and cancelled for counting
+    const activeInvoices = invoices.filter(
+      (inv) => inv.status === "pending" || inv.status === "overdue"
+    );
 
-    const overdue = invoices.filter(
-      (inv) => (inv.status === "pending" || inv.status === "overdue") && inv.dueDate < now
-    ).length;
-
-    const totalUnpaid = invoices
-      .filter((inv) => inv.status === "pending" || inv.status === "overdue")
-      .reduce((sum, inv) => sum + inv.amount, 0);
+    const pending = activeInvoices.filter((inv) => inv.dueDate >= now).length;
+    const overdue = activeInvoices.filter((inv) => inv.dueDate < now).length;
+    const totalUnpaid = activeInvoices.reduce((sum, inv) => sum + inv.amount, 0);
 
     return { pending, overdue, total: totalUnpaid };
   },
@@ -152,7 +148,6 @@ export const getPayments = query({
       throw new Error("Invoice not found");
     }
 
-    // Check access
     if (user.role === "client") {
       if (invoice.organizationId.toString() !== user.organizationId?.toString()) {
         throw new Error("Access denied");
@@ -196,73 +191,65 @@ export const create = mutation({
       throw new Error("Organization not found");
     }
 
-    // Validate inputs
+    // Validate description
     if (!args.description.trim()) {
       throw new Error("Description is required");
     }
-    if (args.lineItems.length === 0) {
-      throw new Error("At least one line item is required");
+    if (args.description.length > 1000) {
+      throw new Error("Description too long (max 1000 characters)");
     }
 
-    // Calculate total amount
-    const amount = args.lineItems.reduce((sum, item) => sum + item.amount, 0);
+    // Validate notes length
+    if (args.notes && args.notes.length > 5000) {
+      throw new Error("Notes too long (max 5000 characters)");
+    }
 
-    // Generate invoice number
-    const year = new Date().getFullYear();
-    const existingInvoices = await ctx.db
-      .query("invoices")
-      .collect();
-    const yearInvoices = existingInvoices.filter((inv) => 
-      inv.invoiceNumber.includes(`INV-${year}`)
-    );
-    const nextNumber = yearInvoices.length + 1;
-    const invoiceNumber = `INV-${year}-${String(nextNumber).padStart(4, "0")}`;
+    // Validate line items with server-side calculation check
+    const validation = validateLineItems(args.lineItems);
+    if (!validation.valid) {
+      throw new Error(validation.error!);
+    }
+
+    // Generate unique invoice number
+    const invoiceNumber = await generateInvoiceNumber(ctx);
 
     const invoiceId = await ctx.db.insert("invoices", {
       organizationId: args.organizationId,
       invoiceNumber,
       description: args.description.trim(),
-      amount,
+      amount: validation.totalAmount,
       currency: "MYR",
       status: args.isDraft ? "draft" : "pending",
       dueDate: args.dueDate,
       issuedDate: Date.now(),
-      lineItems: args.lineItems,
+      lineItems: args.lineItems.map(item => ({
+        ...item,
+        description: item.description.trim(),
+      })),
       notes: args.notes?.trim(),
       createdBy: user._id,
       createdAt: Date.now(),
     });
 
     // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: args.organizationId,
       userId: user._id,
       action: args.isDraft ? "created_draft_invoice" : "issued_invoice",
       resourceType: "invoice",
       resourceId: invoiceId,
       resourceName: invoiceNumber,
-      createdAt: Date.now(),
     });
 
     // Notify organization users if not draft
     if (!args.isDraft) {
-      const orgUsers = await ctx.db
-        .query("users")
-        .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
-        .collect();
-
-      for (const orgUser of orgUsers) {
-        await ctx.db.insert("notifications", {
-          userId: orgUser._id,
-          type: "invoice_due",
-          title: "New Invoice",
-          message: `Invoice ${invoiceNumber} for RM${(amount / 100).toFixed(2)} has been issued`,
-          link: `/invoices`,
-          relatedId: invoiceId,
-          isRead: false,
-          createdAt: Date.now(),
-        });
-      }
+      await notifyOrgUsers(ctx, args.organizationId, {
+        type: "invoice_due",
+        title: "New Invoice",
+        message: `Invoice ${invoiceNumber} has been issued. Click to view details.`,
+        link: `/invoices`,
+        relatedId: invoiceId,
+      });
     }
 
     return invoiceId;
@@ -284,14 +271,13 @@ export const update = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAdminOrStaff(ctx);
+    const user = await requireAdminOrStaff(ctx);
 
     const invoice = await ctx.db.get(args.id);
     if (!invoice) {
       throw new Error("Invoice not found");
     }
 
-    // Only drafts can be edited
     if (invoice.status !== "draft") {
       throw new Error("Only draft invoices can be edited");
     }
@@ -302,15 +288,22 @@ export const update = mutation({
       if (!args.description.trim()) {
         throw new Error("Description is required");
       }
+      if (args.description.length > 1000) {
+        throw new Error("Description too long (max 1000 characters)");
+      }
       updates.description = args.description.trim();
     }
 
     if (args.lineItems !== undefined) {
-      if (args.lineItems.length === 0) {
-        throw new Error("At least one line item is required");
+      const validation = validateLineItems(args.lineItems);
+      if (!validation.valid) {
+        throw new Error(validation.error!);
       }
-      updates.lineItems = args.lineItems;
-      updates.amount = args.lineItems.reduce((sum, item) => sum + item.amount, 0);
+      updates.lineItems = args.lineItems.map(item => ({
+        ...item,
+        description: item.description.trim(),
+      }));
+      updates.amount = validation.totalAmount;
     }
 
     if (args.dueDate !== undefined) {
@@ -318,11 +311,24 @@ export const update = mutation({
     }
 
     if (args.notes !== undefined) {
+      if (args.notes.length > 5000) {
+        throw new Error("Notes too long (max 5000 characters)");
+      }
       updates.notes = args.notes.trim();
     }
 
     if (Object.keys(updates).length > 0) {
       await ctx.db.patch(args.id, updates);
+      
+      // Log activity for draft updates
+      await logActivity(ctx, {
+        organizationId: invoice.organizationId,
+        userId: user._id,
+        action: "updated_draft_invoice",
+        resourceType: "invoice",
+        resourceId: args.id,
+        resourceName: invoice.invoiceNumber,
+      });
     }
   },
 });
@@ -347,35 +353,22 @@ export const publish = mutation({
       issuedDate: Date.now(),
     });
 
-    // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: invoice.organizationId,
       userId: user._id,
       action: "issued_invoice",
       resourceType: "invoice",
       resourceId: args.id,
       resourceName: invoice.invoiceNumber,
-      createdAt: Date.now(),
     });
 
-    // Notify organization users
-    const orgUsers = await ctx.db
-      .query("users")
-      .withIndex("by_organization", (q) => q.eq("organizationId", invoice.organizationId))
-      .collect();
-
-    for (const orgUser of orgUsers) {
-      await ctx.db.insert("notifications", {
-        userId: orgUser._id,
-        type: "invoice_due",
-        title: "New Invoice",
-        message: `Invoice ${invoice.invoiceNumber} for RM${(invoice.amount / 100).toFixed(2)} has been issued`,
-        link: `/invoices`,
-        relatedId: args.id,
-        isRead: false,
-        createdAt: Date.now(),
-      });
-    }
+    await notifyOrgUsers(ctx, invoice.organizationId, {
+      type: "invoice_due",
+      title: "New Invoice",
+      message: `Invoice ${invoice.invoiceNumber} has been issued. Click to view details.`,
+      link: `/invoices`,
+      relatedId: args.id,
+    });
   },
 });
 
@@ -400,15 +393,13 @@ export const cancel = mutation({
 
     await ctx.db.patch(args.id, { status: "cancelled" });
 
-    // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: invoice.organizationId,
       userId: user._id,
       action: "cancelled_invoice",
       resourceType: "invoice",
       resourceId: args.id,
       resourceName: invoice.invoiceNumber,
-      createdAt: Date.now(),
     });
   },
 });
@@ -443,9 +434,23 @@ export const recordPayment = mutation({
       throw new Error("Cannot record payment for cancelled invoice");
     }
 
+    if (invoice.status === "draft") {
+      throw new Error("Cannot record payment for draft invoice");
+    }
+
+    // Validate payment amount
+    const paymentValidation = await validatePaymentAmount(
+      ctx, 
+      args.invoiceId, 
+      args.amount, 
+      invoice.amount
+    );
+    if (!paymentValidation.valid) {
+      throw new Error(paymentValidation.error!);
+    }
+
     const paidAt = args.paidAt || Date.now();
 
-    // Create payment record
     await ctx.db.insert("payments", {
       invoiceId: args.invoiceId,
       organizationId: invoice.organizationId,
@@ -459,41 +464,27 @@ export const recordPayment = mutation({
       createdAt: Date.now(),
     });
 
-    // Update invoice status
     await ctx.db.patch(args.invoiceId, {
       status: "paid",
       paidAt,
     });
 
-    // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: invoice.organizationId,
       userId: user._id,
       action: "recorded_payment",
       resourceType: "invoice",
       resourceId: args.invoiceId,
       resourceName: invoice.invoiceNumber,
-      createdAt: Date.now(),
     });
 
-    // Notify organization users
-    const orgUsers = await ctx.db
-      .query("users")
-      .withIndex("by_organization", (q) => q.eq("organizationId", invoice.organizationId))
-      .collect();
-
-    for (const orgUser of orgUsers) {
-      await ctx.db.insert("notifications", {
-        userId: orgUser._id,
-        type: "payment_received",
-        title: "Payment Received",
-        message: `Payment of RM${(args.amount / 100).toFixed(2)} received for invoice ${invoice.invoiceNumber}`,
-        link: `/invoices`,
-        relatedId: args.invoiceId,
-        isRead: false,
-        createdAt: Date.now(),
-      });
-    }
+    await notifyOrgUsers(ctx, invoice.organizationId, {
+      type: "payment_received",
+      title: "Payment Received",
+      message: `Payment received for invoice ${invoice.invoiceNumber}. Click to view details.`,
+      link: `/invoices`,
+      relatedId: args.invoiceId,
+    });
   },
 });
 
@@ -501,54 +492,27 @@ export const recordPayment = mutation({
 // STRIPE ACTIONS
 // ============================================
 
-// Create Stripe checkout session
 export const createCheckoutSession = action({
   args: { invoiceId: v.id("invoices") },
   handler: async (ctx, args) => {
-    // Get identity
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Unauthorized");
     }
 
-    // Get invoice
     const invoice = await ctx.runQuery(api.invoices.get, { id: args.invoiceId });
     if (!invoice) {
       throw new Error("Invoice not found");
     }
 
-    if (invoice.status !== "pending" && invoice.status !== "overdue") {
+    if (invoice.status !== "pending" && invoice.displayStatus !== "overdue") {
       throw new Error("Invoice cannot be paid");
     }
 
-    // TODO: Create Stripe checkout session when Stripe is configured
-    // For now, return a placeholder indicating Stripe needs to be set up
-    // When ready, configure STRIPE_SECRET_KEY in Convex environment variables
-    // and implement the checkout session creation
-
-    // Placeholder response - Stripe not yet configured
+    // Placeholder - Stripe integration pending
     return {
       checkoutUrl: null,
       message: "Online payment is coming soon. Please use bank transfer for now.",
     };
-
-    // When Stripe is configured, the implementation would look like:
-    // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    // const session = await stripe.checkout.sessions.create({
-    //   mode: "payment",
-    //   payment_method_types: ["card", "fpx"],
-    //   line_items: invoice.lineItems.map(item => ({
-    //     price_data: {
-    //       currency: invoice.currency.toLowerCase(),
-    //       product_data: { name: item.description },
-    //       unit_amount: item.unitPrice,
-    //     },
-    //     quantity: item.quantity,
-    //   })),
-    //   success_url: `${siteUrl}/invoices?success=true&invoice=${args.invoiceId}`,
-    //   cancel_url: `${siteUrl}/invoices?cancelled=true&invoice=${args.invoiceId}`,
-    //   metadata: { invoiceId: args.invoiceId },
-    // });
-    // return { checkoutUrl: session.url };
   },
 });

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
@@ -32,9 +34,13 @@ import {
   Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Id, Doc } from "../../convex/_generated/dataModel";
+import type { Id } from "../../convex/_generated/dataModel";
 
-const statusOptions = [
+// Invoice status type
+type InvoiceStatus = "draft" | "pending" | "paid" | "overdue" | "cancelled";
+type StatusFilter = InvoiceStatus | "all";
+
+const statusOptions: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All Invoices" },
   { value: "pending", label: "Pending" },
   { value: "overdue", label: "Overdue" },
@@ -89,25 +95,39 @@ function formatDate(timestamp: number): string {
   });
 }
 
+// Line item type for display
+interface LineItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+
 export function Invoices() {
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [selectedInvoice, setSelectedInvoice] = useState<Id<"invoices"> | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const invoices = useQuery(api.invoices.list, {
-    status: statusFilter === "all" ? undefined : statusFilter as any,
+    status: statusFilter === "all" ? undefined : statusFilter,
   });
 
   const invoiceCounts = useQuery(api.invoices.countPending, {});
 
   const selectedInvoiceData = useQuery(
     api.invoices.get,
-    selectedInvoice ? { id: selectedInvoice } : "skip"
+    detailDialogOpen && selectedInvoice ? { id: selectedInvoice } : "skip"
   );
 
   const handleViewDetails = (invoiceId: Id<"invoices">) => {
     setSelectedInvoice(invoiceId);
     setDetailDialogOpen(true);
+  };
+
+  const handlePayNow = () => {
+    toast.info("Online payment coming soon", {
+      description: "Please contact us for bank transfer details.",
+    });
   };
 
   return (
@@ -123,7 +143,21 @@ export function Invoices() {
       </div>
 
       {/* Summary Cards */}
-      {invoiceCounts && (
+      {invoiceCounts === undefined ? (
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader className="pb-2">
+                <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+                <div className="h-8 w-16 animate-pulse rounded bg-muted mt-2" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-3 w-32 animate-pulse rounded bg-muted" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
         <div className="grid gap-4 sm:grid-cols-3">
           <Card>
             <CardHeader className="pb-2">
@@ -170,9 +204,10 @@ export function Invoices() {
       {/* Filters */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]">
+          <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <Label htmlFor="status-filter" className="sr-only">Filter by status</Label>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+            <SelectTrigger id="status-filter" className="w-[150px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -188,7 +223,7 @@ export function Invoices() {
 
       {/* Invoice List */}
       {invoices === undefined ? (
-        <div className="flex h-64 items-center justify-center">
+        <div className="flex h-64 items-center justify-center" aria-busy="true" aria-live="polite">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
             <p className="text-sm text-muted-foreground">Loading invoices...</p>
@@ -208,17 +243,16 @@ export function Invoices() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {invoices.map((invoice: Doc<"invoices"> & { organizationName?: string }) => {
-            const isOverdue = invoice.status === "pending" && invoice.dueDate < Date.now();
-            const displayStatus = isOverdue ? "overdue" : invoice.status;
-            const displayConfig = statusConfig[displayStatus];
+          {invoices.map((invoice) => {
+            const displayStatus = invoice.displayStatus || invoice.status;
+            const displayConfig = statusConfig[displayStatus] || statusConfig.pending;
 
             return (
               <Card
                 key={invoice._id}
                 className={cn(
                   "transition-shadow hover:shadow-md",
-                  isOverdue && "border-destructive/50"
+                  displayStatus === "overdue" && "border-destructive/50"
                 )}
               >
                 <CardContent className="p-4">
@@ -234,7 +268,7 @@ export function Invoices() {
                           "h-5 w-5",
                           displayStatus === "paid" ? "text-green-600" :
                           displayStatus === "overdue" ? "text-red-600" : "text-muted-foreground"
-                        )} />
+                        )} aria-hidden="true" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -247,15 +281,15 @@ export function Invoices() {
                         <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
                           {invoice.description}
                         </p>
-                        {"organizationName" in invoice && (
+                        {invoice.organizationName && (
                           <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                            <Building2 className="h-3 w-3" />
+                            <Building2 className="h-3 w-3" aria-hidden="true" />
                             {invoice.organizationName}
                           </div>
                         )}
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                           <span>Issued {formatDate(invoice.issuedDate)}</span>
-                          <span className={isOverdue ? "text-destructive font-medium" : ""}>
+                          <span className={displayStatus === "overdue" ? "text-destructive font-medium" : ""}>
                             Due {formatDate(invoice.dueDate)}
                           </span>
                           {invoice.paidAt && (
@@ -279,12 +313,12 @@ export function Invoices() {
                           className="gap-1"
                           onClick={() => handleViewDetails(invoice._id)}
                         >
-                          <Eye className="h-3 w-3" />
+                          <Eye className="h-3 w-3" aria-hidden="true" />
                           View
                         </Button>
-                        {(invoice.status === "pending" || isOverdue) && (
-                          <Button size="sm" className="gap-1">
-                            <CreditCard className="h-3 w-3" />
+                        {(displayStatus === "pending" || displayStatus === "overdue") && (
+                          <Button size="sm" className="gap-1" onClick={handlePayNow}>
+                            <CreditCard className="h-3 w-3" aria-hidden="true" />
                             Pay Now
                           </Button>
                         )}
@@ -313,11 +347,11 @@ export function Invoices() {
               {/* Status & Dates */}
               <div className="flex flex-wrap items-center gap-4">
                 <Badge 
-                  variant={statusConfig[selectedInvoiceData.status]?.variant || "default"}
+                  variant={statusConfig[selectedInvoiceData.displayStatus || selectedInvoiceData.status]?.variant || "default"}
                   className="gap-1"
                 >
-                  {statusConfig[selectedInvoiceData.status]?.icon}
-                  {statusConfig[selectedInvoiceData.status]?.label}
+                  {statusConfig[selectedInvoiceData.displayStatus || selectedInvoiceData.status]?.icon}
+                  {statusConfig[selectedInvoiceData.displayStatus || selectedInvoiceData.status]?.label}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
                   Issued: {formatDate(selectedInvoiceData.issuedDate)}
@@ -338,18 +372,18 @@ export function Invoices() {
               {/* Line Items */}
               <div>
                 <h4 className="font-medium mb-2">Line Items</h4>
-                <div className="rounded-lg border">
-                  <table className="w-full text-sm">
+                <div className="rounded-lg border overflow-x-auto">
+                  <table className="w-full text-sm min-w-[400px]">
                     <thead className="border-b bg-muted/50">
                       <tr>
-                        <th className="px-4 py-2 text-left">Description</th>
-                        <th className="px-4 py-2 text-right">Qty</th>
-                        <th className="px-4 py-2 text-right">Unit Price</th>
-                        <th className="px-4 py-2 text-right">Amount</th>
+                        <th scope="col" className="px-4 py-2 text-left">Description</th>
+                        <th scope="col" className="px-4 py-2 text-right">Qty</th>
+                        <th scope="col" className="px-4 py-2 text-right">Unit Price</th>
+                        <th scope="col" className="px-4 py-2 text-right">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedInvoiceData.lineItems.map((item: { description: string; quantity: number; unitPrice: number; amount: number }, index: number) => (
+                      {selectedInvoiceData.lineItems.map((item: LineItem, index: number) => (
                         <tr key={index} className="border-b last:border-0">
                           <td className="px-4 py-2">{item.description}</td>
                           <td className="px-4 py-2 text-right">{item.quantity}</td>
@@ -388,20 +422,27 @@ export function Invoices() {
 
               {/* Actions */}
               <div className="flex justify-end gap-2 pt-4 border-t">
-                <Button variant="outline" className="gap-1" disabled>
-                  <Download className="h-4 w-4" />
+                <Button 
+                  variant="outline" 
+                  className="gap-1" 
+                  disabled
+                  title="PDF download coming soon"
+                >
+                  <Download className="h-4 w-4" aria-hidden="true" />
                   Download PDF
                 </Button>
-                {(selectedInvoiceData.status === "pending" || selectedInvoiceData.status === "overdue") && (
-                  <Button className="gap-1">
-                    <CreditCard className="h-4 w-4" />
+                {(selectedInvoiceData.displayStatus === "pending" || 
+                  selectedInvoiceData.displayStatus === "overdue" ||
+                  selectedInvoiceData.status === "pending") && (
+                  <Button className="gap-1" onClick={handlePayNow}>
+                    <CreditCard className="h-4 w-4" aria-hidden="true" />
                     Pay Now
                   </Button>
                 )}
               </div>
             </div>
           ) : (
-            <div className="flex h-32 items-center justify-center">
+            <div className="flex h-32 items-center justify-center" aria-busy="true">
               <Spinner />
             </div>
           )}

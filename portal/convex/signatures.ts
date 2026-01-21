@@ -1,6 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
+import { logActivity, notifyOrgUsers, notifyAdmins, validateSignatureData } from "./lib/helpers";
 
 // ============================================
 // QUERIES
@@ -18,14 +19,13 @@ export const list = query({
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
+    const now = Date.now();
 
     let requests;
 
     if (user.role === "admin" || user.role === "staff") {
-      // Admin/staff see all signature requests
       requests = await ctx.db.query("signatureRequests").collect();
     } else if (user.organizationId) {
-      // Clients see their organization's signature requests
       requests = await ctx.db
         .query("signatureRequests")
         .withIndex("by_organization", (q) => q.eq("organizationId", user.organizationId!))
@@ -37,14 +37,6 @@ export const list = query({
     // Filter by status if specified
     if (args.status) {
       requests = requests.filter((r) => r.status === args.status);
-    }
-
-    // Check for expired requests
-    const now = Date.now();
-    for (const req of requests) {
-      if (req.status === "pending" && req.expiresAt && req.expiresAt < now) {
-        req.status = "expired";
-      }
     }
 
     // Sort by requested date descending
@@ -59,6 +51,10 @@ export const list = query({
 
     return requests.map((req) => ({
       ...req,
+      // Compute expired status for display
+      displayStatus: req.status === "pending" && req.expiresAt && req.expiresAt < now 
+        ? "expired" 
+        : req.status,
       documentName: docMap.get(req.documentId.toString()) || "Unknown Document",
     }));
   },
@@ -75,17 +71,15 @@ export const get = query({
       return null;
     }
 
-    // Check access
     if (user.role === "client") {
       if (request.organizationId.toString() !== user.organizationId?.toString()) {
         throw new Error("Access denied");
       }
     }
 
-    // Get document info
     const document = await ctx.db.get(request.documentId);
+    const now = Date.now();
 
-    // Get signature if signed
     let signature = null;
     if (request.status === "signed") {
       signature = await ctx.db
@@ -94,7 +88,6 @@ export const get = query({
         .first();
     }
 
-    // Get signer info if signed
     let signerName = null;
     if (request.signedBy) {
       const signer = await ctx.db.get(request.signedBy);
@@ -103,6 +96,9 @@ export const get = query({
 
     return {
       ...request,
+      displayStatus: request.status === "pending" && request.expiresAt && request.expiresAt < now 
+        ? "expired" 
+        : request.status,
       documentName: document?.name || "Unknown Document",
       signature,
       signerName,
@@ -115,6 +111,7 @@ export const countPending = query({
   args: {},
   handler: async (ctx) => {
     const user = await requireAuth(ctx);
+    const now = Date.now();
 
     let requests;
 
@@ -129,7 +126,6 @@ export const countPending = query({
       return 0;
     }
 
-    const now = Date.now();
     return requests.filter(
       (r) => r.status === "pending" && (!r.expiresAt || r.expiresAt > now)
     ).length;
@@ -152,13 +148,11 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const user = await requireAdminOrStaff(ctx);
 
-    // Validate organization exists
     const org = await ctx.db.get(args.organizationId);
     if (!org) {
       throw new Error("Organization not found");
     }
 
-    // Validate document exists and belongs to organization
     const document = await ctx.db.get(args.documentId);
     if (!document) {
       throw new Error("Document not found");
@@ -167,12 +161,16 @@ export const create = mutation({
       throw new Error("Document does not belong to this organization");
     }
 
-    // Validate inputs
     if (!args.title.trim()) {
       throw new Error("Title is required");
     }
+    if (args.title.length > 200) {
+      throw new Error("Title too long (max 200 characters)");
+    }
+    if (args.description && args.description.length > 1000) {
+      throw new Error("Description too long (max 1000 characters)");
+    }
 
-    // Check for existing pending request for this document
     const existingRequest = await ctx.db
       .query("signatureRequests")
       .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
@@ -180,7 +178,7 @@ export const create = mutation({
       .first();
 
     if (existingRequest) {
-      throw new Error("A signature request already exists for this document");
+      throw new Error("A pending signature request already exists for this document");
     }
 
     const requestId = await ctx.db.insert("signatureRequests", {
@@ -194,35 +192,22 @@ export const create = mutation({
       expiresAt: args.expiresAt,
     });
 
-    // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: args.organizationId,
       userId: user._id,
       action: "requested_signature",
       resourceType: "signature_request",
       resourceId: requestId,
       resourceName: args.title.trim(),
-      createdAt: Date.now(),
     });
 
-    // Notify organization users
-    const orgUsers = await ctx.db
-      .query("users")
-      .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
-      .collect();
-
-    for (const orgUser of orgUsers) {
-      await ctx.db.insert("notifications", {
-        userId: orgUser._id,
-        type: "system",
-        title: "Signature Required",
-        message: `Please sign: "${args.title.trim()}"`,
-        link: `/signatures/${requestId}`,
-        relatedId: requestId,
-        isRead: false,
-        createdAt: Date.now(),
-      });
-    }
+    await notifyOrgUsers(ctx, args.organizationId, {
+      type: "system",
+      title: "Signature Required",
+      message: `Please sign: "${args.title.trim()}"`,
+      link: `/signatures`,
+      relatedId: requestId,
+    });
 
     return requestId;
   },
@@ -237,7 +222,7 @@ export const sign = mutation({
       v.literal("type"),
       v.literal("upload")
     ),
-    signatureData: v.string(), // Base64 or typed name
+    signatureData: v.string(),
     legalName: v.string(),
     agreedToTerms: v.boolean(),
     ipAddress: v.optional(v.string()),
@@ -246,42 +231,45 @@ export const sign = mutation({
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
 
-    // Validate request
     const request = await ctx.db.get(args.requestId);
     if (!request) {
       throw new Error("Signature request not found");
     }
 
-    // Check access
+    // Check access - only users in the organization can sign
     if (user.role === "client") {
       if (request.organizationId.toString() !== user.organizationId?.toString()) {
         throw new Error("Access denied");
       }
     }
 
-    // Check status
     if (request.status !== "pending") {
-      throw new Error("This signature request is no longer pending");
+      throw new Error(`This signature request is ${request.status}, not pending`);
     }
 
-    // Check expiry
     if (request.expiresAt && request.expiresAt < Date.now()) {
       await ctx.db.patch(args.requestId, { status: "expired" });
       throw new Error("This signature request has expired");
     }
 
-    // Validate inputs
+    // Validate legal name
     if (!args.legalName.trim()) {
       throw new Error("Legal name is required");
     }
+    if (args.legalName.length > 200) {
+      throw new Error("Legal name too long (max 200 characters)");
+    }
+
     if (!args.agreedToTerms) {
       throw new Error("You must agree to the terms");
     }
-    if (!args.signatureData) {
-      throw new Error("Signature is required");
+
+    // Validate signature data
+    const signatureValidation = validateSignatureData(args.signatureType, args.signatureData);
+    if (!signatureValidation.valid) {
+      throw new Error(signatureValidation.error!);
     }
 
-    // Create signature record
     await ctx.db.insert("signatures", {
       signatureRequestId: args.requestId,
       userId: user._id,
@@ -294,42 +282,28 @@ export const sign = mutation({
       timestamp: Date.now(),
     });
 
-    // Update request status
     await ctx.db.patch(args.requestId, {
       status: "signed",
       signedAt: Date.now(),
       signedBy: user._id,
     });
 
-    // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: request.organizationId,
       userId: user._id,
       action: "signed_document",
       resourceType: "signature_request",
       resourceId: args.requestId,
       resourceName: request.title,
-      createdAt: Date.now(),
     });
 
-    // Notify admin/staff about the signature
-    const admins = await ctx.db
-      .query("users")
-      .filter((q) => q.or(q.eq(q.field("role"), "admin"), q.eq(q.field("role"), "staff")))
-      .collect();
-
-    for (const admin of admins) {
-      await ctx.db.insert("notifications", {
-        userId: admin._id,
-        type: "system",
-        title: "Document Signed",
-        message: `${user.name} signed "${request.title}"`,
-        link: `/signatures/${args.requestId}`,
-        relatedId: args.requestId,
-        isRead: false,
-        createdAt: Date.now(),
-      });
-    }
+    await notifyAdmins(ctx, {
+      type: "system",
+      title: "Document Signed",
+      message: `${user.name} signed "${request.title}"`,
+      link: `/signatures`,
+      relatedId: args.requestId,
+    }, user._id);
   },
 });
 
@@ -347,7 +321,6 @@ export const decline = mutation({
       throw new Error("Signature request not found");
     }
 
-    // Check access
     if (user.role === "client") {
       if (request.organizationId.toString() !== user.organizationId?.toString()) {
         throw new Error("Access denied");
@@ -355,13 +328,12 @@ export const decline = mutation({
     }
 
     if (request.status !== "pending") {
-      throw new Error("This signature request is no longer pending");
+      throw new Error(`This signature request is ${request.status}, not pending`);
     }
 
     await ctx.db.patch(args.requestId, { status: "declined" });
 
-    // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: request.organizationId,
       userId: user._id,
       action: "declined_signature",
@@ -369,27 +341,15 @@ export const decline = mutation({
       resourceId: args.requestId,
       resourceName: request.title,
       metadata: args.reason ? { reason: args.reason } : undefined,
-      createdAt: Date.now(),
     });
 
-    // Notify admin/staff
-    const admins = await ctx.db
-      .query("users")
-      .filter((q) => q.or(q.eq(q.field("role"), "admin"), q.eq(q.field("role"), "staff")))
-      .collect();
-
-    for (const admin of admins) {
-      await ctx.db.insert("notifications", {
-        userId: admin._id,
-        type: "system",
-        title: "Signature Declined",
-        message: `${user.name} declined to sign "${request.title}"`,
-        link: `/signatures/${args.requestId}`,
-        relatedId: args.requestId,
-        isRead: false,
-        createdAt: Date.now(),
-      });
-    }
+    await notifyAdmins(ctx, {
+      type: "system",
+      title: "Signature Declined",
+      message: `${user.name} declined to sign "${request.title}"`,
+      link: `/signatures`,
+      relatedId: args.requestId,
+    }, user._id);
   },
 });
 
@@ -410,15 +370,13 @@ export const cancel = mutation({
 
     await ctx.db.patch(args.id, { status: "expired" });
 
-    // Log activity
-    await ctx.db.insert("activityLogs", {
+    await logActivity(ctx, {
       organizationId: request.organizationId,
       userId: user._id,
       action: "cancelled_signature_request",
       resourceType: "signature_request",
       resourceId: args.id,
       resourceName: request.title,
-      createdAt: Date.now(),
     });
   },
 });

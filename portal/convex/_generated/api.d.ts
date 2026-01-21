@@ -16,6 +16,7 @@ import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as invoices from "../invoices.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_helpers from "../lib/helpers.js";
 import type * as notifications from "../notifications.js";
 import type * as organizations from "../organizations.js";
 import type * as signatures from "../signatures.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   invoices: typeof invoices;
   "lib/auth": typeof lib_auth;
+  "lib/helpers": typeof lib_helpers;
   notifications: typeof notifications;
   organizations: typeof organizations;
   signatures: typeof signatures;

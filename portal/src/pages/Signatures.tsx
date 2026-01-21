@@ -46,9 +46,13 @@ import {
   FileText,
 } from "lucide-react";
 import { cn, formatDistanceToNow } from "@/lib/utils";
-import type { Id, Doc } from "../../convex/_generated/dataModel";
+import type { Id } from "../../convex/_generated/dataModel";
 
-const statusOptions = [
+// Status types
+type SignatureStatus = "pending" | "signed" | "declined" | "expired";
+type StatusFilter = SignatureStatus | "all";
+
+const statusOptions: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All Requests" },
   { value: "pending", label: "Pending" },
   { value: "signed", label: "Signed" },
@@ -213,7 +217,7 @@ function SignatureCanvas({
 }
 
 export function Signatures() {
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [signDialogOpen, setSignDialogOpen] = useState(false);
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<Id<"signatureRequests"> | null>(null);
@@ -225,7 +229,7 @@ export function Signatures() {
   const [isSigning, setIsSigning] = useState(false);
 
   const requests = useQuery(api.signatures.list, {
-    status: statusFilter === "all" ? undefined : statusFilter as any,
+    status: statusFilter === "all" ? undefined : statusFilter,
   });
 
   const pendingCount = useQuery(api.signatures.countPending, {});
@@ -329,9 +333,10 @@ export function Signatures() {
       {/* Filters */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]">
+          <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <Label htmlFor="signature-status-filter" className="sr-only">Filter by status</Label>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+            <SelectTrigger id="signature-status-filter" className="w-[150px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -347,7 +352,7 @@ export function Signatures() {
 
       {/* Request List */}
       {requests === undefined ? (
-        <div className="flex h-64 items-center justify-center">
+        <div className="flex h-64 items-center justify-center" aria-busy="true" aria-live="polite">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
             <p className="text-sm text-muted-foreground">Loading signature requests...</p>
@@ -367,15 +372,16 @@ export function Signatures() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {requests.map((request: Doc<"signatureRequests"> & { documentName: string }) => {
-            const config = statusConfig[request.status];
+          {requests.map((request) => {
+            const displayStatus = request.displayStatus || request.status;
+            const config = statusConfig[displayStatus] || statusConfig.pending;
 
             return (
               <Card
                 key={request._id}
                 className={cn(
                   "transition-shadow hover:shadow-md",
-                  request.status === "pending" && "border-l-4 border-l-warning"
+                  displayStatus === "pending" && "border-l-4 border-l-warning"
                 )}
               >
                 <CardContent className="p-4">
@@ -384,14 +390,14 @@ export function Signatures() {
                     <div className="flex items-start gap-4">
                       <div className={cn(
                         "flex h-10 w-10 items-center justify-center rounded-lg",
-                        request.status === "signed" ? "bg-green-100" :
-                        request.status === "pending" ? "bg-amber-100" : "bg-muted"
+                        displayStatus === "signed" ? "bg-green-100" :
+                        displayStatus === "pending" ? "bg-amber-100" : "bg-muted"
                       )}>
                         <FileSignature className={cn(
                           "h-5 w-5",
-                          request.status === "signed" ? "text-green-600" :
-                          request.status === "pending" ? "text-amber-600" : "text-muted-foreground"
-                        )} />
+                          displayStatus === "signed" ? "text-green-600" :
+                          displayStatus === "pending" ? "text-amber-600" : "text-muted-foreground"
+                        )} aria-hidden="true" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -408,7 +414,7 @@ export function Signatures() {
                         )}
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                           <div className="flex items-center gap-1">
-                            <FileText className="h-3 w-3" />
+                            <FileText className="h-3 w-3" aria-hidden="true" />
                             {request.documentName}
                           </div>
                           <span>Requested {formatDistanceToNow(request.requestedAt)}</span>
@@ -427,7 +433,7 @@ export function Signatures() {
                     </div>
 
                     {/* Actions */}
-                    {request.status === "pending" && (
+                    {displayStatus === "pending" && (
                       <div className="flex gap-2">
                         <Button
                           variant="outline"
@@ -441,7 +447,7 @@ export function Signatures() {
                           className="gap-1"
                           onClick={() => handleSignClick(request._id)}
                         >
-                          <PenTool className="h-3 w-3" />
+                          <PenTool className="h-3 w-3" aria-hidden="true" />
                           Sign
                         </Button>
                       </div>

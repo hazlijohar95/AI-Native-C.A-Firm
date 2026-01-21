@@ -26,6 +26,7 @@ export function Dashboard() {
   const documentCount = useQuery(api.documents.count);
   const pendingTaskCount = useQuery(api.tasks.countPending);
   const unreadAnnouncementCount = useQuery(api.announcements.countUnread);
+  const invoiceCounts = useQuery(api.invoices.countPending);
   const recentActivity = useQuery(api.activity.list, { limit: 5 });
 
   // Sync user to database on first load (fallback if webhook hasn't fired)
@@ -87,8 +88,10 @@ export function Dashboard() {
         />
         <StatusCard
           title="Invoices"
-          value="0"
-          description="Outstanding"
+          value={(invoiceCounts?.pending ?? 0) + (invoiceCounts?.overdue ?? 0) > 0 
+            ? `${(invoiceCounts?.pending ?? 0) + (invoiceCounts?.overdue ?? 0)}` 
+            : "0"}
+          description={invoiceCounts?.overdue ? `${invoiceCounts.overdue} overdue` : "Outstanding"}
           icon={Receipt}
           href="/invoices"
           color="green"
