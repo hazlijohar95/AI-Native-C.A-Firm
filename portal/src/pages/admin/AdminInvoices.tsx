@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -478,11 +478,11 @@ function RecordPaymentDialog({ invoiceId, onClose }: RecordPaymentDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Set default amount when invoice loads
-  useState(() => {
-    if (invoice) {
+  useEffect(() => {
+    if (invoice && !amount) {
       setAmount((invoice.amount / 100).toFixed(2));
     }
-  });
+  }, [invoice, amount]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

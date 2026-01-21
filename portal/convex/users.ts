@@ -115,6 +115,23 @@ export const assignToOrganization = mutation({
   },
 });
 
+// Remove user from organization (admin only)
+export const removeFromOrganization = mutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await ctx.db.patch(args.userId, { organizationId: undefined });
+  },
+});
+
 // List all users (admin/staff only)
 export const list = query({
   args: {},

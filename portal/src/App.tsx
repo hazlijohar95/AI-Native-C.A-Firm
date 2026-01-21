@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
+import { Authenticated, Unauthenticated, AuthLoading, useQuery } from "convex/react";
 import { Toaster } from "sonner";
+import { api } from "../convex/_generated/api";
 import { Spinner } from "@/components/ui/spinner";
 import { Shell } from "@/components/layout/Shell";
 import { Login } from "@/pages/Login";
@@ -55,13 +56,13 @@ function App() {
             <Route path="/signatures/:id" element={<Signatures />} />
             <Route path="/settings" element={<ComingSoon title="Settings" />} />
             
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/organizations" element={<AdminClients />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/invoices" element={<AdminInvoices />} />
-            <Route path="/admin/announcements" element={<AdminAnnouncements />} />
-            <Route path="/admin/activity" element={<AdminActivity />} />
+            {/* Admin Routes - Protected by AdminRoute wrapper */}
+            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            <Route path="/admin/organizations" element={<AdminRoute><AdminClients /></AdminRoute>} />
+            <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+            <Route path="/admin/invoices" element={<AdminRoute><AdminInvoices /></AdminRoute>} />
+            <Route path="/admin/announcements" element={<AdminRoute><AdminAnnouncements /></AdminRoute>} />
+            <Route path="/admin/activity" element={<AdminRoute><AdminActivity /></AdminRoute>} />
             
             {/* Fallbacks */}
             <Route path="/callback" element={<Navigate to="/dashboard" replace />} />
@@ -71,6 +72,29 @@ function App() {
       </Authenticated>
     </>
   );
+}
+
+/**
+ * Admin route protection wrapper - redirects non-admin/staff users to dashboard
+ */
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const currentUser = useQuery(api.users.getCurrentUser);
+
+  // Still loading user data
+  if (currentUser === undefined) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  // Not an admin or staff - redirect to dashboard
+  if (!currentUser || (currentUser.role !== "admin" && currentUser.role !== "staff")) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 }
 
 // Placeholder component for pages not yet implemented

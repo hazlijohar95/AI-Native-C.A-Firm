@@ -52,10 +52,11 @@ import type { Id } from "../../../convex/_generated/dataModel";
 type AnnouncementType = "general" | "tax_update" | "deadline" | "news";
 
 export function AdminAnnouncements() {
-  const announcements = useQuery(api.announcements.list, {});
+  const announcements = useQuery(api.admin.listAllAnnouncements);
   const organizations = useQuery(api.organizations.list);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<(typeof announcements extends (infer T)[] | undefined ? T : never) | null>(null);
 
@@ -65,7 +66,8 @@ export function AdminAnnouncements() {
       announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       announcement.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = typeFilter === "all" || announcement.type === typeFilter;
-    return matchesSearch && matchesType;
+    const matchesStatus = statusFilter === "all" || announcement.adminStatus === statusFilter;
+    return matchesSearch && matchesType && matchesStatus;
   });
 
   const getTypeBadge = (type: AnnouncementType) => {
@@ -78,6 +80,19 @@ export function AdminAnnouncements() {
         return <Badge variant="destructive">Deadline</Badge>;
       case "news":
         return <Badge className="bg-purple-500">News</Badge>;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "active":
+        return <Badge className="bg-green-500">Active</Badge>;
+      case "scheduled":
+        return <Badge className="bg-amber-500">Scheduled</Badge>;
+      case "expired":
+        return <Badge variant="secondary" className="text-muted-foreground">Expired</Badge>;
+      default:
+        return null;
     }
   };
 
@@ -130,6 +145,17 @@ export function AdminAnnouncements() {
             <SelectItem value="news">News</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="expired">Expired</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Announcements List */}
@@ -156,11 +182,12 @@ export function AdminAnnouncements() {
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                       {announcement.isPinned && (
                         <Pin className="h-4 w-4 text-primary" />
                       )}
                       {getTypeBadge(announcement.type as AnnouncementType)}
+                      {getStatusBadge(announcement.adminStatus)}
                       {announcement.targetOrganizations && announcement.targetOrganizations.length > 0 ? (
                         <Badge variant="outline" className="gap-1">
                           <Building2 className="h-3 w-3" />

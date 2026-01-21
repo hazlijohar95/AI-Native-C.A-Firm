@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -241,12 +241,20 @@ interface UserEditDialogProps {
 function UserEditDialog({ user, organizations, onClose }: UserEditDialogProps) {
   const updateRole = useMutation(api.users.updateRole);
   const assignToOrg = useMutation(api.users.assignToOrganization);
+  const removeFromOrg = useMutation(api.users.removeFromOrganization);
   
   const [role, setRole] = useState<UserRole>(user.role);
   const [organizationId, setOrganizationId] = useState<string>(
     user.organizationId?.toString() || "none"
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Reset form when user changes
+  useEffect(() => {
+    setRole(user.role);
+    setOrganizationId(user.organizationId?.toString() || "none");
+    setIsSubmitting(false);
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,11 +270,16 @@ function UserEditDialog({ user, organizations, onClose }: UserEditDialogProps) {
       const newOrgId = organizationId === "none" ? undefined : organizationId;
       const currentOrgId = user.organizationId?.toString();
       
-      if (newOrgId && newOrgId !== currentOrgId) {
-        await assignToOrg({ 
-          userId: user._id, 
-          organizationId: newOrgId as Id<"organizations">
-        });
+      if (newOrgId !== currentOrgId) {
+        if (newOrgId) {
+          await assignToOrg({ 
+            userId: user._id, 
+            organizationId: newOrgId as Id<"organizations">
+          });
+        } else {
+          // Remove from organization
+          await removeFromOrg({ userId: user._id });
+        }
       }
 
       toast.success("User updated");

@@ -182,3 +182,26 @@ export const listAllSignatureRequests = query({
     }));
   },
 });
+
+// List ALL announcements for admin (including future-scheduled and expired)
+export const listAllAnnouncements = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdminOrStaff(ctx);
+    const now = Date.now();
+
+    const announcements = await ctx.db.query("announcements").collect();
+
+    // Sort by created date descending
+    announcements.sort((a, b) => b.createdAt - a.createdAt);
+
+    // Add status for admin view
+    return announcements.map((a) => ({
+      ...a,
+      adminStatus: 
+        a.publishedAt > now ? "scheduled" :
+        a.expiresAt && a.expiresAt < now ? "expired" :
+        "active",
+    }));
+  },
+});

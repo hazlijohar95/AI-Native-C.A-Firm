@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -8,7 +10,12 @@ import {
   Receipt, 
   PenTool,
   Settings,
-  X
+  X,
+  Building2,
+  Users,
+  Shield,
+  History,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,13 +24,22 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-const navigation = [
+const clientNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Documents", href: "/documents", icon: FileText },
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Announcements", href: "/announcements", icon: Bell },
   { name: "Invoices", href: "/invoices", icon: Receipt },
   { name: "Signatures", href: "/signatures", icon: PenTool },
+];
+
+const adminNavigation = [
+  { name: "Admin Dashboard", href: "/admin", icon: Shield },
+  { name: "Organizations", href: "/admin/organizations", icon: Building2 },
+  { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Invoices", href: "/admin/invoices", icon: Receipt },
+  { name: "Announcements", href: "/admin/announcements", icon: Megaphone },
+  { name: "Activity Log", href: "/admin/activity", icon: History },
 ];
 
 const secondaryNavigation = [
@@ -59,6 +75,9 @@ interface SidebarContentProps {
 }
 
 function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const isAdmin = currentUser?.role === "admin" || currentUser?.role === "staff";
+
   return (
     <div className="flex h-full flex-col">
       {/* Logo */}
@@ -76,9 +95,12 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-2 py-4">
-        {navigation.map((item) => (
+      {/* Client Navigation */}
+      <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
+        <div className="mb-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Portal
+        </div>
+        {clientNavigation.map((item) => (
           <NavLink
             key={item.name}
             to={item.href}
@@ -96,6 +118,33 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
             {item.name}
           </NavLink>
         ))}
+
+        {/* Admin Navigation */}
+        {isAdmin && (
+          <>
+            <div className="mt-6 mb-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Admin
+            </div>
+            {adminNavigation.map((item) => (
+              <NavLink
+                key={item.name}
+                to={item.href}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-gray-700 hover:bg-gray-100"
+                  )
+                }
+              >
+                <item.icon className="h-5 w-5" />
+                {item.name}
+              </NavLink>
+            ))}
+          </>
+        )}
       </nav>
 
       {/* Secondary Navigation */}

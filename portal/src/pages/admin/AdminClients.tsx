@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -184,6 +184,16 @@ function OrganizationDialog({ organization, onClose }: OrganizationDialogProps) 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!organization;
+
+  // Reset form when organization changes (opening new dialog)
+  useEffect(() => {
+    setName(organization?.name || "");
+    setEmail(organization?.email || "");
+    setPhone(organization?.phone || "");
+    setRegistrationNumber(organization?.registrationNumber || "");
+    setAddress(organization?.address || "");
+    setIsSubmitting(false);
+  }, [organization]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
