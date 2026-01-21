@@ -122,6 +122,7 @@ export const create = mutation({
     type: v.string(),
     size: v.number(),
     storageKey: v.string(),
+    convexStorageId: v.optional(v.string()), // For Convex storage fallback
     category: v.union(
       v.literal("tax_return"),
       v.literal("financial_statement"),
@@ -174,6 +175,7 @@ export const create = mutation({
       type: args.type,
       size: args.size,
       storageKey: args.storageKey,
+      convexStorageId: args.convexStorageId,
       category: args.category,
       uploadedBy: user._id,
       uploadedAt: Date.now(),
@@ -252,10 +254,10 @@ export const remove = mutation({
 });
 
 // ============================================
-// ACTIONS (for R2 presigned URLs)
+// ACTIONS (for file storage)
 // ============================================
 
-// Generate presigned URL for upload
+// Generate upload URL using Convex storage
 export const generateUploadUrl = action({
   args: {
     filename: v.string(),
@@ -270,23 +272,24 @@ export const generateUploadUrl = action({
 
     // Generate a unique storage key
     const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
     const sanitizedFilename = args.filename.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const storageKey = `${args.organizationId}/${timestamp}-${sanitizedFilename}`;
+    const storageKey = `documents/${args.organizationId}/${timestamp}-${randomSuffix}-${sanitizedFilename}`;
 
-    // TODO: When R2 is configured, generate presigned URL
-    // For MVP, we'll use Convex storage
-    
+    // Use Convex's built-in storage (R2 integration can be added later)
+    const uploadUrl = await ctx.storage.generateUploadUrl();
     return {
+      uploadUrl,
       storageKey,
-      useConvexStorage: true,
     };
   },
 });
 
-// Generate presigned URL for download
+// Get download URL for a document
 export const generateDownloadUrl = action({
   args: {
-    storageKey: v.string(),
+    convexStorageId: v.string(),
+    filename: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -294,12 +297,15 @@ export const generateDownloadUrl = action({
       throw new Error("Unauthorized");
     }
 
-    // TODO: When R2 is configured, generate presigned download URL
-    // For MVP, we'll use Convex storage
-
+    // Use Convex storage URL
+    const url = await ctx.storage.getUrl(args.convexStorageId as any);
+    if (!url) {
+      throw new Error("File not found");
+    }
+    
     return {
-      storageKey: args.storageKey,
-      useConvexStorage: true,
+      downloadUrl: url,
+      filename: args.filename,
     };
   },
 });

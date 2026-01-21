@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ import {
   UserX,
   UserCheck,
   MoreHorizontal,
+  Download,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -54,6 +56,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatDate, formatDistanceToNow } from "@/lib/utils";
+import { useBulkSelection, exportToCSV, formatDateTimeForExport } from "@/lib/bulk-actions";
 import type { Id } from "../../../convex/_generated/dataModel";
 
 type UserRole = "admin" | "staff" | "client";
@@ -89,6 +92,8 @@ export function AdminUsers() {
   const [deactivatingUser, setDeactivatingUser] = useState<UserType | null>(null);
   const [deactivationReason, setDeactivationReason] = useState("");
   const [isDeactivating, setIsDeactivating] = useState(false);
+  const [bulkDeactivateOpen, setBulkDeactivateOpen] = useState(false);
+  const [isBulkDeactivating, setIsBulkDeactivating] = useState(false);
 
   // Create org lookup map with memoization
   const orgMap = useMemo(() => 
@@ -111,6 +116,18 @@ export function AdminUsers() {
     }),
     [users, searchQuery, roleFilter, statusFilter]
   );
+
+  // Bulk selection
+  const {
+    selectedCount,
+    selectedItems,
+    isSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+    allSelected,
+    someSelected,
+  } = useBulkSelection(filteredUsers);
 
   const getRoleBadgeVariant = (role: UserRole) => {
     switch (role) {
@@ -147,6 +164,58 @@ export function AdminUsers() {
     }
   };
 
+  const handleBulkDeactivate = async () => {
+    setIsBulkDeactivating(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const user of selectedItems) {
+      if (canDeactivate(user)) {
+        try {
+          await deactivateUser({ userId: user._id });
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+    }
+
+    if (successCount > 0) {
+      toast.success(`Deactivated ${successCount} user${successCount > 1 ? "s" : ""}`);
+    }
+    if (failCount > 0) {
+      toast.error(`Failed to deactivate ${failCount} user${failCount > 1 ? "s" : ""}`);
+    }
+
+    setIsBulkDeactivating(false);
+    setBulkDeactivateOpen(false);
+    clearSelection();
+  };
+
+  const handleExport = () => {
+    const dataToExport = selectedCount > 0 ? selectedItems : (filteredUsers || []);
+    
+    exportToCSV(dataToExport, "users-export", [
+      { key: "name", header: "Name" },
+      { key: "email", header: "Email" },
+      { key: "role", header: "Role" },
+      { 
+        key: "organizationId", 
+        header: "Organization",
+        formatter: (val) => val ? (orgMap.get(val as string) || "Unknown") : ""
+      },
+      { 
+        key: "isActive", 
+        header: "Status",
+        formatter: (val) => val !== false ? "Active" : "Deactivated"
+      },
+      { key: "lastLoginAt", header: "Last Login", formatter: formatDateTimeForExport as (val: unknown) => string },
+      { key: "createdAt", header: "Created", formatter: formatDateTimeForExport as (val: unknown) => string },
+    ]);
+
+    toast.success(`Exported ${dataToExport.length} users`);
+  };
+
   const canDeactivate = (user: UserType) => {
     // Can't deactivate yourself
     if (currentUser && user._id === currentUser._id) return false;
@@ -156,6 +225,9 @@ export function AdminUsers() {
     if (user.isActive === false) return false;
     return true;
   };
+
+  // Count how many selected can be deactivated
+  const deactivatableCount = selectedItems.filter(canDeactivate).length;
 
   return (
     <div className="space-y-6">
@@ -170,38 +242,69 @@ export function AdminUsers() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search users..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-1">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="staff">Staff</SelectItem>
+              <SelectItem value="client">Client</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="deactivated">Deactivated</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="staff">Staff</SelectItem>
-            <SelectItem value="client">Client</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="deactivated">Deactivated</SelectItem>
-          </SelectContent>
-        </Select>
+        <Button variant="outline" onClick={handleExport} className="gap-2">
+          <Download className="h-4 w-4" />
+          Export CSV
+        </Button>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedCount > 0 && (
+        <div className="flex items-center gap-4 rounded-lg border bg-muted/50 p-3">
+          <span className="text-sm font-medium">
+            {selectedCount} user{selectedCount > 1 ? "s" : ""} selected
+          </span>
+          <div className="flex gap-2">
+            {deactivatableCount > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setBulkDeactivateOpen(true)}
+                className="gap-1"
+              >
+                <UserX className="h-4 w-4" />
+                Deactivate ({deactivatableCount})
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={clearSelection}>
+              Clear Selection
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Users List */}
       {users === undefined ? (
@@ -229,6 +332,13 @@ export function AdminUsers() {
               </caption>
               <thead>
                 <tr className="border-b bg-muted/50">
+                  <th className="w-10 px-4 py-3">
+                    <Checkbox
+                      checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                      onCheckedChange={toggleAll}
+                      aria-label="Select all users"
+                    />
+                  </th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">User</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Role</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
@@ -240,8 +350,19 @@ export function AdminUsers() {
               <tbody>
                 {filteredUsers?.map((user) => {
                   const isActive = user.isActive !== false;
+                  const selected = isSelected(user._id);
                   return (
-                  <tr key={user._id} className={`border-b last:border-0 hover:bg-muted/30 ${!isActive ? "opacity-60" : ""}`}>
+                  <tr 
+                    key={user._id} 
+                    className={`border-b last:border-0 hover:bg-muted/30 ${!isActive ? "opacity-60" : ""} ${selected ? "bg-primary/5" : ""}`}
+                  >
+                    <td className="px-4 py-3">
+                      <Checkbox
+                        checked={selected}
+                        onCheckedChange={() => toggleSelection(user._id)}
+                        aria-label={`Select ${user.name}`}
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted overflow-hidden">
@@ -391,6 +512,35 @@ export function AdminUsers() {
             >
               {isDeactivating ? <Spinner size="sm" className="mr-2" /> : <UserX className="h-4 w-4 mr-2" />}
               Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Deactivation Dialog */}
+      <AlertDialog open={bulkDeactivateOpen} onOpenChange={setBulkDeactivateOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bulk Deactivate Users</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to deactivate {deactivatableCount} user{deactivatableCount > 1 ? "s" : ""}? 
+              They will no longer be able to access the portal.
+              {selectedCount > deactivatableCount && (
+                <span className="block mt-2 text-amber-600">
+                  Note: {selectedCount - deactivatableCount} selected user{selectedCount - deactivatableCount > 1 ? "s" : ""} cannot be deactivated (admins or already deactivated).
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeactivating}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDeactivate}
+              disabled={isBulkDeactivating}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isBulkDeactivating ? <Spinner size="sm" className="mr-2" /> : <UserX className="h-4 w-4 mr-2" />}
+              Deactivate {deactivatableCount}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -11,6 +11,7 @@ export default defineSchema({
     workosId: v.string(),
     email: v.string(),
     name: v.string(),
+    phone: v.optional(v.string()),
     role: v.union(v.literal("admin"), v.literal("client"), v.literal("staff")),
     organizationId: v.optional(v.id("organizations")),
     avatarUrl: v.optional(v.string()),
@@ -21,6 +22,9 @@ export default defineSchema({
     deactivatedAt: v.optional(v.number()),
     deactivatedBy: v.optional(v.id("users")),
     deactivationReason: v.optional(v.string()),
+    // Onboarding
+    onboardingCompleted: v.optional(v.boolean()),
+    onboardingCompletedAt: v.optional(v.number()),
   })
     .index("by_workos_id", ["workosId"])
     .index("by_email", ["email"])
@@ -60,7 +64,8 @@ export default defineSchema({
     name: v.string(),
     type: v.string(), // MIME type
     size: v.number(), // bytes
-    storageKey: v.string(), // R2 object key
+    storageKey: v.string(), // R2 object key or Convex storage reference
+    convexStorageId: v.optional(v.string()), // Convex storage ID if using fallback
     category: v.union(
       v.literal("tax_return"),
       v.literal("financial_statement"),

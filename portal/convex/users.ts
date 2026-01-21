@@ -241,3 +241,56 @@ export const listActive = query({
     return users.filter(u => u.isActive !== false);
   },
 });
+
+// Update own profile (any authenticated user)
+export const updateProfile = mutation({
+  args: {
+    name: v.optional(v.string()),
+    phone: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const updates: Record<string, unknown> = {};
+
+    if (args.name !== undefined) {
+      const trimmedName = args.name.trim();
+      if (!trimmedName) {
+        throw new Error("Name is required");
+      }
+      if (trimmedName.length > 100) {
+        throw new Error("Name is too long (max 100 characters)");
+      }
+      updates.name = trimmedName;
+    }
+
+    if (args.phone !== undefined) {
+      const trimmedPhone = args.phone.trim();
+      if (trimmedPhone && trimmedPhone.length > 20) {
+        throw new Error("Phone number is too long (max 20 characters)");
+      }
+      updates.phone = trimmedPhone || undefined;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await ctx.db.patch(user._id, updates);
+    }
+
+    return await ctx.db.get(user._id);
+  },
+});
+
+// Mark onboarding as complete
+export const completeOnboarding = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+
+    await ctx.db.patch(user._id, {
+      onboardingCompleted: true,
+      onboardingCompletedAt: Date.now(),
+    });
+
+    return { success: true };
+  },
+});

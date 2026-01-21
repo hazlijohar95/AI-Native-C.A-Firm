@@ -1,4 +1,4 @@
-import { query, mutation, action } from "./_generated/server";
+import { query, mutation, action, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
 import { 
@@ -499,6 +499,7 @@ export const recordPayment = mutation({
 // STRIPE ACTIONS
 // ============================================
 
+// Create checkout session (placeholder - requires Stripe API key)
 export const createCheckoutSession = action({
   args: { invoiceId: v.id("invoices") },
   handler: async (ctx, args) => {
@@ -513,13 +514,112 @@ export const createCheckoutSession = action({
     }
 
     if (invoice.status !== "pending" && invoice.displayStatus !== "overdue") {
-      throw new Error("Invoice cannot be paid");
+      throw new Error("Invoice cannot be paid online");
     }
 
-    // Placeholder - Stripe integration pending
+    // TODO: Implement Stripe checkout when STRIPE_SECRET_KEY is configured
+    // For now, return a placeholder message
     return {
-      checkoutUrl: null,
+      success: false,
       message: "Online payment is coming soon. Please use bank transfer for now.",
+      checkoutUrl: null,
     };
+  },
+});
+
+// Internal mutation to update Stripe session ID
+export const updateStripeSession = internalMutation({
+  args: {
+    invoiceId: v.id("invoices"),
+    sessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.invoiceId, {
+      stripeCheckoutSessionId: args.sessionId,
+    });
+  },
+});
+
+// Internal mutation to record Stripe payment
+export const recordStripePayment = internalMutation({
+  args: {
+    invoiceId: v.id("invoices"),
+    paymentIntentId: v.string(),
+    amount: v.number(),
+    currency: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const invoice = await ctx.db.get(args.invoiceId);
+    if (!invoice) {
+      throw new Error("Invoice not found");
+    }
+
+    // Check if already paid
+    if (invoice.status === "paid") {
+      return; // Already processed
+    }
+
+    const now = Date.now();
+
+    // Insert payment record
+    await ctx.db.insert("payments", {
+      invoiceId: args.invoiceId,
+      organizationId: invoice.organizationId,
+      amount: args.amount,
+      currency: args.currency,
+      method: "stripe",
+      status: "completed",
+      stripePaymentIntentId: args.paymentIntentId,
+      paidAt: now,
+      createdAt: now,
+    });
+
+    // Update invoice status
+    await ctx.db.patch(args.invoiceId, {
+      status: "paid",
+      paidAt: now,
+      stripePaymentIntentId: args.paymentIntentId,
+    });
+
+    // Get a system user for logging (or use the first admin)
+    const admins = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("role"), "admin"))
+      .take(1);
+    
+    const systemUserId = admins[0]?._id;
+
+    if (systemUserId) {
+      // Log activity
+      await ctx.db.insert("activityLogs", {
+        organizationId: invoice.organizationId,
+        userId: systemUserId,
+        action: "recorded_payment",
+        resourceType: "invoice",
+        resourceId: args.invoiceId.toString(),
+        resourceName: invoice.invoiceNumber,
+        metadata: { method: "stripe", paymentIntentId: args.paymentIntentId },
+        createdAt: now,
+      });
+    }
+
+    // Notify organization users
+    const orgUsers = await ctx.db
+      .query("users")
+      .withIndex("by_organization", (q) => q.eq("organizationId", invoice.organizationId))
+      .collect();
+
+    for (const user of orgUsers) {
+      await ctx.db.insert("notifications", {
+        userId: user._id,
+        type: "payment_received",
+        title: "Payment Received",
+        message: `Payment received for invoice ${invoice.invoiceNumber}. Thank you!`,
+        link: `/invoices`,
+        relatedId: args.invoiceId.toString(),
+        isRead: false,
+        createdAt: now,
+      });
+    }
   },
 });

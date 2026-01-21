@@ -14,6 +14,8 @@ import { Tasks } from "@/pages/Tasks";
 import { Announcements } from "@/pages/Announcements";
 import { Invoices } from "@/pages/Invoices";
 import { Signatures } from "@/pages/Signatures";
+import { Onboarding } from "@/pages/Onboarding";
+import { Help } from "@/pages/Help";
 import { NotFound } from "@/pages/NotFound";
 
 // Lazy load admin pages for code splitting
@@ -55,71 +57,7 @@ function App() {
       </Unauthenticated>
 
       <Authenticated>
-        <Shell>
-          <ErrorBoundary>
-            <Routes>
-              {/* Client Routes */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/documents" element={<Documents />} />
-              <Route path="/tasks" element={<Tasks />} />
-              <Route path="/announcements" element={<Announcements />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/signatures" element={<Signatures />} />
-              <Route path="/signatures/:id" element={<Signatures />} />
-              <Route path="/settings" element={<ComingSoon title="Settings" />} />
-              <Route path="/help" element={<ComingSoon title="Help & Support" />} />
-              
-              {/* Admin Routes - Protected by AdminRoute wrapper, lazy loaded */}
-              <Route path="/admin" element={
-                <AdminRoute>
-                  <Suspense fallback={<PageLoader />}>
-                    <AdminDashboard />
-                  </Suspense>
-                </AdminRoute>
-              } />
-              <Route path="/admin/organizations" element={
-                <AdminRoute>
-                  <Suspense fallback={<PageLoader />}>
-                    <AdminClients />
-                  </Suspense>
-                </AdminRoute>
-              } />
-              <Route path="/admin/users" element={
-                <AdminRoute>
-                  <Suspense fallback={<PageLoader />}>
-                    <AdminUsers />
-                  </Suspense>
-                </AdminRoute>
-              } />
-              <Route path="/admin/invoices" element={
-                <AdminRoute>
-                  <Suspense fallback={<PageLoader />}>
-                    <AdminInvoices />
-                  </Suspense>
-                </AdminRoute>
-              } />
-              <Route path="/admin/announcements" element={
-                <AdminRoute>
-                  <Suspense fallback={<PageLoader />}>
-                    <AdminAnnouncements />
-                  </Suspense>
-                </AdminRoute>
-              } />
-              <Route path="/admin/activity" element={
-                <AdminRoute>
-                  <Suspense fallback={<PageLoader />}>
-                    <AdminActivity />
-                  </Suspense>
-                </AdminRoute>
-              } />
-              
-              {/* 404 - Must be last */}
-              <Route path="/callback" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ErrorBoundary>
-        </Shell>
+        <AuthenticatedRoutes />
       </Authenticated>
     </ErrorBoundary>
   );
@@ -142,6 +80,111 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+/**
+ * Authenticated routes with onboarding check
+ */
+function AuthenticatedRoutes() {
+  const currentUser = useQuery(api.users.getCurrentUser);
+
+  // Still loading
+  if (currentUser === undefined) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  // Check if user needs onboarding (client role only, admin/staff skip onboarding)
+  const needsOnboarding = 
+    currentUser && 
+    currentUser.role === "client" && 
+    !currentUser.onboardingCompleted;
+
+  // Onboarding route (no shell)
+  if (needsOnboarding) {
+    return (
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/callback" element={<Navigate to="/onboarding" replace />} />
+          <Route path="*" element={<Navigate to="/onboarding" replace />} />
+        </Routes>
+      </ErrorBoundary>
+    );
+  }
+
+  // Normal authenticated routes
+  return (
+    <Shell>
+      <ErrorBoundary>
+        <Routes>
+          {/* Client Routes */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/documents" element={<Documents />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/announcements" element={<Announcements />} />
+          <Route path="/invoices" element={<Invoices />} />
+          <Route path="/signatures" element={<Signatures />} />
+          <Route path="/signatures/:id" element={<Signatures />} />
+          <Route path="/settings" element={<ComingSoon title="Settings" />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/onboarding" element={<Navigate to="/dashboard" replace />} />
+          
+          {/* Admin Routes - Protected by AdminRoute wrapper, lazy loaded */}
+          <Route path="/admin" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminDashboard />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/organizations" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminClients />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/users" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminUsers />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/invoices" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminInvoices />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/announcements" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminAnnouncements />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/activity" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminActivity />
+              </Suspense>
+            </AdminRoute>
+          } />
+          
+          {/* 404 - Must be last */}
+          <Route path="/callback" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ErrorBoundary>
+    </Shell>
+  );
 }
 
 // Placeholder component for pages not yet implemented
