@@ -181,4 +181,123 @@ export default defineSchema({
   })
     .index("by_organization", ["organizationId", "createdAt"])
     .index("by_user", ["userId", "createdAt"]),
+
+  // ============================================
+  // INVOICES & PAYMENTS (Phase 3)
+  // ============================================
+
+  invoices: defineTable({
+    organizationId: v.id("organizations"),
+    invoiceNumber: v.string(), // e.g., "INV-2026-001"
+    description: v.string(),
+    amount: v.number(), // in cents (e.g., 10000 = RM100.00)
+    currency: v.string(), // e.g., "MYR"
+    status: v.union(
+      v.literal("draft"),
+      v.literal("pending"),
+      v.literal("paid"),
+      v.literal("overdue"),
+      v.literal("cancelled")
+    ),
+    dueDate: v.number(),
+    issuedDate: v.number(),
+    paidAt: v.optional(v.number()),
+    // Line items stored as JSON
+    lineItems: v.array(v.object({
+      description: v.string(),
+      quantity: v.number(),
+      unitPrice: v.number(), // in cents
+      amount: v.number(), // quantity * unitPrice
+    })),
+    // Stripe integration
+    stripePaymentIntentId: v.optional(v.string()),
+    stripeCheckoutSessionId: v.optional(v.string()),
+    // PDF document reference
+    documentStorageKey: v.optional(v.string()),
+    // Metadata
+    notes: v.optional(v.string()),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_status", ["organizationId", "status"])
+    .index("by_due_date", ["organizationId", "dueDate"])
+    .index("by_invoice_number", ["invoiceNumber"]),
+
+  // Payment records (for history and reconciliation)
+  payments: defineTable({
+    invoiceId: v.id("invoices"),
+    organizationId: v.id("organizations"),
+    amount: v.number(), // in cents
+    currency: v.string(),
+    method: v.union(
+      v.literal("stripe"),
+      v.literal("bank_transfer"),
+      v.literal("cash"),
+      v.literal("other")
+    ),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("completed"),
+      v.literal("failed"),
+      v.literal("refunded")
+    ),
+    stripePaymentIntentId: v.optional(v.string()),
+    stripeChargeId: v.optional(v.string()),
+    reference: v.optional(v.string()), // bank reference, receipt number, etc.
+    notes: v.optional(v.string()),
+    paidAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_invoice", ["invoiceId"])
+    .index("by_organization", ["organizationId"])
+    .index("by_stripe_intent", ["stripePaymentIntentId"]),
+
+  // ============================================
+  // E-SIGNATURES (Phase 3)
+  // ============================================
+
+  // Documents requiring signature
+  signatureRequests: defineTable({
+    organizationId: v.id("organizations"),
+    documentId: v.id("documents"), // Reference to the document to sign
+    title: v.string(),
+    description: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("signed"),
+      v.literal("declined"),
+      v.literal("expired")
+    ),
+    requestedBy: v.id("users"),
+    requestedAt: v.number(),
+    expiresAt: v.optional(v.number()),
+    signedAt: v.optional(v.number()),
+    signedBy: v.optional(v.id("users")),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_document", ["documentId"])
+    .index("by_status", ["organizationId", "status"]),
+
+  // Signature records (the actual signatures)
+  signatures: defineTable({
+    signatureRequestId: v.id("signatureRequests"),
+    userId: v.id("users"),
+    // Signature data
+    signatureType: v.union(
+      v.literal("draw"), // Canvas drawing
+      v.literal("type"), // Typed name
+      v.literal("upload") // Uploaded image
+    ),
+    signatureData: v.string(), // Base64 image data or typed name
+    // Legal metadata
+    ipAddress: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    timestamp: v.number(),
+    // Consent
+    agreedToTerms: v.boolean(),
+    legalName: v.string(), // Full legal name entered by signer
+  })
+    .index("by_request", ["signatureRequestId"])
+    .index("by_user", ["userId"]),
 });

@@ -9,6 +9,8 @@ import { Dashboard } from "@/pages/Dashboard";
 import { Documents } from "@/pages/Documents";
 import { Tasks } from "@/pages/Tasks";
 import { Announcements } from "@/pages/Announcements";
+import { Invoices } from "@/pages/Invoices";
+import { Signatures } from "@/pages/Signatures";
 
 function App() {
   return (
@@ -39,7 +41,9 @@ function App() {
             <Route path="/documents" element={<Documents />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/announcements" element={<Announcements />} />
-            <Route path="/invoices" element={<ComingSoon title="Invoices" />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/signatures" element={<Signatures />} />
+            <Route path="/signatures/:id" element={<Signatures />} />
             <Route path="/settings" element={<ComingSoon title="Settings" />} />
             <Route path="/callback" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -55,7 +59,7 @@ function ComingSoon({ title }: { title: string }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="text-muted-foreground">Coming soon in Phase 3</p>
+      <p className="text-muted-foreground">Coming soon</p>
     </div>
   );
 }

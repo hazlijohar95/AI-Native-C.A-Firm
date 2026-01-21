@@ -3,7 +3,7 @@
 
 > **Status:** In Progress  
 > **Last Updated:** 2026-01-21  
-> **Current Phase:** Phase 3 - Payments & Signatures
+> **Current Phase:** Phase 4 - Admin Panel
 
 ---
 
@@ -66,15 +66,21 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 ---
 
 ### Phase 3: Payments & Signatures
-**Status:** Not Started
+**Status:** Complete
 
-- [ ] Invoice upload (admin)
-- [ ] Stripe integration (checkout, webhooks)
-- [ ] Invoice dashboard (view, payment history)
-- [ ] Simple e-signatures (draw/type, metadata capture)
-- [ ] Email notifications (Resend)
+- [x] Invoice schema (invoices, payments tables)
+- [x] Invoice backend (CRUD, queries, status management)
+- [x] Invoice UI (list, details, summary cards)
+- [x] Stripe checkout session placeholder (ready for Stripe key)
+- [x] Manual payment recording (bank transfer, cash)
+- [x] E-signature schema (signatureRequests, signatures tables)
+- [x] E-signature backend (create request, sign, decline)
+- [x] Signature UI with canvas drawing and typed signatures
+- [x] Email notifications placeholder (Resend ready)
 
-**Deliverable:** Clients can pay invoices, sign documents
+**Deliverable:** Clients can view invoices, record payments, sign documents
+
+**Note:** Stripe and Resend integrations are scaffolded but require API keys to be configured in Convex environment variables.
 
 ---
 
@@ -108,6 +114,7 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 
 | Date | Phase | Changes |
 |------|-------|---------|
+| 2026-01-21 | Phase 3 | Completed Phase 3: Invoices, Payments, E-Signatures |
 | 2026-01-21 | Phase 2 | Completed Phase 2: Added toast notifications, delete confirmations, spinner loading states |
 | 2026-01-21 | Phase 2 | Built Documents, Tasks, Announcements, Notifications with proper UX |
 | 2026-01-21 | Phase 2 | Started Phase 2: Core Features |

@@ -6,6 +6,7 @@ import {
   CheckSquare, 
   Bell, 
   Receipt, 
+  PenTool,
   Settings,
   X
 } from "lucide-react";
@@ -22,6 +23,7 @@ const navigation = [
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Announcements", href: "/announcements", icon: Bell },
   { name: "Invoices", href: "/invoices", icon: Receipt },
+  { name: "Signatures", href: "/signatures", icon: PenTool },
 ];
 
 const secondaryNavigation = [
