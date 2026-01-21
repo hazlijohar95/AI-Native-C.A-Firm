@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
+import { Toaster } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { Shell } from "@/components/layout/Shell";
 import { Login } from "@/pages/Login";
@@ -12,6 +13,7 @@ import { Announcements } from "@/pages/Announcements";
 function App() {
   return (
     <>
+      <Toaster position="top-right" richColors closeButton />
       <AuthLoading>
         <div className="flex h-screen w-full items-center justify-center">
           <div className="flex flex-col items-center gap-4">

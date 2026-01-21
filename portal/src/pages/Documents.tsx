@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -20,6 +22,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   FileText,
   Upload,
   Download,
@@ -31,6 +43,7 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/utils";
+import type { Id } from "../../convex/_generated/dataModel";
 
 const categories = [
   { value: "all", label: "All Documents" },
@@ -70,6 +83,12 @@ function formatFileSize(bytes: number): string {
 export function Documents() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<{
+    id: Id<"documents">;
+    name: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const documents = useQuery(api.documents.list, {
     category: categoryFilter === "all" ? undefined : categoryFilter,
@@ -77,9 +96,28 @@ export function Documents() {
 
   const deleteDocument = useMutation(api.documents.remove);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this document?")) {
-      await deleteDocument({ id: id as any });
+  const handleDeleteClick = (id: Id<"documents">, name: string) => {
+    setDocumentToDelete({ id, name });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!documentToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteDocument({ id: documentToDelete.id });
+      toast.success("Document deleted", {
+        description: `"${documentToDelete.name}" has been deleted.`,
+      });
+      setDeleteDialogOpen(false);
+      setDocumentToDelete(null);
+    } catch (error) {
+      toast.error("Failed to delete document", {
+        description: error instanceof Error ? error.message : "An error occurred",
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -143,7 +181,10 @@ export function Documents() {
       {/* Document List */}
       {documents === undefined ? (
         <div className="flex h-64 items-center justify-center">
-          <div className="text-muted-foreground">Loading...</div>
+          <div className="flex flex-col items-center gap-3">
+            <Spinner size="lg" />
+            <p className="text-sm text-muted-foreground">Loading documents...</p>
+          </div>
         </div>
       ) : documents.length === 0 ? (
         <Card>
@@ -192,7 +233,7 @@ export function Documents() {
                     variant="outline"
                     size="sm"
                     className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                    onClick={() => handleDelete(doc._id)}
+                    onClick={() => handleDeleteClick(doc._id, doc.name)}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -202,6 +243,35 @@ export function Documents() {
           ))}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Document</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{documentToDelete?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

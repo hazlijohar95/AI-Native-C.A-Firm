@@ -135,6 +135,12 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
 
+    // Validate organization exists
+    const org = await ctx.db.get(args.organizationId);
+    if (!org) {
+      throw new Error("Organization not found");
+    }
+
     // Verify user has access to this organization
     if (user.role === "client") {
       if (args.organizationId.toString() !== user.organizationId?.toString()) {
@@ -142,10 +148,29 @@ export const create = mutation({
       }
     }
 
+    // Validate folder if provided
+    if (args.folderId) {
+      const folder = await ctx.db.get(args.folderId);
+      if (!folder) {
+        throw new Error("Folder not found");
+      }
+      if (folder.organizationId.toString() !== args.organizationId.toString()) {
+        throw new Error("Folder belongs to different organization");
+      }
+    }
+
+    // Validate inputs
+    if (!args.name.trim()) {
+      throw new Error("Document name is required");
+    }
+    if (args.name.length > 255) {
+      throw new Error("Document name too long");
+    }
+
     const docId = await ctx.db.insert("documents", {
       organizationId: args.organizationId,
       folderId: args.folderId,
-      name: args.name,
+      name: args.name.trim(),
       type: args.type,
       size: args.size,
       storageKey: args.storageKey,
@@ -161,11 +186,11 @@ export const create = mutation({
       action: "uploaded_document",
       resourceType: "document",
       resourceId: docId,
-      resourceName: args.name,
+      resourceName: args.name.trim(),
       createdAt: Date.now(),
     });
 
-    // Create notification for admins/staff
+    // Create notification for admins/staff (inline to avoid circular dependency)
     const admins = await ctx.db
       .query("users")
       .filter((q) => q.or(q.eq(q.field("role"), "admin"), q.eq(q.field("role"), "staff")))
@@ -177,7 +202,7 @@ export const create = mutation({
           userId: admin._id,
           type: "new_document",
           title: "New Document Uploaded",
-          message: `${user.name} uploaded "${args.name}"`,
+          message: `${user.name} uploaded "${args.name.trim()}"`,
           link: `/documents`,
           relatedId: docId,
           isRead: false,
@@ -243,9 +268,6 @@ export const generateUploadUrl = action({
       throw new Error("Unauthorized");
     }
 
-    // For now, use Convex's built-in file storage as fallback
-    // R2 integration will be added when credentials are available
-    
     // Generate a unique storage key
     const timestamp = Date.now();
     const sanitizedFilename = args.filename.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -256,7 +278,6 @@ export const generateUploadUrl = action({
     
     return {
       storageKey,
-      // uploadUrl will be added when R2 is configured
       useConvexStorage: true,
     };
   },

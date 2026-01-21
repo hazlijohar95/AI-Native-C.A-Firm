@@ -34,17 +34,22 @@ export const list = query({
       return [];
     }
 
-    // Enrich with user info
-    const enrichedActivities = await Promise.all(
-      activities.map(async (activity) => {
-        const activityUser = await ctx.db.get(activity.userId);
-        return {
-          ...activity,
-          userName: activityUser?.name || "Unknown User",
-          userAvatar: activityUser?.avatarUrl,
-        };
-      })
+    // Batch fetch all unique users to avoid N+1 queries
+    const userIds = [...new Set(activities.map((a) => a.userId))];
+    const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
+    const userMap = new Map(
+      users.filter(Boolean).map((u) => [u!._id.toString(), u!])
     );
+
+    // Enrich with user info using the map
+    const enrichedActivities = activities.map((activity) => {
+      const activityUser = userMap.get(activity.userId.toString());
+      return {
+        ...activity,
+        userName: activityUser?.name || "Unknown User",
+        userAvatar: activityUser?.avatarUrl,
+      };
+    });
 
     return enrichedActivities;
   },
@@ -73,17 +78,22 @@ export const listByOrganization = query({
       .order("desc")
       .take(limit);
 
-    // Enrich with user info
-    const enrichedActivities = await Promise.all(
-      activities.map(async (activity) => {
-        const activityUser = await ctx.db.get(activity.userId);
-        return {
-          ...activity,
-          userName: activityUser?.name || "Unknown User",
-          userAvatar: activityUser?.avatarUrl,
-        };
-      })
+    // Batch fetch all unique users to avoid N+1 queries
+    const userIds = [...new Set(activities.map((a) => a.userId))];
+    const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
+    const userMap = new Map(
+      users.filter(Boolean).map((u) => [u!._id.toString(), u!])
     );
+
+    // Enrich with user info using the map
+    const enrichedActivities = activities.map((activity) => {
+      const activityUser = userMap.get(activity.userId.toString());
+      return {
+        ...activity,
+        userName: activityUser?.name || "Unknown User",
+        userAvatar: activityUser?.avatarUrl,
+      };
+    });
 
     return enrichedActivities;
   },

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -59,7 +61,16 @@ export function Tasks() {
   const updateStatus = useMutation(api.tasks.updateStatus);
 
   const handleStatusChange = async (taskId: string, newStatus: "pending" | "in_progress" | "completed") => {
-    await updateStatus({ id: taskId as any, status: newStatus });
+    try {
+      await updateStatus({ id: taskId as any, status: newStatus });
+      toast.success("Task updated", {
+        description: newStatus === "completed" ? "Task marked as completed" : `Status changed to ${newStatus.replace("_", " ")}`,
+      });
+    } catch (error) {
+      toast.error("Failed to update task", {
+        description: error instanceof Error ? error.message : "An error occurred",
+      });
+    }
   };
 
   const isOverdue = (dueDate?: number) => {
@@ -111,7 +122,10 @@ export function Tasks() {
       {/* Task List */}
       {tasks === undefined ? (
         <div className="flex h-64 items-center justify-center">
-          <div className="text-muted-foreground">Loading...</div>
+          <div className="flex flex-col items-center gap-3">
+            <Spinner size="lg" />
+            <p className="text-sm text-muted-foreground">Loading tasks...</p>
+          </div>
         </div>
       ) : tasks.length === 0 ? (
         <Card>

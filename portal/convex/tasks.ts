@@ -161,10 +161,37 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const user = await requireAdminOrStaff(ctx);
 
+    // Validate organization exists
+    const org = await ctx.db.get(args.organizationId);
+    if (!org) {
+      throw new Error("Organization not found");
+    }
+
+    // Validate title
+    if (!args.title.trim()) {
+      throw new Error("Task title is required");
+    }
+    if (args.title.length > 200) {
+      throw new Error("Task title too long");
+    }
+
+    // Validate assignee if provided
+    if (args.assignedTo) {
+      const assignee = await ctx.db.get(args.assignedTo);
+      if (!assignee) {
+        throw new Error("Assigned user not found");
+      }
+      // Validate user belongs to org (for clients)
+      if (assignee.role === "client" && 
+          assignee.organizationId?.toString() !== args.organizationId.toString()) {
+        throw new Error("Cannot assign task to user outside organization");
+      }
+    }
+
     const taskId = await ctx.db.insert("tasks", {
       organizationId: args.organizationId,
-      title: args.title,
-      description: args.description,
+      title: args.title.trim(),
+      description: args.description?.trim(),
       status: "pending",
       priority: args.priority,
       dueDate: args.dueDate,
@@ -180,7 +207,7 @@ export const create = mutation({
       action: "created_task",
       resourceType: "task",
       resourceId: taskId,
-      resourceName: args.title,
+      resourceName: args.title.trim(),
       createdAt: Date.now(),
     });
 
@@ -195,7 +222,7 @@ export const create = mutation({
         userId: orgUser._id,
         type: "new_task",
         title: "New Task Assigned",
-        message: `You have a new task: "${args.title}"`,
+        message: `You have a new task: "${args.title.trim()}"`,
         link: `/tasks`,
         relatedId: taskId,
         isRead: false,
@@ -301,13 +328,31 @@ export const update = mutation({
       throw new Error("Task not found");
     }
 
+    // Validate title if provided
+    if (args.title !== undefined) {
+      if (!args.title.trim()) {
+        throw new Error("Task title is required");
+      }
+      if (args.title.length > 200) {
+        throw new Error("Task title too long");
+      }
+    }
+
+    // Validate assignee if provided
+    if (args.assignedTo) {
+      const assignee = await ctx.db.get(args.assignedTo);
+      if (!assignee) {
+        throw new Error("Assigned user not found");
+      }
+    }
+
     const { id, ...updates } = args;
     
     // Filter out undefined values
     const filteredUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) {
-        filteredUpdates[key] = value;
+        filteredUpdates[key] = typeof value === "string" ? value.trim() : value;
       }
     }
 

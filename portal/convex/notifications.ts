@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth } from "./lib/auth";
 
@@ -100,8 +100,8 @@ export const markAllRead = mutation({
   },
 });
 
-// Delete old notifications (cleanup - can be called by cron)
-export const deleteOld = mutation({
+// Delete old notifications (internal - called by cron or admin)
+export const deleteOld = internalMutation({
   args: {
     olderThanDays: v.optional(v.number()),
   },
@@ -126,11 +126,10 @@ export const deleteOld = mutation({
 });
 
 // ============================================
-// INTERNAL: Create notification (called from other functions)
+// INTERNAL: Create notification (called from other Convex functions only)
 // ============================================
 
-// This is exported for use by other Convex functions
-export const createInternal = mutation({
+export const createInternal = internalMutation({
   args: {
     userId: v.id("users"),
     type: v.union(

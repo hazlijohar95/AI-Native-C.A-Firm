@@ -33,17 +33,24 @@ export const list = query({
     announcements = announcements.filter((a) => !a.expiresAt || a.expiresAt > now);
 
     // Filter by organization access
-    if (user.role === "client" && user.organizationId) {
-      announcements = announcements.filter((a) => {
-        // If no target orgs, it's visible to all
-        if (!a.targetOrganizations || a.targetOrganizations.length === 0) {
-          return true;
-        }
-        // Otherwise check if user's org is in the list
-        return a.targetOrganizations.some(
-          (orgId) => orgId.toString() === user.organizationId?.toString()
+    if (user.role === "client") {
+      if (!user.organizationId) {
+        // Clients without org can only see general announcements with no targeting
+        announcements = announcements.filter((a) => 
+          !a.targetOrganizations || a.targetOrganizations.length === 0
         );
-      });
+      } else {
+        announcements = announcements.filter((a) => {
+          // If no target orgs, it's visible to all
+          if (!a.targetOrganizations || a.targetOrganizations.length === 0) {
+            return true;
+          }
+          // Otherwise check if user's org is in the list
+          return a.targetOrganizations.some(
+            (orgId) => orgId.toString() === user.organizationId?.toString()
+          );
+        });
+      }
     }
 
     // Filter by type if specified
@@ -89,8 +96,11 @@ export const get = query({
     }
 
     // Check access for clients
-    if (user.role === "client" && user.organizationId) {
+    if (user.role === "client") {
       if (announcement.targetOrganizations && announcement.targetOrganizations.length > 0) {
+        if (!user.organizationId) {
+          throw new Error("Access denied");
+        }
         const hasAccess = announcement.targetOrganizations.some(
           (orgId) => orgId.toString() === user.organizationId?.toString()
         );
@@ -134,15 +144,21 @@ export const countUnread = query({
     );
 
     // Filter by organization access for clients
-    if (user.role === "client" && user.organizationId) {
-      announcements = announcements.filter((a) => {
-        if (!a.targetOrganizations || a.targetOrganizations.length === 0) {
-          return true;
-        }
-        return a.targetOrganizations.some(
-          (orgId) => orgId.toString() === user.organizationId?.toString()
+    if (user.role === "client") {
+      if (!user.organizationId) {
+        announcements = announcements.filter((a) => 
+          !a.targetOrganizations || a.targetOrganizations.length === 0
         );
-      });
+      } else {
+        announcements = announcements.filter((a) => {
+          if (!a.targetOrganizations || a.targetOrganizations.length === 0) {
+            return true;
+          }
+          return a.targetOrganizations.some(
+            (orgId) => orgId.toString() === user.organizationId?.toString()
+          );
+        });
+      }
     }
 
     // Get reads
@@ -181,9 +197,30 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const user = await requireAdminOrStaff(ctx);
 
+    // Validate inputs
+    if (!args.title.trim()) {
+      throw new Error("Title is required");
+    }
+    if (args.title.length > 200) {
+      throw new Error("Title too long");
+    }
+    if (!args.content.trim()) {
+      throw new Error("Content is required");
+    }
+
+    // Validate target organizations exist
+    if (args.targetOrganizations && args.targetOrganizations.length > 0) {
+      for (const orgId of args.targetOrganizations) {
+        const org = await ctx.db.get(orgId);
+        if (!org) {
+          throw new Error(`Organization ${orgId} not found`);
+        }
+      }
+    }
+
     const announcementId = await ctx.db.insert("announcements", {
-      title: args.title,
-      content: args.content,
+      title: args.title.trim(),
+      content: args.content.trim(),
       type: args.type,
       targetOrganizations: args.targetOrganizations,
       publishedAt: args.publishedAt || Date.now(),
@@ -216,7 +253,7 @@ export const create = mutation({
         userId: targetUser._id,
         type: "new_announcement",
         title: "New Announcement",
-        message: args.title,
+        message: args.title.trim(),
         link: `/announcements`,
         relatedId: announcementId,
         isRead: false,
@@ -233,6 +270,27 @@ export const markRead = mutation({
   args: { id: v.id("announcements") },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
+
+    // Verify announcement exists
+    const announcement = await ctx.db.get(args.id);
+    if (!announcement) {
+      throw new Error("Announcement not found");
+    }
+
+    // Verify access for clients
+    if (user.role === "client") {
+      if (announcement.targetOrganizations && announcement.targetOrganizations.length > 0) {
+        if (!user.organizationId) {
+          throw new Error("Access denied");
+        }
+        const hasAccess = announcement.targetOrganizations.some(
+          (orgId) => orgId.toString() === user.organizationId?.toString()
+        );
+        if (!hasAccess) {
+          throw new Error("Access denied");
+        }
+      }
+    }
 
     // Check if already read
     const existing = await ctx.db
@@ -274,13 +332,28 @@ export const update = mutation({
   handler: async (ctx, args) => {
     await requireAdminOrStaff(ctx);
 
+    const announcement = await ctx.db.get(args.id);
+    if (!announcement) {
+      throw new Error("Announcement not found");
+    }
+
+    // Validate title if provided
+    if (args.title !== undefined) {
+      if (!args.title.trim()) {
+        throw new Error("Title is required");
+      }
+      if (args.title.length > 200) {
+        throw new Error("Title too long");
+      }
+    }
+
     const { id, ...updates } = args;
 
     // Filter out undefined values
     const filteredUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) {
-        filteredUpdates[key] = value;
+        filteredUpdates[key] = typeof value === "string" ? value.trim() : value;
       }
     }
 
@@ -295,6 +368,11 @@ export const remove = mutation({
   args: { id: v.id("announcements") },
   handler: async (ctx, args) => {
     await requireAdminOrStaff(ctx);
+
+    const announcement = await ctx.db.get(args.id);
+    if (!announcement) {
+      throw new Error("Announcement not found");
+    }
 
     // Delete all reads for this announcement
     const reads = await ctx.db

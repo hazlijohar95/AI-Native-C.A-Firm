@@ -3,6 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Bell,
   Megaphone,
@@ -56,7 +57,10 @@ export function Announcements() {
       {/* Announcements List */}
       {announcements === undefined ? (
         <div className="flex h-64 items-center justify-center">
-          <div className="text-muted-foreground">Loading...</div>
+          <div className="flex flex-col items-center gap-3">
+            <Spinner size="lg" />
+            <p className="text-sm text-muted-foreground">Loading announcements...</p>
+          </div>
         </div>
       ) : announcements.length === 0 ? (
         <Card>
