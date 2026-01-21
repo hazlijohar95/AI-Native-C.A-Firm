@@ -28,7 +28,8 @@ export default defineSchema({
   })
     .index("by_workos_id", ["workosId"])
     .index("by_email", ["email"])
-    .index("by_organization", ["organizationId"]),
+    .index("by_organization", ["organizationId"])
+    .index("by_role", ["role"]),
 
   // Organizations (Client Companies)
   organizations: defineTable({

@@ -2,6 +2,7 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { authKit } from "./auth";
 import { requireAuth, requireAdmin, requireAdminOrStaff, getCurrentUserOrNull } from "./lib/auth";
+import { enforceRateLimit, logActivity } from "./lib/helpers";
 
 // Get current authenticated user from WorkOS AuthKit component
 export const getAuthUser = query({
@@ -91,8 +92,34 @@ export const updateRole = mutation({
     role: v.union(v.literal("admin"), v.literal("client"), v.literal("staff")),
   },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const admin = await requireAdmin(ctx);
+    
+    // Rate limit: max 10 role changes per minute
+    await enforceRateLimit(ctx, admin._id.toString(), "updateRole", {
+      maxRequests: 10,
+      windowMs: 60000,
+    });
+
+    // Get the user being updated
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const previousRole = user.role;
+    
+    // Update role
     await ctx.db.patch(args.userId, { role: args.role });
+
+    // Log the role change for audit
+    await logActivity(ctx, {
+      userId: admin._id,
+      action: "changed_user_role",
+      resourceType: "user",
+      resourceId: args.userId,
+      resourceName: user.name,
+      metadata: { previousRole, newRole: args.role },
+    });
   },
 });
 

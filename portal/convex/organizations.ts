@@ -15,10 +15,16 @@ function validateEmail(email: string): void {
 export const get = query({
   args: { id: v.id("organizations") },
   handler: async (ctx, args) => {
-    // Verify user has access to this organization
+    // Check if organization exists first
+    const org = await ctx.db.get(args.id);
+    if (!org) {
+      return null;
+    }
+    
+    // Then verify user has access
     await requireOrgAccess(ctx, args.id.toString());
     
-    return await ctx.db.get(args.id);
+    return org;
   },
 });
 

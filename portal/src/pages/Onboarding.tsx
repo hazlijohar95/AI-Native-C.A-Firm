@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
@@ -43,15 +43,15 @@ export function Onboarding() {
     phone: "",
   });
 
-  // Initialize form with current user data
-  useState(() => {
+  // Initialize form with current user data when user loads
+  useEffect(() => {
     if (currentUser) {
       setProfileData({
         name: currentUser.name || "",
         phone: currentUser.phone || "",
       });
     }
-  });
+  }, [currentUser]);
 
   const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep);
 

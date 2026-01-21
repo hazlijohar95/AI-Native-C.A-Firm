@@ -1,5 +1,7 @@
 import { query, mutation, action } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { requireAuth } from "./lib/auth";
 
 // Document categories for filtering
@@ -285,27 +287,38 @@ export const generateUploadUrl = action({
   },
 });
 
-// Get download URL for a document
+// Get download URL for a document (with authorization check)
+// Note: Uses internal query to avoid circular type reference
 export const generateDownloadUrl = action({
   args: {
-    convexStorageId: v.string(),
-    filename: v.string(),
+    documentId: v.id("documents"),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ downloadUrl: string | null; filename: string }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Unauthorized");
     }
 
+    // Verify user has access to this document via the get query
+    // This checks organization access for clients
+    const doc = await ctx.runQuery(api.documents.get, { id: args.documentId });
+    if (!doc) {
+      throw new Error("Document not found or access denied");
+    }
+
+    if (!doc.convexStorageId) {
+      throw new Error("File not available for download");
+    }
+
     // Use Convex storage URL
-    const url = await ctx.storage.getUrl(args.convexStorageId as any);
+    const url = await ctx.storage.getUrl(doc.convexStorageId as Id<"_storage">);
     if (!url) {
       throw new Error("File not found");
     }
     
     return {
       downloadUrl: url,
-      filename: args.filename,
+      filename: doc.name,
     };
   },
 });
