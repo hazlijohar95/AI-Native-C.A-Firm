@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery } from "convex/react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
@@ -24,15 +25,27 @@ import {
   Bell,
   Building2,
   ExternalLink,
+  ChevronDown,
 } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/utils";
 
+const PAGE_SIZE = 20;
+
 export function AdminActivity() {
-  const activity = useQuery(api.activity.list, { limit: 100 });
+  const [cursor, setCursor] = useState<number | undefined>(undefined);
+  const [allActivities, setAllActivities] = useState<any[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  
+  const activityResult = useQuery(api.activity.list, { limit: PAGE_SIZE, cursor });
   const organizations = useQuery(api.organizations.list);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [actionFilter, setActionFilter] = useState<string>("all");
+
+  // Combine initial results with loaded more results
+  const activities = cursor === undefined 
+    ? activityResult?.activities || []
+    : [...allActivities, ...(activityResult?.activities || [])];
 
   // Create org lookup map
   const orgMap = new Map(
@@ -40,7 +53,7 @@ export function AdminActivity() {
   );
 
   // Filter activity
-  const filteredActivity = activity?.filter((item) => {
+  const filteredActivity = activities.filter((item) => {
     const matchesSearch = 
       item.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.resourceName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -48,6 +61,15 @@ export function AdminActivity() {
     const matchesAction = actionFilter === "all" || item.resourceType === actionFilter;
     return matchesSearch && matchesAction;
   });
+
+  const handleLoadMore = useCallback(() => {
+    if (activityResult?.hasMore && activityResult?.nextCursor) {
+      setIsLoadingMore(true);
+      setAllActivities(activities);
+      setCursor(activityResult.nextCursor);
+      setIsLoadingMore(false);
+    }
+  }, [activityResult, activities]);
 
   const getActionIcon = (resourceType: string) => {
     switch (resourceType) {
@@ -160,11 +182,11 @@ export function AdminActivity() {
       </div>
 
       {/* Activity List */}
-      {activity === undefined ? (
+      {activityResult === undefined && cursor === undefined ? (
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
-      ) : filteredActivity?.length === 0 ? (
+      ) : filteredActivity.length === 0 ? (
         <Card>
           <CardContent className="flex h-48 flex-col items-center justify-center text-center">
             <History className="h-12 w-12 text-muted-foreground/50" />
@@ -178,7 +200,7 @@ export function AdminActivity() {
         </Card>
       ) : (
         <div className="space-y-2">
-          {filteredActivity?.map((item) => (
+          {filteredActivity.map((item) => (
             <Card key={item._id} className="hover:bg-muted/30 transition-colors">
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
@@ -245,11 +267,29 @@ export function AdminActivity() {
         </div>
       )}
 
-      {/* Summary */}
-      {activity && (
-        <p className="text-sm text-muted-foreground">
-          Showing {filteredActivity?.length || 0} of {activity.length} activity items
-        </p>
+      {/* Summary and Load More */}
+      {activities.length > 0 && (
+        <div className="flex flex-col items-center gap-4">
+          {activityResult?.hasMore && (
+            <Button 
+              variant="outline" 
+              onClick={handleLoadMore}
+              disabled={isLoadingMore || activityResult === undefined}
+              className="gap-2"
+            >
+              {isLoadingMore ? (
+                <Spinner size="sm" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+              Load More
+            </Button>
+          )}
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredActivity.length} of {activities.length} loaded activity items
+            {activityResult?.hasMore && " (more available)"}
+          </p>
+        </div>
       )}
     </div>
   );

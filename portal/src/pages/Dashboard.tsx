@@ -27,7 +27,8 @@ export function Dashboard() {
   const pendingTaskCount = useQuery(api.tasks.countPending);
   const unreadAnnouncementCount = useQuery(api.announcements.countUnread);
   const invoiceCounts = useQuery(api.invoices.countPending);
-  const recentActivity = useQuery(api.activity.list, { limit: 5 });
+  const recentActivityResult = useQuery(api.activity.list, { limit: 5 });
+  const recentActivity = recentActivityResult?.activities;
 
   // Sync user to database on first load (fallback if webhook hasn't fired)
   useEffect(() => {

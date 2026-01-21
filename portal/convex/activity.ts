@@ -6,33 +6,53 @@ import { requireAuth } from "./lib/auth";
 // QUERIES
 // ============================================
 
-// Get recent activity for current user/organization
+// Get recent activity for current user/organization (with cursor pagination)
 export const list = query({
   args: {
     limit: v.optional(v.number()),
+    cursor: v.optional(v.number()), // timestamp cursor for pagination
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
-    const limit = args.limit || 20;
+    const limit = Math.min(args.limit || 20, 100); // Cap at 100
 
-    let activities;
+    let activitiesQuery;
 
     if (user.role === "admin" || user.role === "staff") {
       // Admin/staff see all activity
-      activities = await ctx.db
+      activitiesQuery = ctx.db
         .query("activityLogs")
-        .order("desc")
-        .take(limit);
+        .order("desc");
     } else if (user.organizationId) {
       // Clients see their organization's activity
-      activities = await ctx.db
+      activitiesQuery = ctx.db
         .query("activityLogs")
         .withIndex("by_organization", (q) => q.eq("organizationId", user.organizationId!))
-        .order("desc")
-        .take(limit);
+        .order("desc");
     } else {
-      return [];
+      return { activities: [], nextCursor: null, hasMore: false };
     }
+
+    // Apply cursor filter if provided
+    let activities;
+    if (args.cursor) {
+      activities = await activitiesQuery
+        .filter((q) => q.lt(q.field("createdAt"), args.cursor!))
+        .take(limit + 1); // Fetch one extra to check if there are more
+    } else {
+      activities = await activitiesQuery.take(limit + 1);
+    }
+
+    // Check if there are more results
+    const hasMore = activities.length > limit;
+    if (hasMore) {
+      activities = activities.slice(0, limit);
+    }
+
+    // Get next cursor (timestamp of last item)
+    const nextCursor = hasMore && activities.length > 0 
+      ? activities[activities.length - 1].createdAt 
+      : null;
 
     // Batch fetch all unique users to avoid N+1 queries
     const userIds = [...new Set(activities.map((a) => a.userId))];
@@ -51,7 +71,11 @@ export const list = query({
       };
     });
 
-    return enrichedActivities;
+    return {
+      activities: enrichedActivities,
+      nextCursor,
+      hasMore,
+    };
   },
 });
 
