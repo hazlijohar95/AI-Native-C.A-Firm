@@ -147,13 +147,13 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             {recentActivity === undefined ? (
-              <div className="flex h-48 items-center justify-center text-muted-foreground">
-                Loading...
+              <div className="flex h-48 items-center justify-center text-muted-foreground" aria-live="polite" aria-busy="true">
+                Loading…
               </div>
             ) : recentActivity.length === 0 ? (
               <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                  <Clock className="h-6 w-6 text-muted-foreground" />
+                  <Clock className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
                 </div>
                 <p className="mt-4 text-sm font-medium">No recent activity</p>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -161,18 +161,18 @@ export function Dashboard() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4" aria-live="polite">
                 {recentActivity.map((activity) => (
                   <div key={activity._id} className="flex items-start gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
                       {activity.userAvatar ? (
                         <img
                           src={activity.userAvatar}
-                          alt={activity.userName}
+                          alt=""
                           className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
-                        <User className="h-4 w-4 text-muted-foreground" />
+                        <User className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -234,16 +234,16 @@ const colorMap = {
 
 function StatusCard({ title, value, description, icon: Icon, href, color = "blue" }: StatusCardProps) {
   return (
-    <Link to={href}>
-      <Card className="transition-shadow hover:shadow-md cursor-pointer">
+    <Link to={href} className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg">
+      <Card className="transition-shadow group-hover:shadow-md cursor-pointer h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
           <div className={`rounded-lg p-2 ${colorMap[color]}`}>
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4" aria-hidden="true" />
           </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{value}</div>
+          <div className="text-2xl font-bold font-variant-numeric tabular-nums">{value}</div>
           <p className="text-xs text-muted-foreground">{description}</p>
         </CardContent>
       </Card>
@@ -260,19 +260,18 @@ interface QuickActionItemProps {
 
 function QuickActionItem({ icon: Icon, title, description, href }: QuickActionItemProps) {
   return (
-    <Link to={href}>
-      <button
-        className="flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-          <Icon className="h-5 w-5 text-primary" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium">{title}</p>
-          <p className="text-xs text-muted-foreground">{description}</p>
-        </div>
-        <ArrowRight className="h-4 w-4 text-muted-foreground" />
-      </button>
+    <Link 
+      to={href}
+      className="flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+        <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <ArrowRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
     </Link>
   );
 }

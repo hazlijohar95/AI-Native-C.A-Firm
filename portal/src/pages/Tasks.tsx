@@ -23,6 +23,11 @@ import {
 } from "lucide-react";
 import { cn, formatDistanceToNow } from "@/lib/utils";
 
+import type { Id } from "../../convex/_generated/dataModel";
+
+type TaskStatus = "pending" | "in_progress" | "completed";
+type TaskPriority = "low" | "medium" | "high";
+
 const statusOptions = [
   { value: "all", label: "All Tasks" },
   { value: "pending", label: "Pending" },
@@ -44,9 +49,9 @@ const priorityColors: Record<string, "destructive" | "warning" | "secondary"> = 
 };
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pending: <Circle className="h-4 w-4 text-gray-400" />,
-  in_progress: <Clock className="h-4 w-4 text-blue-500" />,
-  completed: <CheckCircle2 className="h-4 w-4 text-green-500" />,
+  pending: <Circle className="h-4 w-4 text-gray-400" aria-hidden="true" />,
+  in_progress: <Clock className="h-4 w-4 text-blue-500" aria-hidden="true" />,
+  completed: <CheckCircle2 className="h-4 w-4 text-green-500" aria-hidden="true" />,
 };
 
 export function Tasks() {
@@ -54,15 +59,15 @@ export function Tasks() {
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
 
   const tasks = useQuery(api.tasks.list, {
-    status: statusFilter === "all" ? undefined : statusFilter as any,
-    priority: priorityFilter === "all" ? undefined : priorityFilter as any,
+    status: statusFilter === "all" ? undefined : statusFilter as TaskStatus,
+    priority: priorityFilter === "all" ? undefined : priorityFilter as TaskPriority,
   });
 
   const updateStatus = useMutation(api.tasks.updateStatus);
 
-  const handleStatusChange = async (taskId: string, newStatus: "pending" | "in_progress" | "completed") => {
+  const handleStatusChange = async (taskId: Id<"tasks">, newStatus: TaskStatus) => {
     try {
-      await updateStatus({ id: taskId as any, status: newStatus });
+      await updateStatus({ id: taskId, status: newStatus });
       toast.success("Task updated", {
         description: newStatus === "completed" ? "Task marked as completed" : `Status changed to ${newStatus.replace("_", " ")}`,
       });
@@ -121,16 +126,16 @@ export function Tasks() {
 
       {/* Task List */}
       {tasks === undefined ? (
-        <div className="flex h-64 items-center justify-center">
+        <div className="flex h-64 items-center justify-center" aria-live="polite" aria-busy="true">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground">Loading tasks...</p>
+            <p className="text-sm text-muted-foreground">Loading tasks…</p>
           </div>
         </div>
       ) : tasks.length === 0 ? (
         <Card>
           <CardContent className="flex h-64 flex-col items-center justify-center">
-            <CheckSquare className="mb-4 h-12 w-12 text-muted-foreground" />
+            <CheckSquare className="mb-4 h-12 w-12 text-muted-foreground" aria-hidden="true" />
             <h3 className="text-lg font-medium">No tasks</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {statusFilter !== "all" || priorityFilter !== "all"
@@ -153,13 +158,15 @@ export function Tasks() {
                 <div className="flex items-start gap-4">
                   {/* Status Toggle */}
                   <button
+                    type="button"
                     onClick={() =>
                       handleStatusChange(
                         task._id,
                         task.status === "completed" ? "pending" : "completed"
                       )
                     }
-                    className="mt-0.5 flex-shrink-0"
+                    className="mt-0.5 flex-shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    aria-label={`Mark task "${task.title}" as ${task.status === "completed" ? "pending" : "completed"}`}
                   >
                     {statusIcons[task.status]}
                   </button>
@@ -180,7 +187,7 @@ export function Tasks() {
                       </Badge>
                       {task.status !== "completed" && isOverdue(task.dueDate) && (
                         <Badge variant="destructive" className="gap-1">
-                          <AlertCircle className="h-3 w-3" />
+                          <AlertCircle className="h-3 w-3" aria-hidden="true" />
                           Overdue
                         </Badge>
                       )}
@@ -195,7 +202,7 @@ export function Tasks() {
                     <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                       {task.dueDate && (
                         <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
+                          <Calendar className="h-3 w-3" aria-hidden="true" />
                           Due {formatDistanceToNow(task.dueDate)}
                         </div>
                       )}
@@ -213,7 +220,7 @@ export function Tasks() {
                     <Select
                       value={task.status}
                       onValueChange={(value) =>
-                        handleStatusChange(task._id, value as any)
+                        handleStatusChange(task._id, value as TaskStatus)
                       }
                     >
                       <SelectTrigger className="w-[130px]">

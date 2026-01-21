@@ -65,11 +65,11 @@ const categoryColors: Record<string, "default" | "info" | "success" | "warning" 
 };
 
 function getFileIcon(type: string) {
-  if (type.includes("pdf")) return <FileText className="h-8 w-8 text-red-500" />;
+  if (type.includes("pdf")) return <FileText className="h-8 w-8 text-red-500" aria-hidden="true" />;
   if (type.includes("spreadsheet") || type.includes("excel") || type.includes("csv"))
-    return <FileSpreadsheet className="h-8 w-8 text-green-600" />;
-  if (type.includes("image")) return <FileImage className="h-8 w-8 text-blue-500" />;
-  return <File className="h-8 w-8 text-gray-500" />;
+    return <FileSpreadsheet className="h-8 w-8 text-green-600" aria-hidden="true" />;
+  if (type.includes("image")) return <FileImage className="h-8 w-8 text-blue-500" aria-hidden="true" />;
+  return <File className="h-8 w-8 text-gray-500" aria-hidden="true" />;
 }
 
 function formatFileSize(bytes: number): string {
@@ -180,16 +180,16 @@ export function Documents() {
 
       {/* Document List */}
       {documents === undefined ? (
-        <div className="flex h-64 items-center justify-center">
+        <div className="flex h-64 items-center justify-center" aria-live="polite" aria-busy="true">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground">Loading documents...</p>
+            <p className="text-sm text-muted-foreground">Loading documents…</p>
           </div>
         </div>
       ) : documents.length === 0 ? (
         <Card>
           <CardContent className="flex h-64 flex-col items-center justify-center">
-            <FolderOpen className="mb-4 h-12 w-12 text-muted-foreground" />
+            <FolderOpen className="mb-4 h-12 w-12 text-muted-foreground" aria-hidden="true" />
             <h3 className="text-lg font-medium">No documents yet</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {categoryFilter !== "all"
@@ -226,7 +226,7 @@ export function Documents() {
                 </div>
                 <div className="mt-4 flex gap-2">
                   <Button variant="outline" size="sm" className="flex-1 gap-1" disabled>
-                    <Download className="h-3 w-3" />
+                    <Download className="h-3 w-3" aria-hidden="true" />
                     Download
                   </Button>
                   <Button
@@ -234,8 +234,9 @@ export function Documents() {
                     size="sm"
                     className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                     onClick={() => handleDeleteClick(doc._id, doc.name)}
+                    aria-label={`Delete ${doc.name}`}
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash2 className="h-3 w-3" aria-hidden="true" />
                   </Button>
                 </div>
               </CardContent>

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -47,12 +48,23 @@ const secondaryNavigation = [
 ];
 
 export function Sidebar({ open, onClose }: SidebarProps) {
+  // Handle Escape key to close mobile sidebar
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [open, onClose]);
+
   return (
     <>
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 transform bg-white shadow-lg motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-in-out lg:hidden",
           open ? "translate-x-0" : "-translate-x-full"
         )}
         aria-label="Mobile navigation"
@@ -100,7 +112,7 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
             onClick={onClose}
             aria-label="Close navigation menu"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </Button>
         )}
       </div>
@@ -173,7 +185,7 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
               )
             }
           >
-            <item.icon className="h-5 w-5" />
+            <item.icon className="h-5 w-5" aria-hidden="true" />
             {item.name}
           </NavLink>
         ))}
