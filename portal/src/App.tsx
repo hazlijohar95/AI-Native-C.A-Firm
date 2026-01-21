@@ -11,6 +11,14 @@ import { Tasks } from "@/pages/Tasks";
 import { Announcements } from "@/pages/Announcements";
 import { Invoices } from "@/pages/Invoices";
 import { Signatures } from "@/pages/Signatures";
+import {
+  AdminDashboard,
+  AdminClients,
+  AdminUsers,
+  AdminInvoices,
+  AdminAnnouncements,
+  AdminActivity,
+} from "@/pages/admin";
 
 function App() {
   return (
@@ -36,6 +44,7 @@ function App() {
       <Authenticated>
         <Shell>
           <Routes>
+            {/* Client Routes */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/documents" element={<Documents />} />
@@ -45,6 +54,16 @@ function App() {
             <Route path="/signatures" element={<Signatures />} />
             <Route path="/signatures/:id" element={<Signatures />} />
             <Route path="/settings" element={<ComingSoon title="Settings" />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/organizations" element={<AdminClients />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/invoices" element={<AdminInvoices />} />
+            <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+            <Route path="/admin/activity" element={<AdminActivity />} />
+            
+            {/* Fallbacks */}
             <Route path="/callback" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

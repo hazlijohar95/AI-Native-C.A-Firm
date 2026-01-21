@@ -1,0 +1,220 @@
+import { useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  History, 
+  Search,
+  User,
+  FileText,
+  CheckSquare,
+  Receipt,
+  PenTool,
+  Bell,
+  Building2,
+} from "lucide-react";
+import { formatDistanceToNow } from "@/lib/utils";
+
+export function AdminActivity() {
+  const activity = useQuery(api.activity.list, { limit: 100 });
+  const organizations = useQuery(api.organizations.list);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [actionFilter, setActionFilter] = useState<string>("all");
+
+  // Create org lookup map
+  const orgMap = new Map(
+    organizations?.map((org) => [org._id.toString(), org.name]) || []
+  );
+
+  // Filter activity
+  const filteredActivity = activity?.filter((item) => {
+    const matchesSearch = 
+      item.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.resourceName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.action.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesAction = actionFilter === "all" || item.resourceType === actionFilter;
+    return matchesSearch && matchesAction;
+  });
+
+  const getActionIcon = (resourceType: string) => {
+    switch (resourceType) {
+      case "document":
+        return <FileText className="h-4 w-4" />;
+      case "task":
+        return <CheckSquare className="h-4 w-4" />;
+      case "invoice":
+        return <Receipt className="h-4 w-4" />;
+      case "signature":
+        return <PenTool className="h-4 w-4" />;
+      case "announcement":
+        return <Bell className="h-4 w-4" />;
+      default:
+        return <History className="h-4 w-4" />;
+    }
+  };
+
+  const getActionBadge = (action: string) => {
+    if (action.includes("created") || action.includes("uploaded") || action.includes("issued")) {
+      return <Badge className="bg-green-500 text-xs">Created</Badge>;
+    }
+    if (action.includes("updated") || action.includes("completed") || action.includes("signed")) {
+      return <Badge className="bg-blue-500 text-xs">Updated</Badge>;
+    }
+    if (action.includes("deleted") || action.includes("cancelled") || action.includes("declined")) {
+      return <Badge variant="destructive" className="text-xs">Removed</Badge>;
+    }
+    return <Badge variant="secondary" className="text-xs">Action</Badge>;
+  };
+
+  const formatAction = (action: string): string => {
+    const actions: Record<string, string> = {
+      uploaded_document: "uploaded document",
+      deleted_document: "deleted document",
+      created_task: "created task",
+      completed_task: "completed task",
+      updated_task: "updated task",
+      deleted_task: "deleted task",
+      created_draft_invoice: "created draft invoice",
+      issued_invoice: "issued invoice",
+      updated_draft_invoice: "updated draft invoice",
+      cancelled_invoice: "cancelled invoice",
+      recorded_payment: "recorded payment for",
+      signed_document: "signed document",
+      declined_signature: "declined signature for",
+      created_signature_request: "requested signature for",
+    };
+    return actions[action] || action.replace(/_/g, " ");
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          Activity Log
+        </h1>
+        <p className="mt-1 text-muted-foreground">
+          View all activity across the portal
+        </p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search activity..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={actionFilter} onValueChange={setActionFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Activity</SelectItem>
+            <SelectItem value="document">Documents</SelectItem>
+            <SelectItem value="task">Tasks</SelectItem>
+            <SelectItem value="invoice">Invoices</SelectItem>
+            <SelectItem value="signature">Signatures</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Activity List */}
+      {activity === undefined ? (
+        <div className="flex h-64 items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+      ) : filteredActivity?.length === 0 ? (
+        <Card>
+          <CardContent className="flex h-48 flex-col items-center justify-center text-center">
+            <History className="h-12 w-12 text-muted-foreground/50" />
+            <p className="mt-4 font-medium">No activity found</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {searchQuery || actionFilter !== "all" 
+                ? "Try adjusting your filters" 
+                : "Activity will appear here as users interact with the portal"}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {filteredActivity?.map((item) => (
+            <Card key={item._id} className="hover:bg-muted/30 transition-colors">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-4">
+                  {/* User Avatar */}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted overflow-hidden">
+                    {item.userAvatar ? (
+                      <img 
+                        src={item.userAvatar} 
+                        alt={item.userName}
+                        className="h-10 w-10 object-cover"
+                      />
+                    ) : (
+                      <User className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </div>
+
+                  {/* Activity Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium">{item.userName}</span>
+                      <span className="text-muted-foreground">{formatAction(item.action)}</span>
+                      {item.resourceName && (
+                        <span className="font-medium truncate">"{item.resourceName}"</span>
+                      )}
+                    </div>
+                    
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
+                      {/* Organization */}
+                      {item.organizationId && (
+                        <span className="flex items-center gap-1 text-muted-foreground">
+                          <Building2 className="h-3 w-3" />
+                          {orgMap.get(item.organizationId.toString()) || "Unknown"}
+                        </span>
+                      )}
+                      
+                      {/* Time */}
+                      <span className="text-muted-foreground">
+                        {formatDistanceToNow(item.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Type */}
+                  <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded bg-muted">
+                      {getActionIcon(item.resourceType)}
+                    </div>
+                    {getActionBadge(item.action)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Summary */}
+      {activity && (
+        <p className="text-sm text-muted-foreground">
+          Showing {filteredActivity?.length || 0} of {activity.length} activity items
+        </p>
+      )}
+    </div>
+  );
+}

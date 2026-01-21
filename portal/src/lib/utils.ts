@@ -80,3 +80,13 @@ export function formatDate(timestamp: number): string {
     day: "numeric",
   });
 }
+
+/**
+ * Format amount in cents to MYR currency string
+ */
+export function formatCurrency(amountInCents: number): string {
+  return new Intl.NumberFormat("en-MY", {
+    style: "currency",
+    currency: "MYR",
+  }).format(amountInCents / 100);
+}
