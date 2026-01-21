@@ -7,10 +7,11 @@ import { requireAuth } from "./lib/auth";
 // ============================================
 
 // Get recent activity for current user/organization (with cursor pagination)
+// Uses composite cursor (timestamp:id) to handle timestamp collisions
 export const list = query({
   args: {
     limit: v.optional(v.number()),
-    cursor: v.optional(v.number()), // timestamp cursor for pagination
+    cursor: v.optional(v.string()), // Composite cursor: "timestamp:id"
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
@@ -33,12 +34,31 @@ export const list = query({
       return { activities: [], nextCursor: null, hasMore: false };
     }
 
+    // Parse composite cursor if provided
+    let cursorTimestamp: number | undefined;
+    let cursorId: string | undefined;
+    
+    if (args.cursor) {
+      const parts = args.cursor.split(":");
+      cursorTimestamp = parseInt(parts[0], 10);
+      cursorId = parts[1];
+    }
+
     // Apply cursor filter if provided
     let activities;
-    if (args.cursor) {
+    if (cursorTimestamp !== undefined) {
+      // Filter by timestamp, then exclude items with same timestamp but earlier/equal ID
       activities = await activitiesQuery
-        .filter((q) => q.lt(q.field("createdAt"), args.cursor!))
-        .take(limit + 1); // Fetch one extra to check if there are more
+        .filter((q) => 
+          q.or(
+            q.lt(q.field("createdAt"), cursorTimestamp!),
+            q.and(
+              q.eq(q.field("createdAt"), cursorTimestamp!),
+              cursorId ? q.lt(q.field("_id"), cursorId as any) : q.eq(1, 1)
+            )
+          )
+        )
+        .take(limit + 1);
     } else {
       activities = await activitiesQuery.take(limit + 1);
     }
@@ -49,9 +69,10 @@ export const list = query({
       activities = activities.slice(0, limit);
     }
 
-    // Get next cursor (timestamp of last item)
-    const nextCursor = hasMore && activities.length > 0 
-      ? activities[activities.length - 1].createdAt 
+    // Get next cursor (composite: timestamp:id of last item)
+    const lastItem = activities[activities.length - 1];
+    const nextCursor = hasMore && lastItem
+      ? `${lastItem.createdAt}:${lastItem._id}`
       : null;
 
     // Batch fetch all unique users to avoid N+1 queries

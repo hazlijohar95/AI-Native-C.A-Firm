@@ -48,7 +48,7 @@ interface ActivityItem {
 }
 
 export function AdminActivity() {
-  const [cursor, setCursor] = useState<number | undefined>(undefined);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [loadedActivities, setLoadedActivities] = useState<ActivityItem[]>([]);
   
   const activityResult = useQuery(api.activity.list, { limit: PAGE_SIZE, cursor });

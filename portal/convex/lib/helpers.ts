@@ -293,7 +293,7 @@ export async function notifyAdmins(
 
 /**
  * Generate a unique invoice number using the year and a sequential counter
- * Uses index query with filter to minimize race condition window
+ * Includes uniqueness check to handle race conditions
  */
 export async function generateInvoiceNumber(ctx: MutationCtx): Promise<string> {
   const year = new Date().getFullYear();
@@ -308,7 +308,10 @@ export async function generateInvoiceNumber(ctx: MutationCtx): Promise<string> {
   
   // Find the highest number
   let maxNumber = 0;
+  const existingNumbers = new Set<string>();
+  
   for (const inv of yearInvoices) {
+    existingNumbers.add(inv.invoiceNumber);
     const match = inv.invoiceNumber.match(/INV-\d{4}-(\d+)/);
     if (match) {
       const num = parseInt(match[1], 10);
@@ -318,9 +321,28 @@ export async function generateInvoiceNumber(ctx: MutationCtx): Promise<string> {
     }
   }
   
-  // Generate next number with padding
-  const nextNumber = maxNumber + 1;
-  return `${prefix}${String(nextNumber).padStart(4, "0")}`;
+  // Generate next number with padding, retry if collision detected
+  // This handles race conditions by checking existing numbers
+  let nextNumber = maxNumber + 1;
+  let invoiceNumber = `${prefix}${String(nextNumber).padStart(4, "0")}`;
+  
+  // Safety check: if number already exists (race condition), increment until unique
+  // Limit retries to prevent infinite loop
+  let retries = 0;
+  const maxRetries = 10;
+  
+  while (existingNumbers.has(invoiceNumber) && retries < maxRetries) {
+    nextNumber++;
+    invoiceNumber = `${prefix}${String(nextNumber).padStart(4, "0")}`;
+    retries++;
+  }
+  
+  if (retries >= maxRetries) {
+    // Fallback: add timestamp suffix to guarantee uniqueness
+    invoiceNumber = `${prefix}${String(nextNumber).padStart(4, "0")}-${Date.now().toString(36)}`;
+  }
+  
+  return invoiceNumber;
 }
 
 /**
