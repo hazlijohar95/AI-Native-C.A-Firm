@@ -39,7 +39,7 @@ export function Callback() {
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="flex flex-col items-center gap-6">
         {/* Logo */}
-        <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center">
+        <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center">
           <span className="text-white font-serif text-xl font-medium">A&H</span>
         </div>
 
@@ -47,16 +47,16 @@ export function Callback() {
         <div className="flex flex-col items-center gap-3">
           <Spinner size="lg" />
           <div className="text-center">
-            <p className="text-brand-black font-medium">Completing sign in</p>
-            <p className="text-brand-gray-600 text-sm mt-1">Please wait a moment...</p>
+            <p className="text-gray-900 font-medium">Completing sign in</p>
+            <p className="text-gray-500 text-sm mt-1">Please wait a moment...</p>
           </div>
         </div>
 
         {/* Progress dots */}
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div className="w-2 h-2 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: "0ms" }} />
+          <div className="w-2 h-2 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: "150ms" }} />
+          <div className="w-2 h-2 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: "300ms" }} />
         </div>
       </div>
     </div>

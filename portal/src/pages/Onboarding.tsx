@@ -98,7 +98,7 @@ export function Onboarding() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center">
+          <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center">
             <span className="text-white font-serif text-xl">A&H</span>
           </div>
           <Spinner size="lg" />
@@ -115,19 +115,19 @@ export function Onboarding() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-brand-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-serif text-sm font-medium">A&H</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-brand-black font-serif font-medium">Amjad & Hazli</h1>
-              <p className="text-brand-gray-600 text-xs uppercase tracking-wider">Getting Started</p>
+              <h1 className="text-gray-900 font-serif font-medium">Amjad & Hazli</h1>
+              <p className="text-gray-500 text-xs uppercase tracking-wider">Getting Started</p>
             </div>
           </div>
-          <div className="text-sm text-brand-gray-600">
-            Step <span className="text-brand-black font-medium">{currentStepIndex + 1}</span> of {STEPS.length}
+          <div className="text-sm text-gray-500">
+            Step <span className="text-gray-900 font-medium">{currentStepIndex + 1}</span> of {STEPS.length}
           </div>
         </div>
       </header>
@@ -147,10 +147,10 @@ export function Onboarding() {
                     <div
                       className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
                         isCompleted
-                          ? "bg-primary text-white shadow-md"
+                          ? "bg-blue-600 text-white shadow-md"
                           : isCurrent
-                          ? "bg-brand-black text-white shadow-md"
-                          : "bg-brand-gray-50 text-brand-gray-400 border border-brand-gray-200"
+                          ? "bg-gray-900 text-white shadow-md"
+                          : "bg-gray-100 text-gray-400 border border-gray-200"
                       }`}
                     >
                       {isCompleted ? (
@@ -159,12 +159,12 @@ export function Onboarding() {
                         <StepIcon className="w-5 h-5" />
                       )}
                       {isCurrent && (
-                        <div className="absolute -inset-1.5 rounded-2xl border-2 border-brand-black/20 animate-pulse" />
+                        <div className="absolute -inset-1.5 rounded-2xl border-2 border-gray-900/20 animate-pulse" />
                       )}
                     </div>
                     <span
                       className={`mt-2.5 text-xs font-medium uppercase tracking-wider hidden sm:block ${
-                        isCurrent ? "text-brand-black" : isCompleted ? "text-primary" : "text-brand-gray-400"
+                        isCurrent ? "text-gray-900" : isCompleted ? "text-blue-600" : "text-gray-400"
                       }`}
                     >
                       {step.title}
@@ -172,7 +172,7 @@ export function Onboarding() {
                   </div>
                   {index < STEPS.length - 1 && (
                     <div className={`h-0.5 flex-1 mx-3 sm:mx-5 rounded-full transition-colors duration-300 ${
-                      isCompleted ? "bg-primary" : "bg-brand-gray-200"
+                      isCompleted ? "bg-blue-600" : "bg-gray-200"
                     }`} />
                   )}
                 </div>
@@ -182,13 +182,13 @@ export function Onboarding() {
         </div>
 
         {/* Content Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-brand-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           
           {/* Welcome Step */}
           {currentStep === "welcome" && (
             <>
-              <div className="bg-primary p-8 lg:p-10 text-white">
-                <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6">
+              <div className="bg-blue-600 p-8 lg:p-10 text-white">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6">
                   <Sparkles className="w-7 h-7" />
                 </div>
                 <h1 className="text-3xl lg:text-4xl font-serif font-medium tracking-tight mb-3">
@@ -208,7 +208,7 @@ export function Onboarding() {
                 </div>
                 <Button 
                   onClick={goToNextStep} 
-                  className="w-full h-12 text-base font-medium bg-primary hover:bg-primary-hover text-white rounded-lg transition-all duration-200 group"
+                  className="w-full h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 group"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
@@ -220,34 +220,34 @@ export function Onboarding() {
           {/* Profile Step */}
           {currentStep === "profile" && (
             <>
-              <div className="p-8 lg:p-10 border-b border-brand-gray-100">
+              <div className="p-8 lg:p-10 border-b border-gray-200">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
                     <User className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl lg:text-3xl font-serif font-medium text-brand-black">Your Profile</h2>
-                    <p className="text-brand-gray-600 mt-0.5">Let's confirm your information</p>
+                    <h2 className="text-2xl lg:text-3xl font-serif font-medium text-gray-900">Your Profile</h2>
+                    <p className="text-gray-500 mt-0.5">Let's confirm your information</p>
                   </div>
                 </div>
               </div>
               <div className="p-8 lg:p-10 space-y-6">
                 <div className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium text-brand-black">
-                      Full Name <span className="text-primary">*</span>
+                    <Label htmlFor="name" className="text-sm font-medium text-gray-900">
+                      Full Name <span className="text-blue-600">*</span>
                     </Label>
                     <Input
                       id="name"
                       placeholder="Enter your full name"
                       value={profileData.name}
                       onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                      className="h-12 text-base bg-brand-gray-50 border-brand-gray-200 focus:border-primary focus:ring-primary rounded-lg px-4"
+                      className="h-12 text-base bg-gray-50 border-gray-200 focus:border-blue-600 focus:ring-blue-600 rounded-lg px-4"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-medium text-brand-black">
-                      Phone Number <span className="text-brand-gray-400 font-normal">(Optional)</span>
+                    <Label htmlFor="phone" className="text-sm font-medium text-gray-900">
+                      Phone Number <span className="text-gray-400 font-normal">(Optional)</span>
                     </Label>
                     <Input
                       id="phone"
@@ -255,16 +255,16 @@ export function Onboarding() {
                       placeholder="+60 12-345 6789"
                       value={profileData.phone}
                       onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                      className="h-12 text-base bg-brand-gray-50 border-brand-gray-200 focus:border-primary focus:ring-primary rounded-lg px-4"
+                      className="h-12 text-base bg-gray-50 border-gray-200 focus:border-blue-600 focus:ring-blue-600 rounded-lg px-4"
                     />
                   </div>
-                  <div className="bg-brand-gray-50 rounded-xl p-4 flex items-center gap-3 border border-brand-gray-100">
-                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-brand-gray-200">
-                      <Mail className="w-5 h-5 text-brand-gray-600" />
+                  <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 border border-gray-200">
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200">
+                      <Mail className="w-5 h-5 text-gray-500" />
                     </div>
                     <div>
-                      <p className="text-brand-black font-medium">{currentUser?.email}</p>
-                      <p className="text-brand-gray-600 text-sm">Contact us to update your email</p>
+                      <p className="text-gray-900 font-medium">{currentUser?.email}</p>
+                      <p className="text-gray-500 text-sm">Contact us to update your email</p>
                     </div>
                   </div>
                 </div>
@@ -272,7 +272,7 @@ export function Onboarding() {
                   <Button 
                     variant="outline" 
                     onClick={goToPrevStep} 
-                    className="h-12 px-6 rounded-lg border-brand-gray-200 hover:bg-brand-gray-50 text-brand-black"
+                    className="h-12 px-6 rounded-lg border-gray-200 hover:bg-gray-50 text-gray-900"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back
@@ -280,7 +280,7 @@ export function Onboarding() {
                   <Button
                     onClick={handleProfileSubmit}
                     disabled={isSubmitting || !profileData.name.trim()}
-                    className="flex-1 h-12 text-base font-medium bg-primary hover:bg-primary-hover text-white rounded-lg transition-all duration-200 disabled:opacity-50 group"
+                    className="flex-1 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 disabled:opacity-50 group"
                   >
                     {isSubmitting ? <Spinner size="sm" className="mr-2" /> : null}
                     <span>Continue</span>
@@ -294,14 +294,14 @@ export function Onboarding() {
           {/* Organization Step */}
           {currentStep === "organization" && (
             <>
-              <div className="p-8 lg:p-10 border-b border-brand-gray-100">
+              <div className="p-8 lg:p-10 border-b border-gray-200">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
                     <Building2 className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl lg:text-3xl font-serif font-medium text-brand-black">Company Info</h2>
-                    <p className="text-brand-gray-600 mt-0.5">
+                    <h2 className="text-2xl lg:text-3xl font-serif font-medium text-gray-900">Company Info</h2>
+                    <p className="text-gray-500 mt-0.5">
                       {currentUser?.organizationId ? "Your linked organization" : "Pending assignment"}
                     </p>
                   </div>
@@ -311,12 +311,12 @@ export function Onboarding() {
                 {currentUser?.organizationId ? (
                   <OrganizationInfo organizationId={currentUser.organizationId} />
                 ) : (
-                  <div className="border-2 border-dashed border-brand-gray-200 rounded-xl p-8 text-center bg-brand-gray-50">
-                    <div className="w-14 h-14 bg-brand-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <Building2 className="w-7 h-7 text-brand-gray-600" />
+                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50">
+                    <div className="w-14 h-14 bg-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                      <Building2 className="w-7 h-7 text-gray-500" />
                     </div>
-                    <h3 className="text-xl font-serif font-medium text-brand-black mb-2">No Organization Yet</h3>
-                    <p className="text-brand-gray-600 max-w-sm mx-auto">
+                    <h3 className="text-xl font-serif font-medium text-gray-900 mb-2">No Organization Yet</h3>
+                    <p className="text-gray-500 max-w-sm mx-auto">
                       Our team will link your account to your company shortly. You can continue using the portal.
                     </p>
                   </div>
@@ -325,14 +325,14 @@ export function Onboarding() {
                   <Button 
                     variant="outline" 
                     onClick={goToPrevStep} 
-                    className="h-12 px-6 rounded-lg border-brand-gray-200 hover:bg-brand-gray-50 text-brand-black"
+                    className="h-12 px-6 rounded-lg border-gray-200 hover:bg-gray-50 text-gray-900"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back
                   </Button>
                   <Button 
                     onClick={goToNextStep} 
-                    className="flex-1 h-12 text-base font-medium bg-primary hover:bg-primary-hover text-white rounded-lg transition-all duration-200 group"
+                    className="flex-1 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 group"
                   >
                     <span>Continue</span>
                     <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
@@ -345,7 +345,7 @@ export function Onboarding() {
           {/* Complete Step */}
           {currentStep === "complete" && (
             <>
-              <div className="bg-primary p-8 lg:p-10 text-white text-center">
+              <div className="bg-blue-600 p-8 lg:p-10 text-white text-center">
                 <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
@@ -361,18 +361,18 @@ export function Onboarding() {
                   <QuickLink icon={FileText} title="Documents" desc="View and upload files" />
                   <QuickLink icon={Bell} title="Announcements" desc="Latest updates" />
                 </div>
-                <div className="bg-brand-gray-50 rounded-xl p-4 text-center border border-brand-gray-100">
-                  <p className="text-brand-gray-600 text-sm">
+                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200">
+                  <p className="text-gray-500 text-sm">
                     Need help? Visit our{" "}
-                    <a href="/help" className="text-primary font-medium hover:underline">Help Center</a>
+                    <a href="/help" className="text-blue-600 font-medium hover:underline">Help Center</a>
                     {" "}or email{" "}
-                    <a href="mailto:support@amjadhazli.com" className="text-primary font-medium hover:underline">support@amjadhazli.com</a>
+                    <a href="mailto:support@amjadhazli.com" className="text-blue-600 font-medium hover:underline">support@amjadhazli.com</a>
                   </p>
                 </div>
                 <Button
                   onClick={handleCompleteOnboarding}
                   disabled={isSubmitting}
-                  className="w-full h-14 text-lg font-medium bg-primary hover:bg-primary-hover text-white rounded-lg transition-all duration-200 group"
+                  className="w-full h-14 text-lg font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 group"
                 >
                   {isSubmitting ? <Spinner size="sm" className="mr-2" /> : null}
                   <span>Enter Dashboard</span>
@@ -389,25 +389,25 @@ export function Onboarding() {
 
 function FeatureCard({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
   return (
-    <div className="bg-brand-gray-50 rounded-xl p-5 text-center border border-brand-gray-100 hover:border-primary/20 hover:bg-primary-muted transition-colors duration-200">
-      <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mx-auto mb-3">
+    <div className="bg-gray-50 rounded-xl p-5 text-center border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200">
+      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
         <Icon className="w-5 h-5 text-white" />
       </div>
-      <h3 className="font-medium text-brand-black">{title}</h3>
-      <p className="text-sm text-brand-gray-600 mt-0.5">{desc}</p>
+      <h3 className="font-medium text-gray-900">{title}</h3>
+      <p className="text-sm text-gray-500 mt-0.5">{desc}</p>
     </div>
   );
 }
 
 function QuickLink({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
   return (
-    <div className="bg-brand-gray-50 rounded-xl p-4 flex items-center gap-3 border border-brand-gray-100 hover:border-primary/20 hover:bg-primary-muted transition-colors cursor-pointer">
-      <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+    <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer">
+      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5 text-white" />
       </div>
       <div>
-        <h3 className="font-medium text-brand-black">{title}</h3>
-        <p className="text-sm text-brand-gray-600">{desc}</p>
+        <h3 className="font-medium text-gray-900">{title}</h3>
+        <p className="text-sm text-gray-500">{desc}</p>
       </div>
     </div>
   );
@@ -418,22 +418,22 @@ function OrganizationInfo({ organizationId }: { organizationId: Id<"organization
 
   if (!organization) {
     return (
-      <div className="bg-brand-gray-50 rounded-xl p-6 flex items-center justify-center border border-brand-gray-100">
+      <div className="bg-gray-50 rounded-xl p-6 flex items-center justify-center border border-gray-200">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="bg-brand-gray-50 rounded-xl p-5 flex items-center gap-4 border border-brand-gray-100">
-      <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
+    <div className="bg-gray-50 rounded-xl p-5 flex items-center gap-4 border border-gray-200">
+      <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
         <Building2 className="w-6 h-6 text-white" />
       </div>
       <div>
-        <h3 className="text-lg font-serif font-medium text-brand-black">{organization.name}</h3>
-        <p className="text-brand-gray-600">{organization.email}</p>
+        <h3 className="text-lg font-serif font-medium text-gray-900">{organization.name}</h3>
+        <p className="text-gray-500">{organization.email}</p>
         {organization.registrationNumber && (
-          <p className="text-sm text-brand-gray-400 mt-0.5">Reg: {organization.registrationNumber}</p>
+          <p className="text-sm text-gray-400 mt-0.5">Reg: {organization.registrationNumber}</p>
         )}
       </div>
     </div>
