@@ -152,9 +152,92 @@ export const listByOrganization = query({
       throw new Error("Access denied");
     }
 
-    return await ctx.db
+    const users = await ctx.db
       .query("users")
       .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
       .collect();
+
+    // For clients, filter out deactivated users
+    if (user.role === "client") {
+      return users.filter(u => u.isActive !== false);
+    }
+
+    return users;
+  },
+});
+
+// Deactivate user (admin only) - soft delete
+export const deactivate = mutation({
+  args: {
+    userId: v.id("users"),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const currentUser = await requireAdmin(ctx);
+    
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Prevent deactivating yourself
+    if (user._id.toString() === currentUser._id.toString()) {
+      throw new Error("Cannot deactivate your own account");
+    }
+
+    // Prevent deactivating another admin
+    if (user.role === "admin") {
+      throw new Error("Cannot deactivate admin users");
+    }
+
+    // Check if already deactivated
+    if (user.isActive === false) {
+      throw new Error("User is already deactivated");
+    }
+
+    await ctx.db.patch(args.userId, {
+      isActive: false,
+      deactivatedAt: Date.now(),
+      deactivatedBy: currentUser._id,
+      deactivationReason: args.reason?.trim() || undefined,
+    });
+  },
+});
+
+// Reactivate user (admin only)
+export const reactivate = mutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if already active
+    if (user.isActive !== false) {
+      throw new Error("User is already active");
+    }
+
+    await ctx.db.patch(args.userId, {
+      isActive: true,
+      deactivatedAt: undefined,
+      deactivatedBy: undefined,
+      deactivationReason: undefined,
+    });
+  },
+});
+
+// List active users only (admin/staff)
+export const listActive = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdminOrStaff(ctx);
+    const users = await ctx.db.query("users").collect();
+    // Filter active users (isActive undefined or true means active)
+    return users.filter(u => u.isActive !== false);
   },
 });

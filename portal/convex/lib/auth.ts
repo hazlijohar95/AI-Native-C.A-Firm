@@ -45,6 +45,11 @@ export async function requireAuth(
     throw new Error("User not found in database");
   }
 
+  // Check if user is deactivated
+  if (user.isActive === false) {
+    throw new Error("Your account has been deactivated. Please contact support.");
+  }
+
   return user;
 }
 

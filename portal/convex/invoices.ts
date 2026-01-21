@@ -6,7 +6,8 @@ import {
   notifyOrgUsers, 
   generateInvoiceNumber, 
   validateLineItems,
-  validatePaymentAmount 
+  validatePaymentAmount,
+  enforceRateLimit,
 } from "./lib/helpers";
 import { api } from "./_generated/api";
 
@@ -420,6 +421,12 @@ export const recordPayment = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireAdminOrStaff(ctx);
+
+    // Rate limit: max 10 payment recordings per minute per user
+    enforceRateLimit(user._id.toString(), "recordPayment", {
+      maxRequests: 10,
+      windowMs: 60000,
+    });
 
     const invoice = await ctx.db.get(args.invoiceId);
     if (!invoice) {

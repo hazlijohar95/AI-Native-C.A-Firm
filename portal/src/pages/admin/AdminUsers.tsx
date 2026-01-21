@@ -14,7 +14,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -31,7 +30,28 @@ import {
   Building2,
   Clock,
   Shield,
+  UserX,
+  UserCheck,
+  MoreHorizontal,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatDate, formatDistanceToNow } from "@/lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -41,9 +61,17 @@ type UserRole = "admin" | "staff" | "client";
 export function AdminUsers() {
   const users = useQuery(api.users.list);
   const organizations = useQuery(api.organizations.list);
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const deactivateUser = useMutation(api.users.deactivate);
+  const reactivateUser = useMutation(api.users.reactivate);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("active");
   const [editingUser, setEditingUser] = useState<(typeof users extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [deactivatingUser, setDeactivatingUser] = useState<(typeof users extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [deactivationReason, setDeactivationReason] = useState("");
+  const [isDeactivating, setIsDeactivating] = useState(false);
 
   // Filter users
   const filteredUsers = users?.filter((user) => {
@@ -51,7 +79,11 @@ export function AdminUsers() {
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    return matchesSearch && matchesRole;
+    const isActive = user.isActive !== false;
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "active" && isActive) || 
+      (statusFilter === "deactivated" && !isActive);
+    return matchesSearch && matchesRole && matchesStatus;
   });
 
   // Create org lookup map
@@ -65,6 +97,43 @@ export function AdminUsers() {
       case "staff": return "secondary";
       case "client": return "outline";
     }
+  };
+
+  const handleDeactivate = async () => {
+    if (!deactivatingUser) return;
+    setIsDeactivating(true);
+    try {
+      await deactivateUser({ 
+        userId: deactivatingUser._id, 
+        reason: deactivationReason.trim() || undefined 
+      });
+      toast.success(`${deactivatingUser.name} has been deactivated`);
+      setDeactivatingUser(null);
+      setDeactivationReason("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to deactivate user");
+    } finally {
+      setIsDeactivating(false);
+    }
+  };
+
+  const handleReactivate = async (user: NonNullable<typeof users>[number]) => {
+    try {
+      await reactivateUser({ userId: user._id });
+      toast.success(`${user.name} has been reactivated`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to reactivate user");
+    }
+  };
+
+  const canDeactivate = (user: NonNullable<typeof users>[number]) => {
+    // Can't deactivate yourself
+    if (currentUser && user._id === currentUser._id) return false;
+    // Can't deactivate admins
+    if (user.role === "admin") return false;
+    // Can't deactivate already deactivated users
+    if (user.isActive === false) return false;
+    return true;
   };
 
   return (
@@ -101,6 +170,16 @@ export function AdminUsers() {
             <SelectItem value="client">Client</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="deactivated">Deactivated</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Users List */}
@@ -128,14 +207,17 @@ export function AdminUsers() {
                 <tr className="border-b bg-muted/50">
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">User</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Role</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Organization</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Last Login</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers?.map((user) => (
-                  <tr key={user._id} className="border-b last:border-0 hover:bg-muted/30">
+                {filteredUsers?.map((user) => {
+                  const isActive = user.isActive !== false;
+                  return (
+                  <tr key={user._id} className={`border-b last:border-0 hover:bg-muted/30 ${!isActive ? "opacity-60" : ""}`}>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted overflow-hidden">
@@ -161,6 +243,11 @@ export function AdminUsers() {
                       </Badge>
                     </td>
                     <td className="px-4 py-3">
+                      <Badge variant={isActive ? "outline" : "destructive"}>
+                        {isActive ? "Active" : "Deactivated"}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3">
                       {user.organizationId ? (
                         <div className="flex items-center gap-2 text-sm">
                           <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -178,20 +265,41 @@ export function AdminUsers() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditingUser(user)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {isActive ? (
+                            <DropdownMenuItem 
+                              onClick={() => setDeactivatingUser(user)}
+                              disabled={!canDeactivate(user)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <UserX className="h-4 w-4 mr-2" />
+                              Deactivate
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => handleReactivate(user)}>
+                              <UserCheck className="h-4 w-4 mr-2" />
+                              Reactivate
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      
+                      {/* Edit Dialog */}
                       <Dialog 
                         open={editingUser?._id === user._id} 
                         onOpenChange={(open) => !open && setEditingUser(null)}
                       >
-                        <DialogTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setEditingUser(user)}
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
-                        </DialogTrigger>
                         <UserEditDialog 
                           user={user}
                           organizations={organizations || []}
@@ -200,7 +308,8 @@ export function AdminUsers() {
                       </Dialog>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -214,8 +323,52 @@ export function AdminUsers() {
           <span>Admins: {users.filter(u => u.role === "admin").length}</span>
           <span>Staff: {users.filter(u => u.role === "staff").length}</span>
           <span>Clients: {users.filter(u => u.role === "client").length}</span>
+          <span>Active: {users.filter(u => u.isActive !== false).length}</span>
+          <span>Deactivated: {users.filter(u => u.isActive === false).length}</span>
         </div>
       )}
+
+      {/* Deactivation Confirmation Dialog */}
+      <AlertDialog 
+        open={!!deactivatingUser} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeactivatingUser(null);
+            setDeactivationReason("");
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deactivate User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to deactivate <strong>{deactivatingUser?.name}</strong>? 
+              They will no longer be able to access the portal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="reason">Reason (optional)</Label>
+            <Textarea
+              id="reason"
+              placeholder="Enter reason for deactivation..."
+              value={deactivationReason}
+              onChange={(e) => setDeactivationReason(e.target.value)}
+              className="mt-2"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeactivating}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeactivate}
+              disabled={isDeactivating}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeactivating ? <Spinner size="sm" className="mr-2" /> : <UserX className="h-4 w-4 mr-2" />}
+              Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

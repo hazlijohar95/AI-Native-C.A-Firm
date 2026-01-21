@@ -1,7 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
-import { logActivity, notifyOrgUsers, notifyAdmins, validateSignatureData } from "./lib/helpers";
+import { logActivity, notifyOrgUsers, notifyAdmins, validateSignatureData, enforceRateLimit } from "./lib/helpers";
 
 // ============================================
 // QUERIES
@@ -230,6 +230,12 @@ export const sign = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
+
+    // Rate limit: max 5 signature attempts per minute per user
+    enforceRateLimit(user._id.toString(), "sign", {
+      maxRequests: 5,
+      windowMs: 60000,
+    });
 
     const request = await ctx.db.get(args.requestId);
     if (!request) {

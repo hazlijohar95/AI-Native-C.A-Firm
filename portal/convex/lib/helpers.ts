@@ -1,6 +1,170 @@
 import type { MutationCtx } from "../_generated/server";
 import type { Id, Doc } from "../_generated/dataModel";
 
+// ============================================
+// VALIDATION HELPERS
+// ============================================
+
+/**
+ * Validate and sanitize a string input
+ */
+export function validateString(
+  value: string,
+  fieldName: string,
+  options: {
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    pattern?: RegExp;
+    patternMessage?: string;
+  } = {}
+): { valid: boolean; error?: string; sanitized: string } {
+  const { required = true, minLength = 0, maxLength = 10000, pattern, patternMessage } = options;
+  
+  const trimmed = (value || "").trim();
+  
+  if (required && !trimmed) {
+    return { valid: false, error: `${fieldName} is required`, sanitized: "" };
+  }
+  
+  if (!required && !trimmed) {
+    return { valid: true, sanitized: "" };
+  }
+  
+  if (trimmed.length < minLength) {
+    return { valid: false, error: `${fieldName} must be at least ${minLength} characters`, sanitized: trimmed };
+  }
+  
+  if (trimmed.length > maxLength) {
+    return { valid: false, error: `${fieldName} must be at most ${maxLength} characters`, sanitized: trimmed };
+  }
+  
+  if (pattern && !pattern.test(trimmed)) {
+    return { valid: false, error: patternMessage || `${fieldName} has invalid format`, sanitized: trimmed };
+  }
+  
+  return { valid: true, sanitized: trimmed };
+}
+
+/**
+ * Validate email format
+ */
+export function validateEmail(email: string): { valid: boolean; error?: string; sanitized: string } {
+  const result = validateString(email, "Email", {
+    required: true,
+    maxLength: 320,
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    patternMessage: "Invalid email format",
+  });
+  
+  if (result.valid) {
+    result.sanitized = result.sanitized.toLowerCase();
+  }
+  
+  return result;
+}
+
+/**
+ * Validate phone number (basic check)
+ */
+export function validatePhone(phone: string): { valid: boolean; error?: string; sanitized: string } {
+  return validateString(phone, "Phone", {
+    required: false,
+    maxLength: 20,
+    pattern: /^[+]?[\d\s\-().]+$/,
+    patternMessage: "Invalid phone number format",
+  });
+}
+
+/**
+ * Validate a positive number within bounds
+ */
+export function validateNumber(
+  value: number,
+  fieldName: string,
+  options: { min?: number; max?: number; allowZero?: boolean } = {}
+): { valid: boolean; error?: string } {
+  const { min = 0, max = Number.MAX_SAFE_INTEGER, allowZero = false } = options;
+  
+  if (typeof value !== "number" || isNaN(value)) {
+    return { valid: false, error: `${fieldName} must be a number` };
+  }
+  
+  if (!allowZero && value === 0) {
+    return { valid: false, error: `${fieldName} cannot be zero` };
+  }
+  
+  if (value < min) {
+    return { valid: false, error: `${fieldName} must be at least ${min}` };
+  }
+  
+  if (value > max) {
+    return { valid: false, error: `${fieldName} must be at most ${max}` };
+  }
+  
+  return { valid: true };
+}
+
+// ============================================
+// RATE LIMITING
+// ============================================
+
+// In-memory rate limit store (resets on function cold start)
+// For production, use Convex scheduled functions or external store
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+/**
+ * Simple rate limiter for mutations
+ * Returns true if request should be allowed, false if rate limited
+ */
+export function checkRateLimit(
+  key: string,
+  options: { maxRequests: number; windowMs: number } = { maxRequests: 10, windowMs: 60000 }
+): { allowed: boolean; remainingRequests: number; resetIn: number } {
+  const now = Date.now();
+  const record = rateLimitStore.get(key);
+  
+  if (!record || now > record.resetAt) {
+    // First request or window expired
+    rateLimitStore.set(key, { count: 1, resetAt: now + options.windowMs });
+    return { allowed: true, remainingRequests: options.maxRequests - 1, resetIn: options.windowMs };
+  }
+  
+  if (record.count >= options.maxRequests) {
+    return { 
+      allowed: false, 
+      remainingRequests: 0, 
+      resetIn: record.resetAt - now 
+    };
+  }
+  
+  record.count++;
+  return { 
+    allowed: true, 
+    remainingRequests: options.maxRequests - record.count, 
+    resetIn: record.resetAt - now 
+  };
+}
+
+/**
+ * Rate limit a user action - throws if rate limited
+ */
+export function enforceRateLimit(
+  userId: string,
+  action: string,
+  options: { maxRequests?: number; windowMs?: number } = {}
+): void {
+  const key = `${userId}:${action}`;
+  const result = checkRateLimit(key, {
+    maxRequests: options.maxRequests ?? 30,
+    windowMs: options.windowMs ?? 60000, // 1 minute default
+  });
+  
+  if (!result.allowed) {
+    throw new Error(`Rate limit exceeded. Please wait ${Math.ceil(result.resetIn / 1000)} seconds.`);
+  }
+}
+
 /**
  * Log an activity to the activity logs
  */

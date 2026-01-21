@@ -16,6 +16,11 @@ export default defineSchema({
     avatarUrl: v.optional(v.string()),
     lastLoginAt: v.optional(v.number()),
     createdAt: v.number(),
+    // User deactivation
+    isActive: v.optional(v.boolean()), // defaults to true if not set
+    deactivatedAt: v.optional(v.number()),
+    deactivatedBy: v.optional(v.id("users")),
+    deactivationReason: v.optional(v.string()),
   })
     .index("by_workos_id", ["workosId"])
     .index("by_email", ["email"])
