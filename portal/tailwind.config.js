@@ -14,8 +14,12 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#253FF6",
+          hover: "#293ED5",
+          light: "#5F73FF",
+          subtle: "rgba(37, 63, 246, 0.01)",
+          muted: "rgba(37, 63, 246, 0.08)",
+          foreground: "#FFFFFF",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -41,6 +45,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Cynco Design System Colors
+        brand: {
+          black: "#090516",
+          gray: {
+            900: "#3A3A3A",
+            600: "#737373",
+            400: "#D7D7D7",
+            200: "#EBEBEB",
+            100: "#F0F0F0",
+            50: "#F8F8F8",
+          },
+          white: "#FFFFFF",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -49,8 +66,13 @@ export default {
       },
       fontFamily: {
         sans: ["Manrope", "system-ui", "sans-serif"],
-        serif: ["Playfair Display", "serif"],
-        mono: ["DM Mono", "monospace"],
+        serif: ["Playfair Display", "Georgia", "serif"],
+        mono: ["DM Mono", "SF Mono", "monospace"],
+      },
+      boxShadow: {
+        'sm': '0 1px 3px rgba(0, 0, 0, 0.06)',
+        'md': '0 4px 12px rgba(0, 0, 0, 0.08)',
+        'lg': '0 8px 24px rgba(0, 0, 0, 0.12)',
       },
       keyframes: {
         "accordion-down": {
