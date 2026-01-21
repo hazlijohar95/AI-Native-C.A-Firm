@@ -2,6 +2,13 @@ import type { MutationCtx } from "../_generated/server";
 import type { Id, Doc } from "../_generated/dataModel";
 
 // ============================================
+// CONSTANTS
+// ============================================
+
+const DEFAULT_RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const DEFAULT_RATE_LIMIT_MAX_REQUESTS = 30;
+
+// ============================================
 // VALIDATION HELPERS
 // ============================================
 
@@ -106,62 +113,81 @@ export function validateNumber(
 }
 
 // ============================================
-// RATE LIMITING
+// RATE LIMITING (Database-backed for serverless)
 // ============================================
 
-// In-memory rate limit store (resets on function cold start)
-// For production, use Convex scheduled functions or external store
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
 /**
- * Simple rate limiter for mutations
- * Returns true if request should be allowed, false if rate limited
+ * Check rate limit using database storage (works in serverless environment)
+ * Returns the rate limit status without throwing
  */
-export function checkRateLimit(
+export async function checkRateLimit(
+  ctx: MutationCtx,
   key: string,
-  options: { maxRequests: number; windowMs: number } = { maxRequests: 10, windowMs: 60000 }
-): { allowed: boolean; remainingRequests: number; resetIn: number } {
+  options: { maxRequests?: number; windowMs?: number } = {}
+): Promise<{ allowed: boolean; remainingRequests: number; resetIn: number }> {
+  const maxRequests = options.maxRequests ?? DEFAULT_RATE_LIMIT_MAX_REQUESTS;
+  const windowMs = options.windowMs ?? DEFAULT_RATE_LIMIT_WINDOW_MS;
   const now = Date.now();
-  const record = rateLimitStore.get(key);
-  
-  if (!record || now > record.resetAt) {
-    // First request or window expired
-    rateLimitStore.set(key, { count: 1, resetAt: now + options.windowMs });
-    return { allowed: true, remainingRequests: options.maxRequests - 1, resetIn: options.windowMs };
-  }
-  
-  if (record.count >= options.maxRequests) {
-    return { 
-      allowed: false, 
-      remainingRequests: 0, 
-      resetIn: record.resetAt - now 
+
+  const existing = await ctx.db
+    .query("rateLimits")
+    .withIndex("by_key", (q) => q.eq("key", key))
+    .unique();
+
+  // No existing record or window expired - create new window
+  if (!existing || now > existing.windowStart + windowMs) {
+    if (existing) {
+      await ctx.db.delete(existing._id);
+    }
+    await ctx.db.insert("rateLimits", {
+      key,
+      count: 1,
+      windowStart: now,
+    });
+    return {
+      allowed: true,
+      remainingRequests: maxRequests - 1,
+      resetIn: windowMs,
     };
   }
-  
-  record.count++;
-  return { 
-    allowed: true, 
-    remainingRequests: options.maxRequests - record.count, 
-    resetIn: record.resetAt - now 
+
+  // Window still active - check limit
+  if (existing.count >= maxRequests) {
+    return {
+      allowed: false,
+      remainingRequests: 0,
+      resetIn: existing.windowStart + windowMs - now,
+    };
+  }
+
+  // Increment counter
+  await ctx.db.patch(existing._id, { count: existing.count + 1 });
+  return {
+    allowed: true,
+    remainingRequests: maxRequests - existing.count - 1,
+    resetIn: existing.windowStart + windowMs - now,
   };
 }
 
 /**
- * Rate limit a user action - throws if rate limited
+ * Enforce rate limit - throws if rate limited
  */
-export function enforceRateLimit(
+export async function enforceRateLimit(
+  ctx: MutationCtx,
   userId: string,
   action: string,
   options: { maxRequests?: number; windowMs?: number } = {}
-): void {
+): Promise<void> {
   const key = `${userId}:${action}`;
-  const result = checkRateLimit(key, {
-    maxRequests: options.maxRequests ?? 30,
-    windowMs: options.windowMs ?? 60000, // 1 minute default
+  const result = await checkRateLimit(ctx, key, {
+    maxRequests: options.maxRequests ?? DEFAULT_RATE_LIMIT_MAX_REQUESTS,
+    windowMs: options.windowMs ?? DEFAULT_RATE_LIMIT_WINDOW_MS,
   });
-  
+
   if (!result.allowed) {
-    throw new Error(`Rate limit exceeded. Please wait ${Math.ceil(result.resetIn / 1000)} seconds.`);
+    throw new Error(
+      `Rate limit exceeded. Please wait ${Math.ceil(result.resetIn / 1000)} seconds.`
+    );
   }
 }
 

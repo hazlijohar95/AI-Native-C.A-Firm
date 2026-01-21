@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../../convex/_generated/api";
@@ -28,13 +28,28 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/utils";
+import type { Id } from "../../../convex/_generated/dataModel";
 
 const PAGE_SIZE = 20;
 
+// Type for activity items from the API
+interface ActivityItem {
+  _id: Id<"activityLogs">;
+  _creationTime: number;
+  organizationId?: Id<"organizations">;
+  userId: Id<"users">;
+  action: string;
+  resourceType: string;
+  resourceId?: string;
+  resourceName?: string;
+  createdAt: number;
+  userName: string;
+  userAvatar?: string;
+}
+
 export function AdminActivity() {
   const [cursor, setCursor] = useState<number | undefined>(undefined);
-  const [allActivities, setAllActivities] = useState<any[]>([]);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadedActivities, setLoadedActivities] = useState<ActivityItem[]>([]);
   
   const activityResult = useQuery(api.activity.list, { limit: PAGE_SIZE, cursor });
   const organizations = useQuery(api.organizations.list);
@@ -42,32 +57,45 @@ export function AdminActivity() {
   const [searchQuery, setSearchQuery] = useState("");
   const [actionFilter, setActionFilter] = useState<string>("all");
 
-  // Combine initial results with loaded more results
-  const activities = cursor === undefined 
-    ? activityResult?.activities || []
-    : [...allActivities, ...(activityResult?.activities || [])];
+  // Determine if we're loading more data
+  const isLoadingMore = cursor !== undefined && activityResult === undefined;
 
-  // Create org lookup map
-  const orgMap = new Map(
-    organizations?.map((org) => [org._id.toString(), org.name]) || []
+  // Combine loaded results with current page
+  const activities = useMemo(() => {
+    if (cursor === undefined) {
+      return activityResult?.activities || [];
+    }
+    // When loading more, append new results to previously loaded
+    if (activityResult?.activities) {
+      return [...loadedActivities, ...activityResult.activities];
+    }
+    return loadedActivities;
+  }, [cursor, activityResult?.activities, loadedActivities]);
+
+  // Create org lookup map with memoization
+  const orgMap = useMemo(() => 
+    new Map(organizations?.map((org) => [org._id.toString(), org.name]) || []),
+    [organizations]
   );
 
-  // Filter activity
-  const filteredActivity = activities.filter((item) => {
-    const matchesSearch = 
-      item.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.resourceName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.action.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesAction = actionFilter === "all" || item.resourceType === actionFilter;
-    return matchesSearch && matchesAction;
-  });
+  // Filter activity with memoization
+  const filteredActivity = useMemo(() => 
+    activities.filter((item) => {
+      const matchesSearch = 
+        item.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.resourceName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.action.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesAction = actionFilter === "all" || item.resourceType === actionFilter;
+      return matchesSearch && matchesAction;
+    }),
+    [activities, searchQuery, actionFilter]
+  );
 
   const handleLoadMore = useCallback(() => {
     if (activityResult?.hasMore && activityResult?.nextCursor) {
-      setIsLoadingMore(true);
-      setAllActivities(activities);
+      // Save current activities before loading more
+      setLoadedActivities(activities);
       setCursor(activityResult.nextCursor);
-      setIsLoadingMore(false);
     }
   }, [activityResult, activities]);
 

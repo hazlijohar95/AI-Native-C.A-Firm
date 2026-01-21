@@ -305,4 +305,16 @@ export default defineSchema({
   })
     .index("by_request", ["signatureRequestId"])
     .index("by_user", ["userId"]),
+
+  // ============================================
+  // RATE LIMITING (Phase 5)
+  // ============================================
+
+  rateLimits: defineTable({
+    key: v.string(), // Format: "userId:action"
+    count: v.number(),
+    windowStart: v.number(), // Timestamp when window started
+  })
+    .index("by_key", ["key"])
+    .index("by_window_start", ["windowStart"]),
 });

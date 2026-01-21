@@ -423,7 +423,7 @@ export const recordPayment = mutation({
     const user = await requireAdminOrStaff(ctx);
 
     // Rate limit: max 10 payment recordings per minute per user
-    enforceRateLimit(user._id.toString(), "recordPayment", {
+    await enforceRateLimit(ctx, user._id.toString(), "recordPayment", {
       maxRequests: 10,
       windowMs: 60000,
     });

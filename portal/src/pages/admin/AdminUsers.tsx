@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,6 +58,23 @@ import type { Id } from "../../../convex/_generated/dataModel";
 
 type UserRole = "admin" | "staff" | "client";
 
+// Type for user from API
+type UserType = {
+  _id: Id<"users">;
+  workosId: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  organizationId?: Id<"organizations">;
+  avatarUrl?: string;
+  lastLoginAt?: number;
+  createdAt: number;
+  isActive?: boolean;
+  deactivatedAt?: number;
+  deactivatedBy?: Id<"users">;
+  deactivationReason?: string;
+};
+
 export function AdminUsers() {
   const users = useQuery(api.users.list);
   const organizations = useQuery(api.organizations.list);
@@ -68,27 +85,31 @@ export function AdminUsers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("active");
-  const [editingUser, setEditingUser] = useState<(typeof users extends (infer T)[] | undefined ? T : never) | null>(null);
-  const [deactivatingUser, setDeactivatingUser] = useState<(typeof users extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [editingUser, setEditingUser] = useState<UserType | null>(null);
+  const [deactivatingUser, setDeactivatingUser] = useState<UserType | null>(null);
   const [deactivationReason, setDeactivationReason] = useState("");
   const [isDeactivating, setIsDeactivating] = useState(false);
 
-  // Filter users
-  const filteredUsers = users?.filter((user) => {
-    const matchesSearch = 
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    const isActive = user.isActive !== false;
-    const matchesStatus = statusFilter === "all" || 
-      (statusFilter === "active" && isActive) || 
-      (statusFilter === "deactivated" && !isActive);
-    return matchesSearch && matchesRole && matchesStatus;
-  });
+  // Create org lookup map with memoization
+  const orgMap = useMemo(() => 
+    new Map(organizations?.map((org) => [org._id.toString(), org.name]) || []),
+    [organizations]
+  );
 
-  // Create org lookup map
-  const orgMap = new Map(
-    organizations?.map((org) => [org._id.toString(), org.name]) || []
+  // Filter users with memoization
+  const filteredUsers = useMemo(() => 
+    users?.filter((user) => {
+      const matchesSearch = 
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRole = roleFilter === "all" || user.role === roleFilter;
+      const isActive = user.isActive !== false;
+      const matchesStatus = statusFilter === "all" || 
+        (statusFilter === "active" && isActive) || 
+        (statusFilter === "deactivated" && !isActive);
+      return matchesSearch && matchesRole && matchesStatus;
+    }),
+    [users, searchQuery, roleFilter, statusFilter]
   );
 
   const getRoleBadgeVariant = (role: UserRole) => {
@@ -117,7 +138,7 @@ export function AdminUsers() {
     }
   };
 
-  const handleReactivate = async (user: NonNullable<typeof users>[number]) => {
+  const handleReactivate = async (user: UserType) => {
     try {
       await reactivateUser({ userId: user._id });
       toast.success(`${user.name} has been reactivated`);
@@ -126,7 +147,7 @@ export function AdminUsers() {
     }
   };
 
-  const canDeactivate = (user: NonNullable<typeof users>[number]) => {
+  const canDeactivate = (user: UserType) => {
     // Can't deactivate yourself
     if (currentUser && user._id === currentUser._id) return false;
     // Can't deactivate admins
@@ -202,7 +223,10 @@ export function AdminUsers() {
       ) : (
         <div className="rounded-md border">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full" aria-label="Users list">
+              <caption className="sr-only">
+                List of portal users with their roles, status, and organization assignments
+              </caption>
               <thead>
                 <tr className="border-b bg-muted/50">
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">User</th>
@@ -224,11 +248,11 @@ export function AdminUsers() {
                           {user.avatarUrl ? (
                             <img 
                               src={user.avatarUrl} 
-                              alt={user.name}
+                              alt=""
                               className="h-10 w-10 object-cover"
                             />
                           ) : (
-                            <User className="h-5 w-5 text-muted-foreground" />
+                            <User className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
                           )}
                         </div>
                         <div>
@@ -250,7 +274,7 @@ export function AdminUsers() {
                     <td className="px-4 py-3">
                       {user.organizationId ? (
                         <div className="flex items-center gap-2 text-sm">
-                          <Building2 className="h-4 w-4 text-muted-foreground" />
+                          <Building2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                           {orgMap.get(user.organizationId.toString()) || "Unknown"}
                         </div>
                       ) : (
@@ -267,13 +291,13 @@ export function AdminUsers() {
                     <td className="px-4 py-3">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button variant="ghost" size="sm" aria-label={`Actions for ${user.name}`}>
+                            <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => setEditingUser(user)}>
-                            <Edit className="h-4 w-4 mr-2" />
+                            <Edit className="h-4 w-4 mr-2" aria-hidden="true" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -283,29 +307,17 @@ export function AdminUsers() {
                               disabled={!canDeactivate(user)}
                               className="text-destructive focus:text-destructive"
                             >
-                              <UserX className="h-4 w-4 mr-2" />
+                              <UserX className="h-4 w-4 mr-2" aria-hidden="true" />
                               Deactivate
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem onClick={() => handleReactivate(user)}>
-                              <UserCheck className="h-4 w-4 mr-2" />
+                              <UserCheck className="h-4 w-4 mr-2" aria-hidden="true" />
                               Reactivate
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      
-                      {/* Edit Dialog */}
-                      <Dialog 
-                        open={editingUser?._id === user._id} 
-                        onOpenChange={(open) => !open && setEditingUser(null)}
-                      >
-                        <UserEditDialog 
-                          user={user}
-                          organizations={organizations || []}
-                          onClose={() => setEditingUser(null)} 
-                        />
-                      </Dialog>
                     </td>
                   </tr>
                   );
@@ -318,7 +330,7 @@ export function AdminUsers() {
 
       {/* Summary */}
       {users && (
-        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground" aria-live="polite">
           <span>Total: {users.length} users</span>
           <span>Admins: {users.filter(u => u.role === "admin").length}</span>
           <span>Staff: {users.filter(u => u.role === "staff").length}</span>
@@ -327,6 +339,20 @@ export function AdminUsers() {
           <span>Deactivated: {users.filter(u => u.isActive === false).length}</span>
         </div>
       )}
+
+      {/* Edit User Dialog - Rendered once outside the table */}
+      <Dialog 
+        open={!!editingUser} 
+        onOpenChange={(open) => !open && setEditingUser(null)}
+      >
+        {editingUser && (
+          <UserEditDialog 
+            user={editingUser}
+            organizations={organizations || []}
+            onClose={() => setEditingUser(null)} 
+          />
+        )}
+      </Dialog>
 
       {/* Deactivation Confirmation Dialog */}
       <AlertDialog 

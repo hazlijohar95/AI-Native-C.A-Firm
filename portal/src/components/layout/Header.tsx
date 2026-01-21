@@ -19,8 +19,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           size="icon"
           className="lg:hidden"
           onClick={onMenuClick}
+          aria-label="Open navigation menu"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5" aria-hidden="true" />
         </Button>
       </div>
 
@@ -45,7 +46,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 className="h-9 w-9 rounded-full object-cover"
               />
             ) : (
-              <User className="h-5 w-5 text-primary" />
+              <User className="h-5 w-5 text-primary" aria-hidden="true" />
             )}
           </div>
 
@@ -54,9 +55,9 @@ export function Header({ onMenuClick }: HeaderProps) {
             variant="ghost"
             size="icon"
             onClick={() => signOut()}
-            title="Sign out"
+            aria-label="Sign out"
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
       </div>

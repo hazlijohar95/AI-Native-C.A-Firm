@@ -232,7 +232,7 @@ export const sign = mutation({
     const user = await requireAuth(ctx);
 
     // Rate limit: max 5 signature attempts per minute per user
-    enforceRateLimit(user._id.toString(), "sign", {
+    await enforceRateLimit(ctx, user._id.toString(), "sign", {
       maxRequests: 5,
       windowMs: 60000,
     });

@@ -18,13 +18,13 @@ export function NotFound() {
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
-        <Button variant="outline" onClick={() => window.history.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
+        <Button variant="outline" onClick={() => window.history.back()} className="gap-2">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Go Back
         </Button>
-        <Link to="/dashboard">
-          <Button>
-            <Home className="mr-2 h-4 w-4" />
+        <Link to="/dashboard" className="w-full sm:w-auto">
+          <Button className="w-full gap-2">
+            <Home className="h-4 w-4" aria-hidden="true" />
             Go to Dashboard
           </Button>
         </Link>
