@@ -18,6 +18,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import type { Id } from "../../convex/_generated/dataModel";
+
 // Onboarding steps
 const STEPS = [
   { id: "welcome", title: "Welcome", icon: Sparkles },
@@ -374,9 +376,9 @@ function FeatureItem({ icon: Icon, title, description }: FeatureItemProps) {
   );
 }
 
-function OrganizationInfo({ organizationId }: { organizationId: string }) {
+function OrganizationInfo({ organizationId }: { organizationId: Id<"organizations"> }) {
   const organization = useQuery(api.organizations.get, {
-    id: organizationId as any,
+    id: organizationId,
   });
 
   if (!organization) {

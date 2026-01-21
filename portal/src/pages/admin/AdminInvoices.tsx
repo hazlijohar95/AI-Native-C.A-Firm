@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -49,9 +48,8 @@ import {
 import { toast } from "sonner";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { exportToCSV, formatDateForExport, formatCurrencyForExport } from "@/lib/bulk-actions";
+import { InvoiceStatusBadge, PaymentStatusBadge, type InvoiceStatus } from "@/components/status-badges";
 import type { Id } from "../../../convex/_generated/dataModel";
-
-type InvoiceStatus = "draft" | "pending" | "paid" | "overdue" | "cancelled";
 
 export function AdminInvoices() {
   const invoices = useQuery(api.admin.listAllInvoices);
@@ -87,21 +85,6 @@ export function AdminInvoices() {
     ]);
 
     toast.success(`Exported ${filteredInvoices.length} invoices`);
-  };
-
-  const getStatusBadge = (status: InvoiceStatus) => {
-    switch (status) {
-      case "draft":
-        return <Badge variant="secondary">Draft</Badge>;
-      case "pending":
-        return <Badge variant="outline" className="border-amber-500 text-amber-600">Pending</Badge>;
-      case "paid":
-        return <Badge className="bg-green-500">Paid</Badge>;
-      case "overdue":
-        return <Badge variant="destructive">Overdue</Badge>;
-      case "cancelled":
-        return <Badge variant="secondary" className="text-muted-foreground">Cancelled</Badge>;
-    }
   };
 
   return (
@@ -182,15 +165,18 @@ export function AdminInvoices() {
       ) : (
         <div className="rounded-md border">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full" aria-label="Invoices list">
+              <caption className="sr-only">
+                List of invoices with client, amount, due date, and status information
+              </caption>
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Invoice</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Client</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Amount</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Due Date</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Actions</th>
+                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Invoice</th>
+                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Client</th>
+                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Amount</th>
+                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Due Date</th>
+                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
+                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -206,7 +192,7 @@ export function AdminInvoices() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 text-sm">
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <Building2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                         {invoice.organizationName}
                       </div>
                     </td>
@@ -217,7 +203,7 @@ export function AdminInvoices() {
                       <span className="text-sm">{formatDate(invoice.dueDate)}</span>
                     </td>
                     <td className="px-4 py-3">
-                      {getStatusBadge(invoice.displayStatus as InvoiceStatus)}
+                      <InvoiceStatusBadge status={invoice.displayStatus as InvoiceStatus} />
                     </td>
                     <td className="px-4 py-3">
                       <InvoiceActions 
@@ -271,39 +257,47 @@ function InvoiceActions({ invoice, onViewDetails, onEdit }: InvoiceActionsProps)
   const publishInvoice = useMutation(api.invoices.publish);
   const cancelInvoice = useMutation(api.invoices.cancel);
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const handlePublish = async () => {
+    setIsPublishing(true);
     try {
       await publishInvoice({ id: invoice._id });
       toast.success("Invoice published");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to publish invoice");
+    } finally {
+      setIsPublishing(false);
     }
   };
 
   const handleCancel = async () => {
+    setIsCancelling(true);
     try {
       await cancelInvoice({ id: invoice._id });
       toast.success("Invoice cancelled");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to cancel invoice");
+    } finally {
+      setIsCancelling(false);
     }
   };
 
   return (
     <div className="flex items-center gap-1">
-      <Button variant="ghost" size="sm" onClick={onViewDetails}>
+      <Button variant="ghost" size="sm" onClick={onViewDetails} aria-label="View invoice details">
         View
       </Button>
 
       {invoice.status === "draft" && (
         <>
-          <Button variant="ghost" size="sm" onClick={onEdit}>
-            <Edit className="h-4 w-4 mr-1" />
+          <Button variant="ghost" size="sm" onClick={onEdit} aria-label="Edit invoice">
+            <Edit className="h-4 w-4 mr-1" aria-hidden="true" />
             Edit
           </Button>
-          <Button variant="ghost" size="sm" onClick={handlePublish}>
-            <Send className="h-4 w-4 mr-1" />
+          <Button variant="ghost" size="sm" onClick={handlePublish} disabled={isPublishing} aria-label="Publish invoice">
+            {isPublishing ? <Spinner size="sm" className="mr-1" /> : <Send className="h-4 w-4 mr-1" aria-hidden="true" />}
             Publish
           </Button>
         </>
@@ -312,8 +306,8 @@ function InvoiceActions({ invoice, onViewDetails, onEdit }: InvoiceActionsProps)
       {(invoice.displayStatus === "pending" || invoice.displayStatus === "overdue") && (
         <Dialog open={isRecordPaymentOpen} onOpenChange={setIsRecordPaymentOpen}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <CreditCard className="h-4 w-4 mr-1" />
+            <Button variant="ghost" size="sm" aria-label="Record payment">
+              <CreditCard className="h-4 w-4 mr-1" aria-hidden="true" />
               Payment
             </Button>
           </DialogTrigger>
@@ -327,8 +321,8 @@ function InvoiceActions({ invoice, onViewDetails, onEdit }: InvoiceActionsProps)
       {invoice.status !== "paid" && invoice.status !== "cancelled" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-              <X className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" disabled={isCancelling} aria-label="Cancel invoice">
+              {isCancelling ? <Spinner size="sm" /> : <X className="h-4 w-4" aria-hidden="true" />}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -741,9 +735,7 @@ function InvoiceDetailsDialog({ invoice, onClose }: InvoiceDetailsDialogProps) {
                       <p className="text-xs text-muted-foreground">Ref: {payment.reference}</p>
                     )}
                   </div>
-                  <Badge variant={payment.status === "completed" ? "default" : "secondary"}>
-                    {payment.status}
-                  </Badge>
+                  <PaymentStatusBadge status={payment.status as "pending" | "completed"} />
                 </div>
               ))}
             </div>

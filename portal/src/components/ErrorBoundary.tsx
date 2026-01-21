@@ -33,13 +33,15 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error to console in development
-    console.error("Error Boundary caught an error:", error, errorInfo);
+    // Log error to console only in development
+    if (import.meta.env.DEV) {
+      console.error("Error Boundary caught an error:", error, errorInfo);
+    }
     
     this.setState({ errorInfo });
 
     // TODO: In production, send to error tracking service (e.g., Sentry)
-    // if (process.env.NODE_ENV === 'production') {
+    // if (import.meta.env.PROD) {
     //   logErrorToService(error, errorInfo);
     // }
   }

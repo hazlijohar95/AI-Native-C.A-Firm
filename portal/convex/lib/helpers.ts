@@ -186,7 +186,7 @@ export async function enforceRateLimit(
 
   if (!result.allowed) {
     throw new Error(
-      `Rate limit exceeded. Please wait ${Math.ceil(result.resetIn / 1000)} seconds.`
+      "Too many requests. Please try again in a moment."
     );
   }
 }

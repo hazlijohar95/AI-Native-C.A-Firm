@@ -11,4 +11,8 @@ export default defineConfig({
       '@convex': path.resolve(__dirname, './convex'),
     },
   },
+  build: {
+    // Suppress chunk size warning - app uses lazy loading already
+    chunkSizeWarningLimit: 600,
+  },
 })

@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -57,9 +56,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatDate, formatDistanceToNow } from "@/lib/utils";
 import { useBulkSelection, exportToCSV, formatDateTimeForExport } from "@/lib/bulk-actions";
+import { UserRoleBadge, UserStatusBadge, type UserRole } from "@/components/status-badges";
 import type { Id } from "../../../convex/_generated/dataModel";
-
-type UserRole = "admin" | "staff" | "client";
 
 // Type for user from API
 type UserType = {
@@ -128,14 +126,6 @@ export function AdminUsers() {
     allSelected,
     someSelected,
   } = useBulkSelection(filteredUsers);
-
-  const getRoleBadgeVariant = (role: UserRole) => {
-    switch (role) {
-      case "admin": return "default";
-      case "staff": return "secondary";
-      case "client": return "outline";
-    }
-  };
 
   const handleDeactivate = async () => {
     if (!deactivatingUser) return;
@@ -383,14 +373,10 @@ export function AdminUsers() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role}
-                      </Badge>
+                      <UserRoleBadge role={user.role} />
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={isActive ? "outline" : "destructive"}>
-                        {isActive ? "Active" : "Deactivated"}
-                      </Badge>
+                      <UserStatusBadge isActive={isActive} />
                     </td>
                     <td className="px-4 py-3">
                       {user.organizationId ? (
