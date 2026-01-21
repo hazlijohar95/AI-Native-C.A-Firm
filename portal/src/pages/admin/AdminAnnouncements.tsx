@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -423,15 +424,13 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
           <div className="grid gap-2">
             <Label>Target Audience</Label>
             <div className="flex items-center gap-2 mb-2">
-              <input
-                type="checkbox"
+              <Checkbox
                 id="targetAll"
                 checked={targetAll}
-                onChange={(e) => {
-                  setTargetAll(e.target.checked);
-                  if (e.target.checked) setSelectedOrgs([]);
+                onCheckedChange={(checked) => {
+                  setTargetAll(checked === true);
+                  if (checked) setSelectedOrgs([]);
                 }}
-                className="rounded border-gray-300"
               />
               <Label htmlFor="targetAll" className="text-sm font-normal">
                 All clients
@@ -447,11 +446,9 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
                       key={org._id} 
                       className="flex items-center gap-2 p-1 hover:bg-muted/50 rounded cursor-pointer"
                     >
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={selectedOrgs.includes(org._id.toString())}
-                        onChange={() => toggleOrg(org._id.toString())}
-                        className="rounded border-gray-300"
+                        onCheckedChange={() => toggleOrg(org._id.toString())}
                       />
                       <span className="text-sm">{org.name}</span>
                     </label>
@@ -463,12 +460,10 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
+              <Checkbox
                 id="isPinned"
                 checked={isPinned}
-                onChange={(e) => setIsPinned(e.target.checked)}
-                className="rounded border-gray-300"
+                onCheckedChange={(checked) => setIsPinned(checked === true)}
               />
               <Label htmlFor="isPinned" className="text-sm font-normal">
                 Pin to top

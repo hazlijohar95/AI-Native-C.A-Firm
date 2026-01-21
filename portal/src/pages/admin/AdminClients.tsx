@@ -15,6 +15,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { 
   Building2, 
   Plus, 
@@ -24,6 +35,7 @@ import {
   Hash,
   Search,
   Edit,
+  Trash,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
@@ -126,6 +138,7 @@ export function AdminClients() {
                       onClose={() => setEditingOrg(null)} 
                     />
                   </Dialog>
+                  <DeleteOrganizationButton id={org._id} name={org.name} />
                 </div>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
@@ -305,5 +318,59 @@ function OrganizationDialog({ organization, onClose }: OrganizationDialogProps) 
         </DialogFooter>
       </form>
     </DialogContent>
+  );
+}
+
+function DeleteOrganizationButton({ id, name }: { id: Id<"organizations">; name: string }) {
+  const removeOrg = useMutation(api.organizations.remove);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await removeOrg({ id });
+      toast.success(`"${name}" deleted`);
+    } catch (error) {
+      // Show the specific error message from the backend
+      const message = error instanceof Error ? error.message : "Failed to delete organization";
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-destructive hover:text-destructive"
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Organization?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will permanently delete "{name}". This action cannot be undone.
+            <br /><br />
+            <strong>Note:</strong> Organizations with users, documents, tasks, invoices, or signature requests cannot be deleted.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={handleDelete} 
+            disabled={isDeleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {isDeleting ? <Spinner size="sm" className="mr-2" /> : null}
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,12 +23,14 @@ import {
   PenTool,
   Bell,
   Building2,
+  ExternalLink,
 } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/utils";
 
 export function AdminActivity() {
   const activity = useQuery(api.activity.list, { limit: 100 });
   const organizations = useQuery(api.organizations.list);
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [actionFilter, setActionFilter] = useState<string>("all");
 
@@ -74,6 +77,29 @@ export function AdminActivity() {
       return <Badge variant="destructive" className="text-xs">Removed</Badge>;
     }
     return <Badge variant="secondary" className="text-xs">Action</Badge>;
+  };
+
+  // Get the link path for a resource based on type
+  const getResourceLink = (resourceType: string): string | null => {
+    switch (resourceType) {
+      case "document":
+        return "/documents";
+      case "task":
+        return "/tasks";
+      case "invoice":
+        return "/admin/invoices";
+      case "signature":
+        return "/signatures";
+      default:
+        return null;
+    }
+  };
+
+  const handleResourceClick = (resourceType: string) => {
+    const link = getResourceLink(resourceType);
+    if (link) {
+      navigate(link);
+    }
   };
 
   const formatAction = (action: string): string => {
@@ -175,7 +201,17 @@ export function AdminActivity() {
                       <span className="font-medium">{item.userName}</span>
                       <span className="text-muted-foreground">{formatAction(item.action)}</span>
                       {item.resourceName && (
-                        <span className="font-medium truncate">"{item.resourceName}"</span>
+                        getResourceLink(item.resourceType) ? (
+                          <button
+                            onClick={() => handleResourceClick(item.resourceType)}
+                            className="inline-flex items-center gap-1 font-medium text-primary hover:underline truncate"
+                          >
+                            "{item.resourceName}"
+                            <ExternalLink className="h-3 w-3 shrink-0" />
+                          </button>
+                        ) : (
+                          <span className="font-medium truncate">"{item.resourceName}"</span>
+                        )
                       )}
                     </div>
                     

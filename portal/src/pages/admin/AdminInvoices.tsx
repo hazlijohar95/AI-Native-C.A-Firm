@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ import {
   X,
   Send,
   CreditCard,
+  Edit,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, formatCurrency } from "@/lib/utils";
@@ -56,6 +58,7 @@ export function AdminInvoices() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<(typeof invoices extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<(typeof invoices extends (infer T)[] | undefined ? T : never) | null>(null);
 
   // Filter invoices
   const filteredInvoices = invoices?.filter((invoice) => {
@@ -195,6 +198,7 @@ export function AdminInvoices() {
                       <InvoiceActions 
                         invoice={invoice}
                         onViewDetails={() => setSelectedInvoice(invoice)}
+                        onEdit={() => setEditingInvoice(invoice)}
                       />
                     </td>
                   </tr>
@@ -214,6 +218,16 @@ export function AdminInvoices() {
           />
         )}
       </Dialog>
+
+      {/* Edit Invoice Dialog (drafts only) */}
+      <Dialog open={!!editingInvoice} onOpenChange={() => setEditingInvoice(null)}>
+        {editingInvoice && (
+          <EditInvoiceDialog 
+            invoice={editingInvoice}
+            onClose={() => setEditingInvoice(null)}
+          />
+        )}
+      </Dialog>
     </div>
   );
 }
@@ -225,9 +239,10 @@ interface InvoiceActionsProps {
     displayStatus: string;
   };
   onViewDetails: () => void;
+  onEdit: () => void;
 }
 
-function InvoiceActions({ invoice, onViewDetails }: InvoiceActionsProps) {
+function InvoiceActions({ invoice, onViewDetails, onEdit }: InvoiceActionsProps) {
   const publishInvoice = useMutation(api.invoices.publish);
   const cancelInvoice = useMutation(api.invoices.cancel);
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
@@ -257,10 +272,16 @@ function InvoiceActions({ invoice, onViewDetails }: InvoiceActionsProps) {
       </Button>
 
       {invoice.status === "draft" && (
-        <Button variant="ghost" size="sm" onClick={handlePublish}>
-          <Send className="h-4 w-4 mr-1" />
-          Publish
-        </Button>
+        <>
+          <Button variant="ghost" size="sm" onClick={onEdit}>
+            <Edit className="h-4 w-4 mr-1" />
+            Edit
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handlePublish}>
+            <Send className="h-4 w-4 mr-1" />
+            Publish
+          </Button>
+        </>
       )}
 
       {(invoice.displayStatus === "pending" || invoice.displayStatus === "overdue") && (
@@ -435,12 +456,10 @@ function CreateInvoiceDialog({ organizations, onClose }: CreateInvoiceDialogProp
           </div>
 
           <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
+            <Checkbox
               id="isDraft"
               checked={isDraft}
-              onChange={(e) => setIsDraft(e.target.checked)}
-              className="rounded border-gray-300"
+              onCheckedChange={(checked) => setIsDraft(checked === true)}
             />
             <Label htmlFor="isDraft" className="text-sm font-normal">
               Save as draft (don't notify client)
@@ -720,6 +739,143 @@ function InvoiceDetailsDialog({ invoice, onClose }: InvoiceDetailsDialogProps) {
           Close
         </Button>
       </DialogFooter>
+    </DialogContent>
+  );
+}
+
+interface EditInvoiceDialogProps {
+  invoice: {
+    _id: Id<"invoices">;
+    invoiceNumber: string;
+    organizationName: string;
+    description: string;
+    amount: number;
+    dueDate: number;
+    lineItems: Array<{
+      description: string;
+      quantity: number;
+      unitPrice: number;
+      amount: number;
+    }>;
+    notes?: string;
+  };
+  onClose: () => void;
+}
+
+function EditInvoiceDialog({ invoice, onClose }: EditInvoiceDialogProps) {
+  const updateInvoice = useMutation(api.invoices.update);
+  
+  const [description, setDescription] = useState(invoice.description);
+  const [amount, setAmount] = useState((invoice.amount / 100).toFixed(2));
+  const [dueDate, setDueDate] = useState(new Date(invoice.dueDate).toISOString().split("T")[0]);
+  const [notes, setNotes] = useState(invoice.notes || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!description.trim()) {
+      toast.error("Description is required");
+      return;
+    }
+
+    const amountInCents = Math.round(parseFloat(amount) * 100);
+    if (isNaN(amountInCents) || amountInCents <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await updateInvoice({
+        id: invoice._id,
+        description: description.trim(),
+        lineItems: [{
+          description: description.trim(),
+          quantity: 1,
+          unitPrice: amountInCents,
+          amount: amountInCents,
+        }],
+        dueDate: new Date(dueDate).getTime(),
+        notes: notes.trim() || undefined,
+      });
+      toast.success("Invoice updated");
+      onClose();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update invoice");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <DialogContent className="max-w-lg">
+      <form onSubmit={handleSubmit}>
+        <DialogHeader>
+          <DialogTitle>Edit Invoice {invoice.invoiceNumber}</DialogTitle>
+          <DialogDescription>
+            Update draft invoice for {invoice.organizationName}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="editDescription">Description *</Label>
+            <Input
+              id="editDescription"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Professional services - January 2026"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="editAmount">Amount (RM) *</Label>
+              <Input
+                id="editAmount"
+                type="number"
+                step="0.01"
+                min="0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="editDueDate">Due Date *</Label>
+              <Input
+                id="editDueDate"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="editNotes">Notes (optional)</Label>
+            <Input
+              id="editNotes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Payment terms, bank details, etc."
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <Spinner size="sm" className="mr-2" /> : null}
+            Save Changes
+          </Button>
+        </DialogFooter>
+      </form>
     </DialogContent>
   );
 }
