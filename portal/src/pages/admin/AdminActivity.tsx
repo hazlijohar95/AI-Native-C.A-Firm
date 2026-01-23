@@ -14,8 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  History, 
+import {
+  History,
   Search,
   User,
   FileText,
@@ -26,7 +26,7 @@ import {
   Building2,
   ExternalLink,
   ChevronDown,
-} from "lucide-react";
+} from "@/lib/icons";
 import { formatDistanceToNow } from "@/lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
 

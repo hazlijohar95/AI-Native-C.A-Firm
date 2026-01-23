@@ -26,17 +26,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { 
-  Building2, 
-  Plus, 
-  Mail, 
-  Phone, 
+import {
+  Building2,
+  Plus,
+  Mail,
+  Phone,
   MapPin,
   Hash,
   Search,
   Edit,
   Trash,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";

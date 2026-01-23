@@ -17,7 +17,7 @@ import {
   Megaphone,
   Receipt,
   CheckCheck,
-} from "lucide-react";
+} from "@/lib/icons";
 import { cn, formatDistanceToNow } from "@/lib/utils";
 
 const typeIcons: Record<string, React.ReactNode> = {

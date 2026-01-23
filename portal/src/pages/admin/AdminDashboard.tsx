@@ -2,18 +2,18 @@ import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { 
-  Building2, 
-  Users, 
-  FileText, 
-  CheckSquare, 
-  Receipt, 
+import {
+  Building2,
+  Users,
+  FileText,
+  CheckSquare,
+  Receipt,
   Megaphone,
   Clock,
   User,
   TrendingUp,
   AlertCircle,
-} from "lucide-react";
+} from "@/lib/icons";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow, formatCurrency } from "@/lib/utils";
 

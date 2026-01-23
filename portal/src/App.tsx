@@ -16,6 +16,7 @@ import { Invoices } from "@/pages/Invoices";
 import { Signatures } from "@/pages/Signatures";
 import { Onboarding } from "@/pages/Onboarding";
 import { Help } from "@/pages/Help";
+import { Settings } from "@/pages/Settings";
 import { NotFound } from "@/pages/NotFound";
 
 // Lazy load admin pages for code splitting
@@ -25,6 +26,9 @@ const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers").then(m => ({ de
 const AdminInvoices = lazy(() => import("@/pages/admin/AdminInvoices").then(m => ({ default: m.AdminInvoices })));
 const AdminAnnouncements = lazy(() => import("@/pages/admin/AdminAnnouncements").then(m => ({ default: m.AdminAnnouncements })));
 const AdminActivity = lazy(() => import("@/pages/admin/AdminActivity").then(m => ({ default: m.AdminActivity })));
+const AdminTasks = lazy(() => import("@/pages/admin/AdminTasks").then(m => ({ default: m.AdminTasks })));
+const AdminSignatures = lazy(() => import("@/pages/admin/AdminSignatures").then(m => ({ default: m.AdminSignatures })));
+const AdminDocuments = lazy(() => import("@/pages/admin/AdminDocuments").then(m => ({ default: m.AdminDocuments })));
 
 // Loading fallback for lazy-loaded components
 function PageLoader() {
@@ -130,7 +134,7 @@ function AuthenticatedRoutes() {
           <Route path="/invoices" element={<Invoices />} />
           <Route path="/signatures" element={<Signatures />} />
           <Route path="/signatures/:id" element={<Signatures />} />
-          <Route path="/settings" element={<ComingSoon title="Settings" />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/help" element={<Help />} />
           <Route path="/onboarding" element={<Navigate to="/dashboard" replace />} />
           
@@ -177,23 +181,34 @@ function AuthenticatedRoutes() {
               </Suspense>
             </AdminRoute>
           } />
-          
+          <Route path="/admin/tasks" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminTasks />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/signatures" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminSignatures />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/documents" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminDocuments />
+              </Suspense>
+            </AdminRoute>
+          } />
+
           {/* 404 - Must be last */}
           <Route path="/callback" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </ErrorBoundary>
     </Shell>
-  );
-}
-
-// Placeholder component for pages not yet implemented
-function ComingSoon({ title }: { title: string }) {
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-4">
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="text-muted-foreground">Coming soon</p>
-    </div>
   );
 }
 

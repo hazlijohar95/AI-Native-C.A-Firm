@@ -35,9 +35,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { 
-  Megaphone, 
-  Plus, 
+import {
+  Megaphone,
+  Plus,
   Search,
   Pin,
   Globe,
@@ -45,7 +45,7 @@ import {
   Edit,
   Trash,
   Calendar,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";

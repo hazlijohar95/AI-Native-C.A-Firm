@@ -34,9 +34,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { 
-  Receipt, 
-  Plus, 
+import {
+  Receipt,
+  Plus,
   Search,
   Building2,
   X,
@@ -44,7 +44,7 @@ import {
   CreditCard,
   Edit,
   Download,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { exportToCSV, formatDateForExport, formatCurrencyForExport } from "@/lib/bulk-actions";

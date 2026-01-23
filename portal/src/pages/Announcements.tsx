@@ -1,9 +1,5 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import {
   Bell,
   Megaphone,
@@ -12,28 +8,39 @@ import {
   Newspaper,
   Pin,
   Check,
-} from "lucide-react";
+  Sparkles,
+} from "@/lib/icons";
 import { cn, formatDistanceToNow } from "@/lib/utils";
 
-const typeIcons: Record<string, React.ReactNode> = {
-  general: <Megaphone className="h-5 w-5 text-blue-500" />,
-  tax_update: <AlertTriangle className="h-5 w-5 text-amber-500" />,
-  deadline: <Calendar className="h-5 w-5 text-red-500" />,
-  news: <Newspaper className="h-5 w-5 text-green-500" />,
-};
-
-const typeLabels: Record<string, string> = {
-  general: "General",
-  tax_update: "Tax Update",
-  deadline: "Deadline",
-  news: "News",
-};
-
-const typeBadgeVariants: Record<string, "info" | "warning" | "destructive" | "success"> = {
-  general: "info",
-  tax_update: "warning",
-  deadline: "destructive",
-  news: "success",
+const typeConfig: Record<string, { icon: React.ReactNode; bg: string; text: string; iconBg: string; label: string }> = {
+  general: {
+    icon: <Megaphone className="h-4 w-4 text-blue-600" />,
+    bg: "bg-blue-50",
+    text: "text-blue-700",
+    iconBg: "bg-blue-50",
+    label: "General",
+  },
+  tax_update: {
+    icon: <AlertTriangle className="h-4 w-4 text-amber-600" />,
+    bg: "bg-amber-50",
+    text: "text-amber-700",
+    iconBg: "bg-amber-50",
+    label: "Tax Update",
+  },
+  deadline: {
+    icon: <Calendar className="h-4 w-4 text-red-600" />,
+    bg: "bg-red-50",
+    text: "text-red-700",
+    iconBg: "bg-red-50",
+    label: "Deadline",
+  },
+  news: {
+    icon: <Newspaper className="h-4 w-4 text-emerald-600" />,
+    bg: "bg-emerald-50",
+    text: "text-emerald-700",
+    iconBg: "bg-emerald-50",
+    label: "News",
+  },
 };
 
 export function Announcements() {
@@ -45,11 +52,22 @@ export function Announcements() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Announcements</h1>
-        <p className="text-sm text-muted-foreground">
+      <div
+        className="opacity-0"
+        style={{
+          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        }}
+      >
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
+          <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
+          <span className="text-xs font-medium text-[#6b6b76]">Updates</span>
+        </div>
+        <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
+          Announcements
+        </h1>
+        <p className="mt-2 text-[#6b6b76]">
           Important updates from Amjad & Hazli
         </p>
       </div>
@@ -58,91 +76,106 @@ export function Announcements() {
       {announcements === undefined ? (
         <div className="flex h-64 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground">Loading announcements...</p>
+            <div className="w-8 h-8 border-2 border-[#e5e5e7] border-t-[#0f0f12] rounded-full animate-spin" />
+            <span className="text-[#9d9da6] text-sm">Loading announcements...</span>
           </div>
         </div>
       ) : announcements.length === 0 ? (
-        <Card>
-          <CardContent className="flex h-64 flex-col items-center justify-center">
-            <Bell className="mb-4 h-12 w-12 text-muted-foreground" />
-            <h3 className="text-lg font-medium">No announcements</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Check back later for updates
-            </p>
-          </CardContent>
-        </Card>
+        <div
+          className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] opacity-0"
+          style={{
+            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
+          }}
+        >
+          <div className="w-14 h-14 rounded-xl bg-[#e5e5e7] flex items-center justify-center mb-4">
+            <Bell className="h-6 w-6 text-[#6b6b76]" />
+          </div>
+          <p className="text-base font-medium text-[#0f0f12]">No announcements</p>
+          <p className="text-sm text-[#9d9da6] mt-1">Check back later for updates</p>
+        </div>
       ) : (
         <div className="space-y-4">
-          {announcements.map((announcement) => (
-            <Card
-              key={announcement._id}
-              className={cn(
-                "transition-all",
-                !announcement.isRead && "border-l-4 border-l-primary bg-primary/5",
-                announcement.isPinned && "ring-1 ring-amber-300"
-              )}
-            >
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      {typeIcons[announcement.type]}
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <CardTitle className="text-lg">
-                          {announcement.title}
-                        </CardTitle>
-                        {announcement.isPinned && (
-                          <Pin className="h-4 w-4 text-amber-500" />
-                        )}
-                        <Badge variant={typeBadgeVariants[announcement.type]}>
-                          {typeLabels[announcement.type]}
-                        </Badge>
-                        {!announcement.isRead && (
-                          <Badge variant="default" className="bg-primary">
-                            New
-                          </Badge>
-                        )}
+          {announcements.map((announcement, index) => {
+            const config = typeConfig[announcement.type] || typeConfig.general;
+            return (
+              <div
+                key={announcement._id}
+                className={cn(
+                  "group bg-white rounded-2xl border border-black/5 overflow-hidden transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] opacity-0",
+                  !announcement.isRead && "border-l-4 border-l-[#253FF6]",
+                  announcement.isPinned && "ring-1 ring-amber-200"
+                )}
+                style={{
+                  animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${0.1 + index * 0.05}s forwards`,
+                }}
+              >
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", config.iconBg)}>
+                        {config.icon}
                       </div>
-                      <CardDescription className="mt-1">
-                        Posted {formatDistanceToNow(announcement.publishedAt)}
-                      </CardDescription>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-serif text-lg text-[#0f0f12]">
+                            {announcement.title}
+                          </h3>
+                          {announcement.isPinned && (
+                            <Pin className="h-4 w-4 text-amber-500" />
+                          )}
+                          <span className={cn("inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide", config.bg, config.text)}>
+                            {config.label}
+                          </span>
+                          {!announcement.isRead && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#253FF6] text-white text-[10px] font-medium uppercase tracking-wide">
+                              New
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs text-[#9d9da6] font-['DM_Mono']">
+                          Posted {formatDistanceToNow(announcement.publishedAt)}
+                        </p>
+                      </div>
                     </div>
+
+                    {!announcement.isRead && (
+                      <button
+                        onClick={() => handleMarkRead(announcement._id)}
+                        className="h-8 px-3 rounded-lg text-xs font-medium text-[#6b6b76] hover:text-[#0f0f12] hover:bg-[#f8f8f8] transition-colors flex items-center gap-1.5"
+                      >
+                        <Check className="h-3 w-3" />
+                        Mark as read
+                      </button>
+                    )}
                   </div>
 
-                  {!announcement.isRead && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1 text-xs"
-                      onClick={() => handleMarkRead(announcement._id)}
-                    >
-                      <Check className="h-3 w-3" />
-                      Mark as read
-                    </Button>
-                  )}
+                  <div className="mt-4 ml-14">
+                    <div className="text-sm text-[#6b6b76] leading-relaxed">
+                      {announcement.content.split("\n").map((paragraph, i) => (
+                        <p key={i} className="mb-2 last:mb-0">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                    {announcement.expiresAt && (
+                      <p className="mt-4 text-xs text-[#9d9da6] font-['DM_Mono']">
+                        Expires {formatDistanceToNow(announcement.expiresAt)}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none text-muted-foreground">
-                  {announcement.content.split("\n").map((paragraph, i) => (
-                    <p key={i} className="mb-2 last:mb-0">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-                {announcement.expiresAt && (
-                  <p className="mt-4 text-xs text-muted-foreground">
-                    Expires {formatDistanceToNow(announcement.expiresAt)}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
+
+      <style>{`
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { LoadingState, EmptyState, SearchInput } from "@/components/common";
 import {
   Dialog,
   DialogContent,
@@ -22,9 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Users, 
-  Search,
+import {
+  Users,
   Edit,
   User,
   Building2,
@@ -34,7 +32,7 @@ import {
   UserCheck,
   MoreHorizontal,
   Download,
-} from "lucide-react";
+} from "@/lib/icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -234,15 +232,12 @@ export function AdminUsers() {
       {/* Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-4 sm:flex-row sm:flex-1">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search users..."
+            className="flex-1"
+          />
           <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by role" />
@@ -298,21 +293,18 @@ export function AdminUsers() {
 
       {/* Users List */}
       {users === undefined ? (
-        <div className="flex h-64 items-center justify-center">
-          <Spinner size="lg" />
-        </div>
+        <LoadingState message="Loading users..." />
       ) : filteredUsers?.length === 0 ? (
-        <Card>
-          <CardContent className="flex h-48 flex-col items-center justify-center text-center">
-            <Users className="h-12 w-12 text-muted-foreground/50" />
-            <p className="mt-4 font-medium">No users found</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {searchQuery || roleFilter !== "all" 
-                ? "Try adjusting your filters" 
-                : "Users will appear here when they sign up"}
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Users}
+          title="No users found"
+          description={
+            searchQuery || roleFilter !== "all"
+              ? "Try adjusting your filters"
+              : "Users will appear here when they sign up"
+          }
+          height="md"
+        />
       ) : (
         <div className="rounded-md border">
           <div className="overflow-x-auto">

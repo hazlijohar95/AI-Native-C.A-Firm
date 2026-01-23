@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
@@ -9,7 +7,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  HelpCircle,
   Search,
   FileText,
   CheckSquare,
@@ -22,7 +19,9 @@ import {
   BookOpen,
   Shield,
   Upload,
-} from "lucide-react";
+  ArrowRight,
+  Sparkles,
+} from "@/lib/icons";
 
 // FAQ data organized by category
 const FAQ_CATEGORIES = [
@@ -177,35 +176,52 @@ export function Help() {
   })).filter((category) => category.faqs.length > 0);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 lg:space-y-10">
       {/* Header */}
-      <div className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <HelpCircle className="h-8 w-8 text-primary" />
+      <div
+        className="opacity-0"
+        style={{
+          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        }}
+      >
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
+          <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
+          <span className="text-xs font-medium text-[#6b6b76]">Support</span>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Help & Support
+        <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
+          Help & <span className="italic text-[#6b6b76]">Support</span>
         </h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mt-2 text-[#6b6b76]">
           Find answers to common questions or get in touch with our team
         </p>
       </div>
 
       {/* Search */}
-      <div className="mx-auto max-w-md">
+      <div
+        className="max-w-xl opacity-0"
+        style={{
+          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
+        }}
+      >
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9d9da6]" />
+          <input
+            type="text"
             placeholder="Search help articles..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="w-full h-12 pl-11 pr-4 bg-white border border-[#EBEBEB] rounded-xl text-sm text-[#0f0f12] placeholder-[#9d9da6] focus:outline-none focus:border-[#253FF6] focus:ring-2 focus:ring-[#253FF6]/10 transition-all"
           />
         </div>
       </div>
 
       {/* Quick Links */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 opacity-0"
+        style={{
+          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards",
+        }}
+      >
         <QuickLinkCard
           icon={Upload}
           title="Upload Documents"
@@ -233,77 +249,109 @@ export function Help() {
       </div>
 
       {/* FAQ Section */}
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Frequently Asked Questions</h2>
+      <div className="space-y-4">
+        <h2
+          className="font-serif text-xl text-[#0f0f12] opacity-0"
+          style={{
+            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
+          }}
+        >
+          Frequently Asked Questions
+        </h2>
 
         {filteredCategories.length === 0 ? (
-          <Card>
-            <CardContent className="flex h-48 flex-col items-center justify-center text-center">
-              <Search className="h-12 w-12 text-muted-foreground/50" />
-              <p className="mt-4 font-medium">No results found</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Try different keywords or browse categories below
-              </p>
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={() => setSearchQuery("")}
-              >
-                Clear Search
-              </Button>
-            </CardContent>
-          </Card>
+          <div
+            className="bg-white rounded-2xl border border-black/5 p-8 text-center opacity-0"
+            style={{
+              animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards",
+            }}
+          >
+            <div className="w-14 h-14 bg-[#f8f8f8] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <Search className="h-6 w-6 text-[#9d9da6]" />
+            </div>
+            <p className="font-medium text-[#0f0f12]">No results found</p>
+            <p className="mt-1 text-sm text-[#6b6b76]">
+              Try different keywords or browse categories below
+            </p>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="mt-4 h-10 px-5 text-sm font-medium text-[#0f0f12] bg-[#f8f8f8] hover:bg-[#f0f0f0] rounded-lg transition-colors"
+            >
+              Clear Search
+            </button>
+          </div>
         ) : (
-          <div className="space-y-6">
-            {filteredCategories.map((category) => (
-              <Card key={category.id}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <category.icon className="h-5 w-5 text-primary" />
-                    {category.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+          <div className="space-y-4">
+            {filteredCategories.map((category, catIndex) => (
+              <div
+                key={category.id}
+                className="bg-white rounded-2xl border border-black/5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02),0_8px_16px_rgba(0,0,0,0.03)] overflow-hidden opacity-0"
+                style={{
+                  animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${0.25 + catIndex * 0.05}s forwards`,
+                }}
+              >
+                <div className="p-5 border-b border-black/5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#f8f8f8] border border-black/5 flex items-center justify-center">
+                      <category.icon className="h-4 w-4 text-[#0f0f12]" />
+                    </div>
+                    <h3 className="font-serif text-lg text-[#0f0f12]">{category.title}</h3>
+                  </div>
+                </div>
+                <div className="px-5 pb-2">
                   <Accordion type="single" collapsible className="w-full">
                     {category.faqs.map((faq, index) => (
                       <AccordionItem
                         key={index}
                         value={`${category.id}-${index}`}
+                        className="border-b border-black/5 last:border-0"
                       >
-                        <AccordionTrigger className="text-left hover:no-underline">
+                        <AccordionTrigger className="py-4 text-left text-[#0f0f12] hover:no-underline hover:text-[#253FF6] [&[data-state=open]]:text-[#253FF6]">
                           {faq.question}
                         </AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground">
+                        <AccordionContent className="text-[#6b6b76] pb-4 leading-relaxed">
                           {faq.answer}
                         </AccordionContent>
                       </AccordionItem>
                     ))}
                   </Accordion>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
 
       {/* Contact Section */}
-      <Card className="border-primary/20 bg-primary/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            Still Need Help?
-          </CardTitle>
-          <CardDescription>
-            Our team is here to assist you with any questions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-3">
+      <div
+        className="bg-[#0f0f12] rounded-2xl p-6 sm:p-8 relative overflow-hidden opacity-0"
+        style={{
+          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards",
+        }}
+      >
+        {/* Pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+              <MessageSquare className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h3 className="font-serif text-xl text-white">Still Need Help?</h3>
+              <p className="text-white/60 text-sm">Our team is here to assist you</p>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3 mt-6">
             <ContactCard
               icon={Mail}
               title="Email Us"
-              value="support@amjadhazli.com"
-              href="mailto:support@amjadhazli.com"
+              value="hello@amjadhazli.com"
+              href="mailto:hello@amjadhazli.com"
             />
             <ContactCard
               icon={Phone}
@@ -318,41 +366,53 @@ export function Help() {
               href="https://maps.google.com"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Resources */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            Resources
-          </CardTitle>
-          <CardDescription>
-            Additional information and guides
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <ResourceLink
-              title="Tax Filing Deadlines"
-              description="Important dates for Malaysian tax submissions"
-            />
-            <ResourceLink
-              title="Document Checklist"
-              description="What documents to prepare for tax filing"
-            />
-            <ResourceLink
-              title="Company Registration Guide"
-              description="Steps for SSM registration in Malaysia"
-            />
-            <ResourceLink
-              title="Privacy Policy"
-              description="How we protect your data"
-            />
+      <div
+        className="bg-white rounded-2xl border border-black/5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02),0_8px_16px_rgba(0,0,0,0.03)] overflow-hidden opacity-0"
+        style={{
+          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards",
+        }}
+      >
+        <div className="p-6 border-b border-black/5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#0f0f12] flex items-center justify-center">
+              <BookOpen className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h3 className="font-serif text-lg text-[#0f0f12]">Resources</h3>
+              <p className="text-[#9d9da6] text-sm">Additional information and guides</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="p-4 grid gap-2 sm:grid-cols-2">
+          <ResourceLink
+            title="Tax Filing Deadlines"
+            description="Important dates for Malaysian tax submissions"
+          />
+          <ResourceLink
+            title="Document Checklist"
+            description="What documents to prepare for tax filing"
+          />
+          <ResourceLink
+            title="Company Registration Guide"
+            description="Steps for SSM registration in Malaysia"
+          />
+          <ResourceLink
+            title="Privacy Policy"
+            description="How we protect your data"
+          />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -366,19 +426,21 @@ interface QuickLinkCardProps {
 
 function QuickLinkCard({ icon: Icon, title, description, href }: QuickLinkCardProps) {
   return (
-    <a href={href}>
-      <Card className="transition-shadow hover:shadow-md cursor-pointer h-full">
-        <CardContent className="flex items-center gap-4 p-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <Icon className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="font-medium">{title}</p>
-            <p className="text-sm text-muted-foreground">{description}</p>
-          </div>
-        </CardContent>
-      </Card>
-    </a>
+    <Link
+      to={href}
+      className="group block bg-white rounded-xl border border-black/5 p-4 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] hover:-translate-y-0.5"
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-xl bg-[#f8f8f8] border border-black/5 flex items-center justify-center flex-shrink-0 group-hover:bg-white group-hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200">
+          <Icon className="h-4 w-4 text-[#0f0f12]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-[#0f0f12]">{title}</p>
+          <p className="text-xs text-[#6b6b76]">{description}</p>
+        </div>
+        <ArrowRight className="h-4 w-4 text-[#9d9da6] opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />
+      </div>
+    </Link>
   );
 }
 
@@ -395,12 +457,14 @@ function ContactCard({ icon: Icon, title, value, href }: ContactCardProps) {
       href={href}
       target={href.startsWith("http") ? "_blank" : undefined}
       rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-      className="flex items-center gap-3 rounded-lg border bg-background p-4 transition-colors hover:bg-muted/50"
+      className="flex items-center gap-3 rounded-xl bg-white/10 backdrop-blur p-4 transition-all hover:bg-white/15"
     >
-      <Icon className="h-5 w-5 text-primary" />
+      <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+        <Icon className="h-4 w-4 text-white" />
+      </div>
       <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-sm text-muted-foreground">{value}</p>
+        <p className="text-sm font-medium text-white">{title}</p>
+        <p className="text-sm text-white/60">{value}</p>
       </div>
     </a>
   );
@@ -413,12 +477,15 @@ interface ResourceLinkProps {
 
 function ResourceLink({ title, description }: ResourceLinkProps) {
   return (
-    <button className="flex items-start gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-muted/50 w-full">
-      <FileText className="mt-0.5 h-5 w-5 text-muted-foreground" />
-      <div>
-        <p className="font-medium">{title}</p>
-        <p className="text-sm text-muted-foreground">{description}</p>
+    <button className="group flex items-center gap-4 rounded-xl p-4 text-left transition-all duration-200 hover:bg-[#f8f8f8] w-full">
+      <div className="w-10 h-10 rounded-xl bg-[#f8f8f8] border border-black/5 flex items-center justify-center flex-shrink-0 group-hover:bg-white group-hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200">
+        <FileText className="h-4 w-4 text-[#0f0f12]" />
       </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-[#0f0f12]">{title}</p>
+        <p className="text-xs text-[#6b6b76]">{description}</p>
+      </div>
+      <ArrowRight className="h-4 w-4 text-[#9d9da6] opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />
     </button>
   );
 }

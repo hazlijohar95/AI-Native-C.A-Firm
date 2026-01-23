@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
+import { Clock, AlertCircle, CheckCircle2, XCircle } from "@/lib/icons";
 
 // =============================================================================
 // Invoice Status Badge

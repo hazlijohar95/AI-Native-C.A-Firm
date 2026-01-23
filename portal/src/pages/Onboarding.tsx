@@ -2,29 +2,25 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import {
   CheckCircle2,
   Building2,
   User,
-  FileText,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
+  FileText,
   Bell,
   Shield,
   Check,
   Mail,
-} from "lucide-react";
+  ArrowUpRight,
+} from "@/lib/icons";
 
 import type { Id } from "../../convex/_generated/dataModel";
 
 const STEPS = [
-  { id: "welcome", title: "Welcome", icon: Sparkles },
+  { id: "welcome", title: "Welcome", icon: FileText },
   { id: "profile", title: "Profile", icon: User },
   { id: "organization", title: "Company", icon: Building2 },
   { id: "complete", title: "Complete", icon: CheckCircle2 },
@@ -98,10 +94,8 @@ export function Onboarding() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center">
-            <span className="text-white font-serif text-xl">A&H</span>
-          </div>
-          <Spinner size="lg" />
+          <div className="w-5 h-5 border-2 border-[#EBEBEB] border-t-[#253FF6] rounded-full animate-spin" />
+          <p className="text-sm text-[#737373]">Loading...</p>
         </div>
       </div>
     );
@@ -114,27 +108,32 @@ export function Onboarding() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto flex h-16 items-center justify-between px-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-serif text-sm font-medium">A&H</span>
+      {/* Navigation */}
+      <nav className="border-b border-[#F1F1F1]">
+        <div className="max-w-3xl mx-auto px-5 md:px-8">
+          <div className="flex items-center justify-between h-14">
+            <a href="https://amjadhazli.com" className="font-['Playfair_Display'] text-[#090516] text-lg">
+              Amjad & Hazli
+            </a>
+            <div className="flex items-center gap-4">
+              <span className="font-['DM_Mono'] text-[11px] text-[#737373] uppercase tracking-[0.02em]">
+                Step {currentStepIndex + 1} of {STEPS.length}
+              </span>
+              <a
+                href="https://amjadhazli.com"
+                className="flex items-center gap-1 text-[13px] text-[#737373] hover:text-[#090516] transition-colors"
+              >
+                <span className="hidden sm:inline">Exit</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-gray-900 font-serif font-medium">Amjad & Hazli</h1>
-              <p className="text-gray-500 text-xs uppercase tracking-wider">Getting Started</p>
-            </div>
-          </div>
-          <div className="text-sm text-gray-500">
-            Step <span className="text-gray-900 font-medium">{currentStepIndex + 1}</span> of {STEPS.length}
           </div>
         </div>
-      </header>
+      </nav>
 
-      <div className="max-w-3xl mx-auto px-6 py-10 lg:py-14">
+      <div className="max-w-xl mx-auto px-5 md:px-8 py-10 md:py-16">
         {/* Progress Steps */}
-        <div className="mb-10 lg:mb-14">
+        <div className="mb-10 md:mb-12">
           <div className="flex items-center justify-between">
             {STEPS.map((step, index) => {
               const StepIcon = step.icon;
@@ -145,35 +144,35 @@ export function Onboarding() {
                 <div key={step.id} className="flex items-center flex-1 last:flex-none">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      className={`relative w-10 h-10 rounded flex items-center justify-center transition-all duration-300 ${
                         isCompleted
-                          ? "bg-blue-600 text-white shadow-md"
+                          ? "bg-[#22c55e] text-white"
                           : isCurrent
-                          ? "bg-gray-900 text-white shadow-md"
-                          : "bg-gray-100 text-gray-400 border border-gray-200"
+                          ? "bg-[#253FF6] text-white"
+                          : "bg-[#F8F8F8] text-[#737373] border border-[#EBEBEB]"
                       }`}
                     >
                       {isCompleted ? (
-                        <Check className="w-5 h-5" strokeWidth={3} />
+                        <Check className="w-4 h-4" strokeWidth={2.5} />
                       ) : (
-                        <StepIcon className="w-5 h-5" />
-                      )}
-                      {isCurrent && (
-                        <div className="absolute -inset-1.5 rounded-2xl border-2 border-gray-900/20 animate-pulse" />
+                        <StepIcon className="w-4 h-4" strokeWidth={1.5} />
                       )}
                     </div>
                     <span
-                      className={`mt-2.5 text-xs font-medium uppercase tracking-wider hidden sm:block ${
-                        isCurrent ? "text-gray-900" : isCompleted ? "text-blue-600" : "text-gray-400"
+                      className={`mt-2.5 font-['DM_Mono'] text-[10px] uppercase tracking-[0.02em] hidden sm:block transition-colors duration-300 ${
+                        isCurrent ? "text-[#090516]" : isCompleted ? "text-[#22c55e]" : "text-[#737373]"
                       }`}
                     >
                       {step.title}
                     </span>
                   </div>
                   {index < STEPS.length - 1 && (
-                    <div className={`h-0.5 flex-1 mx-3 sm:mx-5 rounded-full transition-colors duration-300 ${
-                      isCompleted ? "bg-blue-600" : "bg-gray-200"
-                    }`} />
+                    <div className="h-px flex-1 mx-3 md:mx-5 bg-[#EBEBEB] relative overflow-hidden">
+                      <div
+                        className="absolute inset-y-0 left-0 bg-[#22c55e] transition-all duration-500"
+                        style={{ width: isCompleted ? "100%" : "0%" }}
+                      />
+                    </div>
                   )}
                 </div>
               );
@@ -181,207 +180,208 @@ export function Onboarding() {
           </div>
         </div>
 
-        {/* Content Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          
-          {/* Welcome Step */}
-          {currentStep === "welcome" && (
-            <>
-              <div className="bg-blue-600 p-8 lg:p-10 text-white">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6">
-                  <Sparkles className="w-7 h-7" />
-                </div>
-                <h1 className="text-3xl lg:text-4xl font-serif font-medium tracking-tight mb-3">
-                  Welcome to your
-                  <br />
-                  client portal
-                </h1>
-                <p className="text-white/80 text-lg max-w-md">
-                  A secure space for managing your financial documents, tracking tasks, and staying connected with our team.
-                </p>
-              </div>
-              <div className="p-8 lg:p-10">
-                <div className="grid sm:grid-cols-3 gap-4 mb-8">
-                  <FeatureCard icon={FileText} title="Documents" desc="Secure file sharing" />
-                  <FeatureCard icon={Bell} title="Updates" desc="Real-time notifications" />
-                  <FeatureCard icon={Shield} title="Security" desc="Enterprise protection" />
-                </div>
-                <Button 
-                  onClick={goToNextStep} 
-                  className="w-full h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 group"
-                >
-                  <span>Get Started</span>
-                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </div>
-            </>
-          )}
+        {/* Welcome Step */}
+        {currentStep === "welcome" && (
+          <div className="text-center">
+            <span className="inline-block font-['DM_Mono'] text-[11px] text-[#737373] uppercase tracking-[0.02em] mb-4">
+              Getting Started
+            </span>
+            <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl text-[#090516] leading-tight mb-4">
+              Welcome to your
+              <br />
+              <span className="italic text-[#737373]">client portal</span>
+            </h1>
+            <p className="text-[#737373] text-base max-w-md mx-auto leading-relaxed mb-10">
+              A secure space for managing your financial documents, tracking tasks, and staying connected with our team.
+            </p>
 
-          {/* Profile Step */}
-          {currentStep === "profile" && (
-            <>
-              <div className="p-8 lg:p-10 border-b border-gray-200">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
-                    <User className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl lg:text-3xl font-serif font-medium text-gray-900">Your Profile</h2>
-                    <p className="text-gray-500 mt-0.5">Let's confirm your information</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-8 lg:p-10 space-y-6">
-                <div className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium text-gray-900">
-                      Full Name <span className="text-blue-600">*</span>
-                    </Label>
-                    <Input
-                      id="name"
-                      placeholder="Enter your full name"
-                      value={profileData.name}
-                      onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                      className="h-12 text-base bg-gray-50 border-gray-200 focus:border-blue-600 focus:ring-blue-600 rounded-lg px-4"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-medium text-gray-900">
-                      Phone Number <span className="text-gray-400 font-normal">(Optional)</span>
-                    </Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+60 12-345 6789"
-                      value={profileData.phone}
-                      onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                      className="h-12 text-base bg-gray-50 border-gray-200 focus:border-blue-600 focus:ring-blue-600 rounded-lg px-4"
-                    />
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 border border-gray-200">
-                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200">
-                      <Mail className="w-5 h-5 text-gray-500" />
-                    </div>
-                    <div>
-                      <p className="text-gray-900 font-medium">{currentUser?.email}</p>
-                      <p className="text-gray-500 text-sm">Contact us to update your email</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={goToPrevStep} 
-                    className="h-12 px-6 rounded-lg border-gray-200 hover:bg-gray-50 text-gray-900"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
-                  </Button>
-                  <Button
-                    onClick={handleProfileSubmit}
-                    disabled={isSubmitting || !profileData.name.trim()}
-                    className="flex-1 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 disabled:opacity-50 group"
-                  >
-                    {isSubmitting ? <Spinner size="sm" className="mr-2" /> : null}
-                    <span>Continue</span>
-                    <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
+            <div className="grid sm:grid-cols-3 gap-3 mb-8">
+              <FeatureCard icon={FileText} title="Documents" desc="Secure file sharing" />
+              <FeatureCard icon={Bell} title="Updates" desc="Real-time notifications" />
+              <FeatureCard icon={Shield} title="Security" desc="Enterprise protection" />
+            </div>
 
-          {/* Organization Step */}
-          {currentStep === "organization" && (
-            <>
-              <div className="p-8 lg:p-10 border-b border-gray-200">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl lg:text-3xl font-serif font-medium text-gray-900">Company Info</h2>
-                    <p className="text-gray-500 mt-0.5">
-                      {currentUser?.organizationId ? "Your linked organization" : "Pending assignment"}
-                    </p>
-                  </div>
+            <button
+              onClick={goToNextStep}
+              className="group w-full h-11 px-5 bg-[#253FF6] hover:bg-[#293ED5] text-white rounded text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <span>Get Started</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </div>
+        )}
+
+        {/* Profile Step */}
+        {currentStep === "profile" && (
+          <div>
+            <div className="text-center mb-8">
+              <div className="w-12 h-12 bg-[#253FF6] rounded flex items-center justify-center mx-auto mb-4">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="font-['Playfair_Display'] text-2xl md:text-3xl text-[#090516] mb-1">Your Profile</h2>
+              <p className="text-[#737373] text-sm">Confirm your information</p>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="block font-['DM_Mono'] text-[11px] text-[#737373] uppercase tracking-[0.02em]">
+                  Full Name <span className="text-[#ef4444]">*</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={profileData.name}
+                  onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                  className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EBEBEB] rounded text-sm text-[#090516] placeholder-[#737373] focus:outline-none focus:border-[#253FF6] focus:ring-1 focus:ring-[#253FF6]/20"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="phone" className="block font-['DM_Mono'] text-[11px] text-[#737373] uppercase tracking-[0.02em]">
+                  Phone Number <span className="text-[#737373] lowercase font-normal tracking-normal">(Optional)</span>
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  placeholder="+60 12-345 6789"
+                  value={profileData.phone}
+                  onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                  className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EBEBEB] rounded text-sm text-[#090516] placeholder-[#737373] focus:outline-none focus:border-[#253FF6] focus:ring-1 focus:ring-[#253FF6]/20"
+                />
+              </div>
+              <div className="bg-[#F8F8F8] border border-[#EBEBEB] rounded p-4 flex items-center gap-3">
+                <div className="w-9 h-9 bg-white border border-[#EBEBEB] rounded flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-4 h-4 text-[#737373]" />
+                </div>
+                <div>
+                  <p className="text-[#090516] text-sm font-medium">{currentUser?.email}</p>
+                  <p className="text-[#737373] text-xs mt-0.5">Contact us to update your email</p>
                 </div>
               </div>
-              <div className="p-8 lg:p-10 space-y-6">
-                {currentUser?.organizationId ? (
-                  <OrganizationInfo organizationId={currentUser.organizationId} />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={goToPrevStep}
+                className="h-11 px-4 rounded border border-[#EBEBEB] text-[#3A3A3A] text-sm font-medium hover:bg-[#F8F8F8] transition-colors flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+              <button
+                onClick={handleProfileSubmit}
+                disabled={isSubmitting || !profileData.name.trim()}
+                className="group flex-1 h-11 px-5 bg-[#253FF6] hover:bg-[#293ED5] disabled:bg-[#EBEBEB] disabled:text-[#737373] disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50">
-                    <div className="w-14 h-14 bg-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <Building2 className="w-7 h-7 text-gray-500" />
-                    </div>
-                    <h3 className="text-xl font-serif font-medium text-gray-900 mb-2">No Organization Yet</h3>
-                    <p className="text-gray-500 max-w-sm mx-auto">
-                      Our team will link your account to your company shortly. You can continue using the portal.
-                    </p>
-                  </div>
-                )}
-                <div className="flex gap-3 pt-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={goToPrevStep} 
-                    className="h-12 px-6 rounded-lg border-gray-200 hover:bg-gray-50 text-gray-900"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
-                  </Button>
-                  <Button 
-                    onClick={goToNextStep} 
-                    className="flex-1 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 group"
-                  >
+                  <>
                     <span>Continue</span>
-                    <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
 
-          {/* Complete Step */}
-          {currentStep === "complete" && (
-            <>
-              <div className="bg-blue-600 p-8 lg:p-10 text-white text-center">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h1 className="text-3xl lg:text-4xl font-serif font-medium tracking-tight mb-3">
-                  You're all set!
-                </h1>
-                <p className="text-white/80 text-lg max-w-sm mx-auto">
-                  Your account is ready. Explore your personalized dashboard.
-                </p>
+        {/* Organization Step */}
+        {currentStep === "organization" && (
+          <div>
+            <div className="text-center mb-8">
+              <div className="w-12 h-12 bg-[#253FF6] rounded flex items-center justify-center mx-auto mb-4">
+                <Building2 className="w-5 h-5 text-white" />
               </div>
-              <div className="p-8 lg:p-10 space-y-6">
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <QuickLink icon={FileText} title="Documents" desc="View and upload files" />
-                  <QuickLink icon={Bell} title="Announcements" desc="Latest updates" />
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200">
-                  <p className="text-gray-500 text-sm">
-                    Need help? Visit our{" "}
-                    <a href="/help" className="text-blue-600 font-medium hover:underline">Help Center</a>
-                    {" "}or email{" "}
-                    <a href="mailto:support@amjadhazli.com" className="text-blue-600 font-medium hover:underline">support@amjadhazli.com</a>
+              <h2 className="font-['Playfair_Display'] text-2xl md:text-3xl text-[#090516] mb-1">Company Info</h2>
+              <p className="text-[#737373] text-sm">
+                {currentUser?.organizationId ? "Your linked organization" : "Pending assignment"}
+              </p>
+            </div>
+
+            <div className="mb-6">
+              {currentUser?.organizationId ? (
+                <OrganizationInfo organizationId={currentUser.organizationId} />
+              ) : (
+                <div className="border border-dashed border-[#D7D7D7] rounded p-8 text-center bg-[#F8F8F8]">
+                  <div className="w-12 h-12 bg-[#EBEBEB] rounded flex items-center justify-center mx-auto mb-4">
+                    <Building2 className="w-5 h-5 text-[#737373]" />
+                  </div>
+                  <h3 className="font-['Playfair_Display'] text-xl text-[#090516] mb-2">No Organization Yet</h3>
+                  <p className="text-[#737373] max-w-sm mx-auto text-sm leading-relaxed">
+                    Our team will link your account to your company shortly. You can continue using the portal.
                   </p>
                 </div>
-                <Button
-                  onClick={handleCompleteOnboarding}
-                  disabled={isSubmitting}
-                  className="w-full h-14 text-lg font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 group"
-                >
-                  {isSubmitting ? <Spinner size="sm" className="mr-2" /> : null}
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={goToPrevStep}
+                className="h-11 px-4 rounded border border-[#EBEBEB] text-[#3A3A3A] text-sm font-medium hover:bg-[#F8F8F8] transition-colors flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+              <button
+                onClick={goToNextStep}
+                className="group flex-1 h-11 px-5 bg-[#253FF6] hover:bg-[#293ED5] text-white rounded text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <span>Continue</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Complete Step */}
+        {currentStep === "complete" && (
+          <div className="text-center">
+            <div className="w-14 h-14 bg-[#22c55e] rounded flex items-center justify-center mx-auto mb-5">
+              <CheckCircle2 className="w-7 h-7 text-white" />
+            </div>
+            <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl text-[#090516] mb-3">You're all set!</h1>
+            <p className="text-[#737373] text-base max-w-sm mx-auto mb-8">
+              Your account is ready. Explore your personalized dashboard.
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-3 mb-6">
+              <QuickLink icon={FileText} title="Documents" desc="View and upload files" />
+              <QuickLink icon={Bell} title="Announcements" desc="Latest updates" />
+            </div>
+
+            <div className="bg-[#F8F8F8] border border-[#EBEBEB] rounded p-4 text-center mb-6">
+              <p className="text-[#737373] text-sm">
+                Need help?{" "}
+                <a href="mailto:hello@amjadhazli.com" className="text-[#253FF6] font-medium hover:underline underline-offset-2">
+                  Contact support
+                </a>
+              </p>
+            </div>
+
+            <button
+              onClick={handleCompleteOnboarding}
+              disabled={isSubmitting}
+              className="group w-full h-12 px-5 bg-[#253FF6] hover:bg-[#293ED5] disabled:bg-[#EBEBEB] disabled:text-[#737373] disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
                   <span>Enter Dashboard</span>
-                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-[#F1F1F1] py-4 mt-auto">
+        <p className="text-center text-xs text-[#737373]">
+          &copy; {new Date().getFullYear()} Amjad & Hazli. All rights reserved.
+        </p>
       </div>
     </div>
   );
@@ -389,25 +389,25 @@ export function Onboarding() {
 
 function FeatureCard({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
   return (
-    <div className="bg-gray-50 rounded-xl p-5 text-center border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200">
-      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-        <Icon className="w-5 h-5 text-white" />
+    <div className="bg-[#F8F8F8] border border-[#EBEBEB] rounded p-4 text-center">
+      <div className="w-10 h-10 bg-white border border-[#EBEBEB] rounded flex items-center justify-center mx-auto mb-3">
+        <Icon className="w-4 h-4 text-[#090516]" />
       </div>
-      <h3 className="font-medium text-gray-900">{title}</h3>
-      <p className="text-sm text-gray-500 mt-0.5">{desc}</p>
+      <h3 className="font-medium text-[#090516] text-sm">{title}</h3>
+      <p className="text-xs text-[#737373] mt-0.5">{desc}</p>
     </div>
   );
 }
 
 function QuickLink({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
   return (
-    <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer">
-      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <Icon className="w-5 h-5 text-white" />
+    <div className="bg-[#F8F8F8] border border-[#EBEBEB] rounded p-4 flex items-center gap-3 text-left">
+      <div className="w-10 h-10 bg-white border border-[#EBEBEB] rounded flex items-center justify-center flex-shrink-0">
+        <Icon className="w-4 h-4 text-[#090516]" />
       </div>
       <div>
-        <h3 className="font-medium text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-500">{desc}</p>
+        <h3 className="font-medium text-[#090516] text-sm">{title}</h3>
+        <p className="text-xs text-[#737373]">{desc}</p>
       </div>
     </div>
   );
@@ -418,22 +418,24 @@ function OrganizationInfo({ organizationId }: { organizationId: Id<"organization
 
   if (!organization) {
     return (
-      <div className="bg-gray-50 rounded-xl p-6 flex items-center justify-center border border-gray-200">
-        <Spinner />
+      <div className="bg-[#F8F8F8] border border-[#EBEBEB] rounded p-6 flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-[#EBEBEB] border-t-[#253FF6] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 rounded-xl p-5 flex items-center gap-4 border border-gray-200">
-      <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
-        <Building2 className="w-6 h-6 text-white" />
+    <div className="bg-[#F8F8F8] border border-[#EBEBEB] rounded p-4 flex items-center gap-4">
+      <div className="w-10 h-10 bg-white border border-[#EBEBEB] rounded flex items-center justify-center flex-shrink-0">
+        <Building2 className="w-4 h-4 text-[#090516]" />
       </div>
       <div>
-        <h3 className="text-lg font-serif font-medium text-gray-900">{organization.name}</h3>
-        <p className="text-gray-500">{organization.email}</p>
+        <h3 className="font-['Playfair_Display'] text-lg text-[#090516]">{organization.name}</h3>
+        <p className="text-[#737373] text-sm">{organization.email}</p>
         {organization.registrationNumber && (
-          <p className="text-sm text-gray-400 mt-0.5">Reg: {organization.registrationNumber}</p>
+          <p className="font-['DM_Mono'] text-[11px] text-[#737373] uppercase tracking-[0.02em] mt-0.5">
+            Reg: {organization.registrationNumber}
+          </p>
         )}
       </div>
     </div>
