@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { authKit } from "./auth";
 import { requireAuth, requireAdmin, requireAdminOrStaff, getCurrentUserOrNull } from "./lib/auth";
@@ -319,5 +319,83 @@ export const completeOnboarding = mutation({
     });
 
     return { success: true };
+  },
+});
+
+// ============================================
+// EMAIL PREFERENCES
+// ============================================
+
+// Get email preferences for a user (internal - used by email system)
+export const getEmailPreferences = internalQuery({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    // Parse the userId to get the Convex ID
+    const users = await ctx.db.query("users").collect();
+    const user = users.find(u => u._id.toString() === args.userId);
+
+    if (!user) {
+      return null;
+    }
+
+    // Return preferences with defaults (all enabled by default)
+    return {
+      documentRequests: user.emailPreferences?.documentRequests ?? true,
+      taskAssignments: user.emailPreferences?.taskAssignments ?? true,
+      taskComments: user.emailPreferences?.taskComments ?? true,
+      invoices: user.emailPreferences?.invoices ?? true,
+      signatures: user.emailPreferences?.signatures ?? true,
+      announcements: user.emailPreferences?.announcements ?? true,
+    };
+  },
+});
+
+// Get current user's email preferences
+export const getMyEmailPreferences = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+
+    // Return preferences with defaults (all enabled by default)
+    return {
+      documentRequests: user.emailPreferences?.documentRequests ?? true,
+      taskAssignments: user.emailPreferences?.taskAssignments ?? true,
+      taskComments: user.emailPreferences?.taskComments ?? true,
+      invoices: user.emailPreferences?.invoices ?? true,
+      signatures: user.emailPreferences?.signatures ?? true,
+      announcements: user.emailPreferences?.announcements ?? true,
+    };
+  },
+});
+
+// Update email preferences
+export const updateEmailPreferences = mutation({
+  args: {
+    documentRequests: v.optional(v.boolean()),
+    taskAssignments: v.optional(v.boolean()),
+    taskComments: v.optional(v.boolean()),
+    invoices: v.optional(v.boolean()),
+    signatures: v.optional(v.boolean()),
+    announcements: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    // Merge with existing preferences
+    const currentPrefs = user.emailPreferences || {};
+    const newPrefs = {
+      documentRequests: args.documentRequests ?? currentPrefs.documentRequests ?? true,
+      taskAssignments: args.taskAssignments ?? currentPrefs.taskAssignments ?? true,
+      taskComments: args.taskComments ?? currentPrefs.taskComments ?? true,
+      invoices: args.invoices ?? currentPrefs.invoices ?? true,
+      signatures: args.signatures ?? currentPrefs.signatures ?? true,
+      announcements: args.announcements ?? currentPrefs.announcements ?? true,
+    };
+
+    await ctx.db.patch(user._id, {
+      emailPreferences: newPrefs,
+    });
+
+    return newPrefs;
   },
 });

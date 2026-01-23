@@ -1,9 +1,9 @@
 # Client Portal Roadmap
 ## Amjad & Hazli - AI-Native Chartered Accounting Firm
 
-> **Status:** Phase 6 Complete  
-> **Last Updated:** 2026-01-21  
-> **Current Phase:** Ready for Production
+> **Status:** Enhancement Phase 1 Complete
+> **Last Updated:** 2026-01-24
+> **Current Phase:** Production with Enhancements
 
 ---
 
@@ -162,15 +162,82 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 
 ---
 
+### Enhancement Phase 1: Collaboration & Notifications
+**Status:** Complete
+
+Core improvements for accounting firm workflows based on product audit.
+
+- [x] **Document Request Workflow** - Admin can request specific documents from clients
+  - New `documentRequests` table for tracking requests
+  - Request creation UI in admin documents page
+  - Client-facing pending requests view with upload capability
+  - Status tracking: pending → uploaded → reviewed/rejected
+  - Category and due date support
+
+- [x] **Task Comments** - Collaboration on task items
+  - New `taskComments` table with proper indexing
+  - Comment threads in task detail dialogs (client and admin)
+  - Author attribution and timestamps
+  - Pagination with 100-comment default limit
+  - Error handling preserves comment text on failure
+
+- [x] **Email Notifications via Resend** - Transactional email system
+  - Document request notifications (new request, approved, rejected)
+  - Task assignment and comment notifications
+  - Invoice creation notifications
+  - Signature request notifications
+  - Announcement notifications
+  - **User email preferences** with per-category opt-out toggles
+  - Settings page integration for notification management
+
+- [x] **Document Preview for Signatures** - Compliance requirement
+  - Two-step signing flow: preview document → then sign
+  - PDF/image preview in modal with fullscreen option
+  - Audit trail logging for document preview
+  - Preview timestamp recorded before signature
+
+- [x] **Code Quality Improvements**
+  - Fixed React hook usage (useState → useEffect for side effects)
+  - Added email preference checking before all sends
+  - Implemented pagination for unbounded queries
+  - Improved error handling with user-friendly messages
+
+**Key Files Added/Modified:**
+- `convex/documentRequests.ts` - Document request backend
+- `convex/emails.ts` - Resend email integration with preferences
+- `convex/tasks.ts` - Task comments mutations/queries
+- `convex/signatures.ts` - Document preview action
+- `convex/users.ts` - Email preferences management
+- `portal/src/pages/Documents.tsx` - Request fulfillment UI
+- `portal/src/pages/Tasks.tsx` - Comment threads
+- `portal/src/pages/Signatures.tsx` - Two-step preview flow
+- `portal/src/pages/Settings.tsx` - Email preferences UI
+
+---
+
 ## Future Enhancements
 
+### Enhancement Phase 2 (Planned)
+- [ ] Folder organization for documents
+- [ ] Task reminders & due date alerts (cron jobs)
+- [ ] Stripe payment integration (payment links, webhooks)
+- [ ] Document search (full-text on name/description)
+
+### Enhancement Phase 3 (Planned)
+- [ ] Task templates for common workflows
+- [ ] Recurring tasks (weekly, monthly, quarterly)
+- [ ] Client financial summary dashboard
+- [ ] Multi-party signatures
+
+### Enhancement Phase 4 (Planned)
+- [ ] Bulk operations (assign, update, status change)
+- [ ] Client onboarding templates
+- [ ] Activity analytics and reporting
+
+### Other Future Items
 - [ ] R2 direct upload with presigned URLs (when bucket configured)
-- [ ] Stripe checkout integration (when API key configured)
-- [ ] Resend email notifications (when API key configured)
 - [ ] Dark mode support
 - [ ] Mobile app (React Native)
-- [ ] Advanced reporting / analytics dashboard
-- [ ] Client document requests workflow
 - [ ] Two-factor authentication
 
 ---
@@ -179,6 +246,11 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 
 | Date | Phase | Changes |
 |------|-------|---------|
+| 2026-01-24 | Enhancement 1 | Added document request workflow with status tracking |
+| 2026-01-24 | Enhancement 1 | Added task comments for collaboration |
+| 2026-01-24 | Enhancement 1 | Implemented Resend email notifications with user preferences |
+| 2026-01-24 | Enhancement 1 | Added two-step signature flow with document preview |
+| 2026-01-24 | Enhancement 1 | Code review fixes: email preferences, React hooks, pagination |
 | 2026-01-21 | Phase 6 | Added onboarding wizard, help pages, bulk actions, CSV export |
 | 2026-01-21 | Phase 5 | Added Playwright E2E testing setup with auth and navigation tests |
 | 2026-01-21 | Phase 5 | Added accessibility: skip link, ARIA labels, semantic HTML |

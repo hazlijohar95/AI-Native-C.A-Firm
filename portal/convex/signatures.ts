@@ -1,7 +1,9 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, action } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
 import { logActivity, notifyOrgUsers, notifyAdmins, validateSignatureData, enforceRateLimit } from "./lib/helpers";
+import { api } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 
 // ============================================
 // QUERIES
@@ -384,5 +386,84 @@ export const cancel = mutation({
       resourceId: args.id,
       resourceName: request.title,
     });
+  },
+});
+
+// ============================================
+// DOCUMENT PREVIEW
+// ============================================
+
+// Get document preview URL for signature request
+export const getDocumentPreview = action({
+  args: {
+    requestId: v.id("signatureRequests"),
+  },
+  handler: async (ctx, args): Promise<{ url: string | null; filename: string; mimeType: string }> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    // Get the signature request
+    const request = await ctx.runQuery(api.signatures.get, { id: args.requestId });
+    if (!request) {
+      throw new Error("Signature request not found or access denied");
+    }
+
+    // Get the document
+    const doc = await ctx.runQuery(api.documents.get, { id: request.documentId });
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    if (!doc.convexStorageId) {
+      throw new Error("Document file not available");
+    }
+
+    // Get the storage URL
+    const url = await ctx.storage.getUrl(doc.convexStorageId as Id<"_storage">);
+    if (!url) {
+      throw new Error("Document file not found");
+    }
+
+    return {
+      url,
+      filename: doc.name,
+      mimeType: doc.type || "application/pdf",
+    };
+  },
+});
+
+// Record that user previewed document (for audit trail)
+export const recordDocumentPreview = mutation({
+  args: {
+    requestId: v.id("signatureRequests"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const request = await ctx.db.get(args.requestId);
+    if (!request) {
+      throw new Error("Signature request not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (request.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    // Log the preview for audit purposes
+    await logActivity(ctx, {
+      organizationId: request.organizationId,
+      userId: user._id,
+      action: "previewed_document_for_signature",
+      resourceType: "signature_request",
+      resourceId: args.requestId,
+      resourceName: request.title,
+    });
+
+    return { success: true, previewedAt: Date.now() };
   },
 });

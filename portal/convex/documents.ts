@@ -2,7 +2,7 @@ import { query, mutation, action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { requireAuth } from "./lib/auth";
+import { requireAuth, requireAdminOrStaff } from "./lib/auth";
 
 // Document categories for filtering
 export const categories = [
@@ -407,5 +407,330 @@ export const generateDownloadUrl = action({
       downloadUrl: url,
       filename: doc.name,
     };
+  },
+});
+
+// ============================================
+// DOCUMENT REQUESTS
+// ============================================
+
+// List document requests for current user
+export const listRequests = query({
+  args: {
+    status: v.optional(v.union(
+      v.literal("pending"),
+      v.literal("uploaded"),
+      v.literal("reviewed"),
+      v.literal("rejected")
+    )),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    let requests;
+
+    if (user.role === "admin" || user.role === "staff") {
+      // Admin/staff see all requests
+      requests = await ctx.db.query("documentRequests").collect();
+    } else if (user.organizationId) {
+      // Clients see requests assigned to them
+      requests = await ctx.db
+        .query("documentRequests")
+        .withIndex("by_client", (q) => q.eq("clientId", user._id))
+        .collect();
+    } else {
+      return [];
+    }
+
+    // Filter by status if specified
+    if (args.status) {
+      requests = requests.filter((r) => r.status === args.status);
+    }
+
+    // Sort by due date (soonest first), then by created date
+    requests.sort((a, b) => {
+      if (a.dueDate && b.dueDate) return a.dueDate - b.dueDate;
+      if (a.dueDate) return -1;
+      if (b.dueDate) return 1;
+      return b.createdAt - a.createdAt;
+    });
+
+    return requests;
+  },
+});
+
+// Get single document request
+export const getRequest = query({
+  args: { id: v.id("documentRequests") },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const request = await ctx.db.get(args.id);
+
+    if (!request) {
+      return null;
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (request.clientId.toString() !== user._id.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    return request;
+  },
+});
+
+// Count pending document requests for dashboard
+export const countPendingRequests = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+
+    let requests;
+
+    if (user.role === "admin" || user.role === "staff") {
+      requests = await ctx.db.query("documentRequests").collect();
+      // Admin sees count of uploaded (needs review)
+      return requests.filter((r) => r.status === "uploaded").length;
+    } else {
+      // Clients see count of pending (needs upload)
+      requests = await ctx.db
+        .query("documentRequests")
+        .withIndex("by_client", (q) => q.eq("clientId", user._id))
+        .collect();
+      return requests.filter((r) => r.status === "pending" || r.status === "rejected").length;
+    }
+  },
+});
+
+// Create document request (admin/staff only)
+export const createRequest = mutation({
+  args: {
+    organizationId: v.id("organizations"),
+    clientId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    category: v.union(
+      v.literal("tax_return"),
+      v.literal("financial_statement"),
+      v.literal("invoice"),
+      v.literal("agreement"),
+      v.literal("receipt"),
+      v.literal("other")
+    ),
+    dueDate: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAdminOrStaff(ctx);
+
+    // Validate organization exists
+    const org = await ctx.db.get(args.organizationId);
+    if (!org) {
+      throw new Error("Organization not found");
+    }
+
+    // Validate client exists and belongs to organization
+    const client = await ctx.db.get(args.clientId);
+    if (!client) {
+      throw new Error("Client not found");
+    }
+    if (client.role !== "client") {
+      throw new Error("User is not a client");
+    }
+    if (client.organizationId?.toString() !== args.organizationId.toString()) {
+      throw new Error("Client does not belong to this organization");
+    }
+
+    // Validate title
+    if (!args.title.trim()) {
+      throw new Error("Request title is required");
+    }
+    if (args.title.length > 200) {
+      throw new Error("Request title too long");
+    }
+
+    const requestId = await ctx.db.insert("documentRequests", {
+      organizationId: args.organizationId,
+      clientId: args.clientId,
+      requestedBy: user._id,
+      title: args.title.trim(),
+      description: args.description?.trim(),
+      category: args.category,
+      dueDate: args.dueDate,
+      status: "pending",
+      createdAt: Date.now(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: args.organizationId,
+      userId: user._id,
+      action: "requested_document",
+      resourceType: "documentRequest",
+      resourceId: requestId,
+      resourceName: args.title.trim(),
+      createdAt: Date.now(),
+    });
+
+    // Notify the client
+    await ctx.db.insert("notifications", {
+      userId: args.clientId,
+      type: "new_document",
+      title: "Document Requested",
+      message: `Please upload: "${args.title.trim()}"`,
+      link: `/documents`,
+      relatedId: requestId,
+      isRead: false,
+      createdAt: Date.now(),
+    });
+
+    return requestId;
+  },
+});
+
+// Fulfill document request (client uploads document)
+export const fulfillRequest = mutation({
+  args: {
+    requestId: v.id("documentRequests"),
+    documentId: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const request = await ctx.db.get(args.requestId);
+
+    if (!request) {
+      throw new Error("Request not found");
+    }
+
+    // Check access - only assigned client can fulfill
+    if (user.role === "client") {
+      if (request.clientId.toString() !== user._id.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    // Validate document exists
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Update request
+    await ctx.db.patch(args.requestId, {
+      status: "uploaded",
+      documentId: args.documentId,
+      uploadedAt: Date.now(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: request.organizationId,
+      userId: user._id,
+      action: "fulfilled_document_request",
+      resourceType: "documentRequest",
+      resourceId: args.requestId,
+      resourceName: request.title,
+      createdAt: Date.now(),
+    });
+
+    // Notify admins/staff
+    const admins = await ctx.db
+      .query("users")
+      .filter((q) => q.or(q.eq(q.field("role"), "admin"), q.eq(q.field("role"), "staff")))
+      .collect();
+
+    for (const admin of admins) {
+      await ctx.db.insert("notifications", {
+        userId: admin._id,
+        type: "new_document",
+        title: "Document Uploaded",
+        message: `${user.name} uploaded "${request.title}" for review`,
+        link: `/documents`,
+        relatedId: args.requestId,
+        isRead: false,
+        createdAt: Date.now(),
+      });
+    }
+  },
+});
+
+// Review document request (admin/staff only)
+export const reviewRequest = mutation({
+  args: {
+    requestId: v.id("documentRequests"),
+    action: v.union(v.literal("approve"), v.literal("reject")),
+    note: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAdminOrStaff(ctx);
+    const request = await ctx.db.get(args.requestId);
+
+    if (!request) {
+      throw new Error("Request not found");
+    }
+
+    if (request.status !== "uploaded") {
+      throw new Error("Request must be in uploaded status to review");
+    }
+
+    const newStatus = args.action === "approve" ? "reviewed" : "rejected";
+
+    await ctx.db.patch(args.requestId, {
+      status: newStatus,
+      reviewNote: args.note?.trim(),
+      reviewedAt: Date.now(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: request.organizationId,
+      userId: user._id,
+      action: args.action === "approve" ? "approved_document" : "rejected_document",
+      resourceType: "documentRequest",
+      resourceId: args.requestId,
+      resourceName: request.title,
+      createdAt: Date.now(),
+    });
+
+    // Notify the client
+    await ctx.db.insert("notifications", {
+      userId: request.clientId,
+      type: "new_document",
+      title: args.action === "approve" ? "Document Approved" : "Document Rejected",
+      message: args.action === "approve"
+        ? `Your document "${request.title}" has been approved`
+        : `Your document "${request.title}" needs to be re-uploaded${args.note ? `: ${args.note}` : ""}`,
+      link: `/documents`,
+      relatedId: args.requestId,
+      isRead: false,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Cancel document request (admin/staff only)
+export const cancelRequest = mutation({
+  args: { id: v.id("documentRequests") },
+  handler: async (ctx, args) => {
+    const user = await requireAdminOrStaff(ctx);
+    const request = await ctx.db.get(args.id);
+
+    if (!request) {
+      throw new Error("Request not found");
+    }
+
+    await ctx.db.delete(args.id);
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: request.organizationId,
+      userId: user._id,
+      action: "cancelled_document_request",
+      resourceType: "documentRequest",
+      resourceId: args.id,
+      resourceName: request.title,
+      createdAt: Date.now(),
+    });
   },
 });

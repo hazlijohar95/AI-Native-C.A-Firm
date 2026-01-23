@@ -25,6 +25,15 @@ export default defineSchema({
     // Onboarding
     onboardingCompleted: v.optional(v.boolean()),
     onboardingCompletedAt: v.optional(v.number()),
+    // Email Preferences (defaults to true if not set)
+    emailPreferences: v.optional(v.object({
+      documentRequests: v.optional(v.boolean()),
+      taskAssignments: v.optional(v.boolean()),
+      taskComments: v.optional(v.boolean()),
+      invoices: v.optional(v.boolean()),
+      signatures: v.optional(v.boolean()),
+      announcements: v.optional(v.boolean()),
+    })),
   })
     .index("by_workos_id", ["workosId"])
     .index("by_email", ["email"])
@@ -310,6 +319,59 @@ export default defineSchema({
     legalName: v.string(), // Full legal name entered by signer
   })
     .index("by_request", ["signatureRequestId"])
+    .index("by_user", ["userId"]),
+
+  // ============================================
+  // DOCUMENT REQUESTS
+  // ============================================
+
+  // Admin requests specific documents from clients
+  documentRequests: defineTable({
+    organizationId: v.id("organizations"),
+    clientId: v.id("users"), // The client user who should upload
+    requestedBy: v.id("users"), // Admin/staff who made the request
+    title: v.string(), // e.g., "Bank statements for Q4 2025"
+    description: v.optional(v.string()), // Detailed instructions
+    category: v.union(
+      v.literal("tax_return"),
+      v.literal("financial_statement"),
+      v.literal("invoice"),
+      v.literal("agreement"),
+      v.literal("receipt"),
+      v.literal("other")
+    ),
+    dueDate: v.optional(v.number()),
+    status: v.union(
+      v.literal("pending"), // Waiting for client to upload
+      v.literal("uploaded"), // Client uploaded, awaiting review
+      v.literal("reviewed"), // Admin reviewed and accepted
+      v.literal("rejected") // Admin rejected, needs re-upload
+    ),
+    documentId: v.optional(v.id("documents")), // Linked document once uploaded
+    reviewNote: v.optional(v.string()), // Admin note on rejection/review
+    createdAt: v.number(),
+    uploadedAt: v.optional(v.number()),
+    reviewedAt: v.optional(v.number()),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_client", ["clientId"])
+    .index("by_status", ["organizationId", "status"])
+    .index("by_document", ["documentId"]),
+
+  // ============================================
+  // TASK COMMENTS
+  // ============================================
+
+  // Comments/discussion on tasks
+  taskComments: defineTable({
+    taskId: v.id("tasks"),
+    userId: v.id("users"),
+    content: v.string(),
+    createdAt: v.number(),
+    editedAt: v.optional(v.number()),
+    isDeleted: v.optional(v.boolean()),
+  })
+    .index("by_task", ["taskId"])
     .index("by_user", ["userId"]),
 
   // ============================================

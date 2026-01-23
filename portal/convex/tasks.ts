@@ -387,3 +387,239 @@ export const remove = mutation({
     });
   },
 });
+
+// ============================================
+// TASK COMMENTS
+// ============================================
+
+// List comments for a task
+export const listComments = query({
+  args: {
+    taskId: v.id("tasks"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const task = await ctx.db.get(args.taskId);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (task.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    // Default limit to 100 comments to prevent unbounded queries
+    const limit = args.limit ?? 100;
+
+    const comments = await ctx.db
+      .query("taskComments")
+      .withIndex("by_task", (q) => q.eq("taskId", args.taskId))
+      .collect();
+
+    // Filter out deleted comments and sort by created date
+    const activeComments = comments
+      .filter((c) => !c.isDeleted)
+      .sort((a, b) => a.createdAt - b.createdAt)
+      .slice(-limit); // Take the most recent N comments
+
+    // Get user info for each comment
+    const commentsWithUsers = await Promise.all(
+      activeComments.map(async (comment) => {
+        const commentUser = await ctx.db.get(comment.userId);
+        return {
+          ...comment,
+          userName: commentUser?.name ?? "Unknown User",
+          userRole: commentUser?.role ?? "client",
+        };
+      })
+    );
+
+    return commentsWithUsers;
+  },
+});
+
+// Count comments for a task
+export const countComments = query({
+  args: { taskId: v.id("tasks") },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const task = await ctx.db.get(args.taskId);
+
+    if (!task) {
+      return 0;
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (task.organizationId.toString() !== user.organizationId?.toString()) {
+        return 0;
+      }
+    }
+
+    const comments = await ctx.db
+      .query("taskComments")
+      .withIndex("by_task", (q) => q.eq("taskId", args.taskId))
+      .collect();
+
+    return comments.filter((c) => !c.isDeleted).length;
+  },
+});
+
+// Add comment to task
+export const addComment = mutation({
+  args: {
+    taskId: v.id("tasks"),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const task = await ctx.db.get(args.taskId);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (task.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    // Validate content
+    if (!args.content.trim()) {
+      throw new Error("Comment cannot be empty");
+    }
+    if (args.content.length > 2000) {
+      throw new Error("Comment too long (max 2000 characters)");
+    }
+
+    const commentId = await ctx.db.insert("taskComments", {
+      taskId: args.taskId,
+      userId: user._id,
+      content: args.content.trim(),
+      createdAt: Date.now(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: task.organizationId,
+      userId: user._id,
+      action: "commented_task",
+      resourceType: "task",
+      resourceId: args.taskId,
+      resourceName: task.title,
+      createdAt: Date.now(),
+    });
+
+    // Notify relevant users
+    // If client comments, notify admins/staff
+    // If admin/staff comments, notify the client assigned to the task
+    if (user.role === "client") {
+      const admins = await ctx.db
+        .query("users")
+        .filter((q) => q.or(q.eq(q.field("role"), "admin"), q.eq(q.field("role"), "staff")))
+        .collect();
+
+      for (const admin of admins) {
+        await ctx.db.insert("notifications", {
+          userId: admin._id,
+          type: "new_task",
+          title: "New Comment on Task",
+          message: `${user.name} commented on "${task.title}"`,
+          link: `/tasks`,
+          relatedId: args.taskId,
+          isRead: false,
+          createdAt: Date.now(),
+        });
+      }
+    } else {
+      // Notify org users
+      const orgUsers = await ctx.db
+        .query("users")
+        .withIndex("by_organization", (q) => q.eq("organizationId", task.organizationId))
+        .collect();
+
+      for (const orgUser of orgUsers) {
+        if (orgUser._id.toString() !== user._id.toString()) {
+          await ctx.db.insert("notifications", {
+            userId: orgUser._id,
+            type: "new_task",
+            title: "New Comment on Task",
+            message: `${user.name} commented on "${task.title}"`,
+            link: `/tasks`,
+            relatedId: args.taskId,
+            isRead: false,
+            createdAt: Date.now(),
+          });
+        }
+      }
+    }
+
+    return commentId;
+  },
+});
+
+// Edit comment
+export const editComment = mutation({
+  args: {
+    commentId: v.id("taskComments"),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const comment = await ctx.db.get(args.commentId);
+
+    if (!comment) {
+      throw new Error("Comment not found");
+    }
+
+    // Only the comment author can edit
+    if (comment.userId.toString() !== user._id.toString()) {
+      throw new Error("You can only edit your own comments");
+    }
+
+    // Validate content
+    if (!args.content.trim()) {
+      throw new Error("Comment cannot be empty");
+    }
+    if (args.content.length > 2000) {
+      throw new Error("Comment too long (max 2000 characters)");
+    }
+
+    await ctx.db.patch(args.commentId, {
+      content: args.content.trim(),
+      editedAt: Date.now(),
+    });
+  },
+});
+
+// Delete comment (soft delete)
+export const deleteComment = mutation({
+  args: { commentId: v.id("taskComments") },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const comment = await ctx.db.get(args.commentId);
+
+    if (!comment) {
+      throw new Error("Comment not found");
+    }
+
+    // Only the comment author or admin/staff can delete
+    const isAuthor = comment.userId.toString() === user._id.toString();
+    const isAdmin = user.role === "admin" || user.role === "staff";
+
+    if (!isAuthor && !isAdmin) {
+      throw new Error("You can only delete your own comments");
+    }
+
+    await ctx.db.patch(args.commentId, {
+      isDeleted: true,
+    });
+  },
+});
