@@ -53,3 +53,17 @@ xcuserdata/
 
 # Claude plans (temporary)
 .claude/plans/
+
+# Assets and media files (served from CDN)
+assets/
+portal/public/images/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.svg
+!portal/public/favicon.svg
+
+# Build outputs
+portal/dist/
