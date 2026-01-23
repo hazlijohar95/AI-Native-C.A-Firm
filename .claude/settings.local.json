@@ -65,7 +65,12 @@
       "mcp__plugin_serena_serena__list_dir",
       "Bash(done)",
       "Skill(frontend-design)",
-      "Skill(frontend-design:*)"
+      "Skill(frontend-design:*)",
+      "Bash(npx skills:*)",
+      "Skill(vercel-react-best-practices)",
+      "Skill(vercel-react-best-practices:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx convex:*)"
     ],
     "deny": [],
     "ask": []
