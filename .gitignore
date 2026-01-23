@@ -40,19 +40,13 @@ xcuserdata/
 .env
 .env.secret.toml
 
-# Editor skills/AI agent configurations (auto-generated)
-.claude/skills/
-.cursor/skills/
-.codex/skills/
-.kiro/skills/
-.opencode/skills/
-.windsurf/skills/
-
-# Claude local settings (user-specific)
-.claude/settings.local.json
-
-# Claude plans (temporary)
-.claude/plans/
+# AI agent configurations (user-specific, auto-generated)
+.claude/
+.cursor/
+.codex/
+.kiro/
+.opencode/
+.windsurf/
 
 # Assets and media files (served from CDN)
 assets/
