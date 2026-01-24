@@ -23,14 +23,7 @@
     <!-- H crossbar - weaves through A -->
     <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
 
-    <!-- Decorative arch connecting top -->
-    <path d="M24 24Q60 0 96 24" stroke="url(#gold)" stroke-width="4" fill="none"/>
-
-    <!-- Bottom flourish -->
-    <path d="M24 116Q60 140 96 116" stroke="url(#gold)" stroke-width="4" fill="none"/>
-
-    <!-- Inner decorative curves -->
-    <path d="M30 40Q60 20 90 40" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+    <!-- Inner decorative curve -->
     <path d="M30 100Q60 120 90 100" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
   </g>
 </svg>

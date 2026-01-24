@@ -1,4 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 80" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 80" fill="none">
+  <!-- AMJAD & HAZLI horizontal logo (white) -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&amp;display=swap');
+  </style>
   <defs>
     <linearGradient id="gold-hw" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#C9A86C"/>
@@ -15,14 +19,12 @@
     <path d="M96 24h8v92h-8z"/>
     <path d="M90 24h20v5H90zM90 111h20v5H90z"/>
     <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
-    <path d="M24 24Q60 0 96 24" stroke="url(#gold-hw)" stroke-width="4" fill="none"/>
-    <path d="M24 116Q60 140 96 116" stroke="url(#gold-hw)" stroke-width="4" fill="none"/>
   </g>
 
   <!-- Horizontal wordmark in white -->
-  <text x="85" y="52" font-family="'Playfair Display', 'Times New Roman', serif" font-size="32" font-weight="400" letter-spacing="0.1em" fill="white">
+  <text x="85" y="52" font-family="'Playfair Display', Georgia, serif" font-size="32" font-weight="400" letter-spacing="0.1em" fill="white">
     <tspan>AMJAD</tspan>
-    <tspan dx="6" font-size="22" fill="#B8986B">&amp;</tspan>
-    <tspan dx="6">HAZLI</tspan>
+    <tspan dx="8" font-size="24" fill="#B8986B">&amp;</tspan>
+    <tspan dx="8">HAZLI</tspan>
   </text>
 </svg>

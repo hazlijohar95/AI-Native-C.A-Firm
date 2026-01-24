@@ -1,5 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" fill="none">
-  <!-- White version for dark backgrounds - monogram in gold, text in white -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- AMJAD & HAZLI stacked logo (white) for dark backgrounds -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&amp;display=swap');
+  </style>
   <defs>
     <linearGradient id="gold-white" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#C9A86C"/>
@@ -16,16 +19,14 @@
     <path d="M96 24h8v92h-8z"/>
     <path d="M90 24h20v5H90zM90 111h20v5H90z"/>
     <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
-    <path d="M24 24Q60 0 96 24" stroke="url(#gold-white)" stroke-width="4" fill="none"/>
-    <path d="M24 116Q60 140 96 116" stroke="url(#gold-white)" stroke-width="4" fill="none"/>
   </g>
 
   <!-- Wordmark in white -->
-  <text x="200" y="210" text-anchor="middle" font-family="'Playfair Display', 'Times New Roman', serif" font-size="42" font-weight="400" letter-spacing="0.15em" fill="white">
+  <text x="200" y="200" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="36" font-weight="400" letter-spacing="0.12em" fill="white">
     <tspan>AMJAD</tspan>
-    <tspan dx="8" font-size="28" fill="#B8986B">&amp;</tspan>
+    <tspan dx="8" font-size="26" fill="#B8986B">&amp;</tspan>
     <tspan dx="8">HAZLI</tspan>
   </text>
 
-  <text x="200" y="260" text-anchor="middle" font-family="'Playfair Display', 'Times New Roman', serif" font-size="18" font-weight="400" letter-spacing="0.25em" fill="white">CHARTERED ACCOUNTANTS</text>
+  <text x="200" y="245" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="14" font-weight="400" letter-spacing="0.2em" fill="rgba(255,255,255,0.7)">CHARTERED ACCOUNTANTS</text>
 </svg>

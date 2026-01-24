@@ -5,7 +5,5 @@
     <path d="M16 24h8v92h-8z"/>
     <path d="M96 24h8v92h-8z"/>
     <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
-    <path d="M24 24Q60 0 96 24" stroke="#B8986B" stroke-width="6" fill="none"/>
-    <path d="M24 116Q60 140 96 116" stroke="#B8986B" stroke-width="6" fill="none"/>
   </g>
 </svg>
