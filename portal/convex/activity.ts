@@ -54,7 +54,7 @@ export const list = query({
             q.lt(q.field("createdAt"), cursorTimestamp!),
             q.and(
               q.eq(q.field("createdAt"), cursorTimestamp!),
-              cursorId ? q.lt(q.field("_id"), cursorId as any) : q.eq(1, 1)
+              cursorId ? q.lt(q.field("_id"), cursorId as string) : q.eq(1, 1)
             )
           )
         )

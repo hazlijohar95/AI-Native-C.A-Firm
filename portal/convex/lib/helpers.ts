@@ -201,7 +201,7 @@ export async function logActivity(
     userId: Id<"users">;
     action: string;
     resourceType: string;
-    resourceId?: Id<any>;
+    resourceId?: { toString(): string };
     resourceName?: string;
     metadata?: Record<string, unknown>;
   }
@@ -229,7 +229,7 @@ export async function notifyOrgUsers(
     title: string;
     message: string;
     link?: string;
-    relatedId?: Id<any>;
+    relatedId?: { toString(): string };
   },
   excludeUserId?: Id<"users">
 ) {
@@ -265,7 +265,7 @@ export async function notifyAdmins(
     title: string;
     message: string;
     link?: string;
-    relatedId?: Id<any>;
+    relatedId?: { toString(): string };
   },
   excludeUserId?: Id<"users">
 ) {

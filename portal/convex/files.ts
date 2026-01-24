@@ -15,7 +15,7 @@ export const getUploadUrl = action({
     filename: v.string(),
     contentType: v.string(),
   },
-  handler: async (ctx, _args) => {
+  handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Unauthorized");
@@ -25,36 +25,34 @@ export const getUploadUrl = action({
     // This requires:
     // 1. R2 bucket credentials in environment
     // 2. AWS SDK v3 for S3 (R2 is S3-compatible)
-    
+
     // Placeholder response
     throw new Error("R2 not yet configured. Please set up R2 credentials.");
-    
-    /*
+
     // Example implementation with AWS SDK:
-    import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-    import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-    
-    const s3 = new S3Client({
-      region: "auto",
-      endpoint: process.env.R2_ENDPOINT,
-      credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-      },
-    });
-    
-    const key = `${identity.subject}/${Date.now()}-${_args.filename}`;
-    
-    const command = new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME,
-      Key: key,
-      ContentType: _args.contentType,
-    });
-    
-    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-    
-    return { url, key };
-    */
+    // import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+    // import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+    //
+    // const s3 = new S3Client({
+    //   region: "auto",
+    //   endpoint: process.env.R2_ENDPOINT,
+    //   credentials: {
+    //     accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    //     secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    //   },
+    // });
+    //
+    // const key = `${identity.subject}/${Date.now()}-${args.filename}`;
+    //
+    // const command = new PutObjectCommand({
+    //   Bucket: process.env.R2_BUCKET_NAME,
+    //   Key: key,
+    //   ContentType: args.contentType,
+    // });
+    //
+    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    //
+    // return { url, key };
   },
 });
 
@@ -62,7 +60,7 @@ export const getDownloadUrl = action({
   args: {
     key: v.string(),
   },
-  handler: async (ctx, _args) => {
+  handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Unauthorized");
@@ -70,31 +68,29 @@ export const getDownloadUrl = action({
 
     // TODO: Implement R2 presigned URL generation for downloads
     // Also verify user has access to this document
-    
+
     throw new Error("R2 not yet configured. Please set up R2 credentials.");
-    
-    /*
+
     // Example implementation:
-    import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-    import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-    
-    const s3 = new S3Client({
-      region: "auto",
-      endpoint: process.env.R2_ENDPOINT,
-      credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-      },
-    });
-    
-    const command = new GetObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME,
-      Key: _args.key,
-    });
-    
-    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-    
-    return { url };
-    */
+    // import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+    // import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+    //
+    // const s3 = new S3Client({
+    //   region: "auto",
+    //   endpoint: process.env.R2_ENDPOINT,
+    //   credentials: {
+    //     accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    //     secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    //   },
+    // });
+    //
+    // const command = new GetObjectCommand({
+    //   Bucket: process.env.R2_BUCKET_NAME,
+    //   Key: args.key,
+    // });
+    //
+    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    //
+    // return { url };
   },
 });

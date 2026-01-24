@@ -29,6 +29,7 @@ const AdminActivity = lazy(() => import("@/pages/admin/AdminActivity").then(m =>
 const AdminTasks = lazy(() => import("@/pages/admin/AdminTasks").then(m => ({ default: m.AdminTasks })));
 const AdminSignatures = lazy(() => import("@/pages/admin/AdminSignatures").then(m => ({ default: m.AdminSignatures })));
 const AdminDocuments = lazy(() => import("@/pages/admin/AdminDocuments").then(m => ({ default: m.AdminDocuments })));
+const AdminServices = lazy(() => import("@/pages/admin/AdminServices").then(m => ({ default: m.AdminServices })));
 
 // Loading fallback for lazy-loaded components
 function PageLoader() {
@@ -199,6 +200,13 @@ function AuthenticatedRoutes() {
             <AdminRoute>
               <Suspense fallback={<PageLoader />}>
                 <AdminDocuments />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/services" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminServices />
               </Suspense>
             </AdminRoute>
           } />

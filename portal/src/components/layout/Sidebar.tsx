@@ -18,6 +18,7 @@ import {
   History,
   Megaphone,
   HelpCircle,
+  Layers,
 } from "@/lib/icons";
 
 interface SidebarProps {
@@ -38,6 +39,7 @@ const adminNavigation = [
   { name: "Admin Dashboard", href: "/admin", icon: Shield },
   { name: "Organizations", href: "/admin/organizations", icon: Building2 },
   { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Services", href: "/admin/services", icon: Layers },
   { name: "Tasks", href: "/admin/tasks", icon: CheckSquare },
   { name: "Invoices", href: "/admin/invoices", icon: Receipt },
   { name: "Signatures", href: "/admin/signatures", icon: PenTool },
@@ -111,10 +113,7 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
     <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="flex h-14 items-center justify-between border-b border-[#F1F1F1] px-4">
-        <a href="https://amjadhazli.com" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-[#090516]">
-            <span className="text-white font-['Playfair_Display'] text-sm">A</span>
-          </div>
+        <a href="https://amjadhazli.com" className="flex items-center">
           <span className="font-['Playfair_Display'] text-[#090516] text-base">Amjad & Hazli</span>
         </a>
         {showCloseButton && (

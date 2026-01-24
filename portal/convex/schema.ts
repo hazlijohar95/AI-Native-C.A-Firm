@@ -3,6 +3,43 @@ import { v } from "convex/values";
 
 export default defineSchema({
   // ============================================
+  // SERVICE TYPES & SUBSCRIPTIONS
+  // ============================================
+
+  // Master list of available services (Accounting, Advisory, Taxation, etc.)
+  serviceTypes: defineTable({
+    code: v.string(), // "accounting", "taxation", "advisory", "cosec", "payroll"
+    name: v.string(), // Display name
+    description: v.optional(v.string()),
+    icon: v.string(), // Lucide icon name
+    color: v.string(), // Tailwind color: "blue", "emerald", etc.
+    displayOrder: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    createdBy: v.id("users"),
+  })
+    .index("by_code", ["code"])
+    .index("by_active", ["isActive", "displayOrder"]),
+
+  // Track which services each organization subscribes to
+  clientSubscriptions: defineTable({
+    organizationId: v.id("organizations"),
+    serviceTypeId: v.id("serviceTypes"),
+    status: v.union(
+      v.literal("active"),
+      v.literal("inactive"),
+      v.literal("pending")
+    ),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
+    createdAt: v.number(),
+    createdBy: v.id("users"),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_org_status", ["organizationId", "status"])
+    .index("by_service", ["serviceTypeId"]),
+
+  // ============================================
   // USERS & ORGANIZATIONS
   // ============================================
 
@@ -56,21 +93,26 @@ export default defineSchema({
   // DOCUMENTS
   // ============================================
 
-  // Document folders
+  // Document folders (2 levels max: Service → Folder → Documents)
   folders: defineTable({
     organizationId: v.id("organizations"),
+    serviceTypeId: v.optional(v.id("serviceTypes")), // Associate folder with service
     name: v.string(),
-    parentId: v.optional(v.id("folders")),
+    description: v.optional(v.string()),
+    color: v.optional(v.string()), // For visual distinction
+    parentId: v.optional(v.id("folders")), // Exists but we enforce 2-level max in mutations
     createdAt: v.number(),
     createdBy: v.id("users"),
   })
     .index("by_organization", ["organizationId"])
-    .index("by_parent", ["parentId"]),
+    .index("by_parent", ["parentId"])
+    .index("by_service", ["organizationId", "serviceTypeId"]),
 
   // Documents
   documents: defineTable({
     organizationId: v.id("organizations"),
     folderId: v.optional(v.id("folders")),
+    serviceTypeId: v.optional(v.id("serviceTypes")), // Associate document with service
     name: v.string(),
     type: v.string(), // MIME type
     size: v.number(), // bytes
@@ -84,6 +126,12 @@ export default defineSchema({
       v.literal("receipt"),
       v.literal("other")
     ),
+    // Enhanced metadata
+    description: v.optional(v.string()),
+    fiscalYear: v.optional(v.string()), // "2025", "2024"
+    fiscalPeriod: v.optional(v.string()), // "Q1", "Jan", etc.
+    expiresAt: v.optional(v.number()), // For auto-archival
+    currentVersion: v.optional(v.number()), // Latest version number
     uploadedBy: v.id("users"),
     uploadedAt: v.number(),
     isDeleted: v.optional(v.boolean()),
@@ -92,7 +140,49 @@ export default defineSchema({
     .index("by_organization", ["organizationId"])
     .index("by_folder", ["folderId"])
     .index("by_category", ["organizationId", "category"])
-    .index("by_uploaded_at", ["organizationId", "uploadedAt"]),
+    .index("by_uploaded_at", ["organizationId", "uploadedAt"])
+    .index("by_service", ["organizationId", "serviceTypeId"])
+    .index("by_fiscal_year", ["organizationId", "fiscalYear"]),
+
+  // Document tags for flexible categorization
+  documentTags: defineTable({
+    documentId: v.id("documents"),
+    tag: v.string(), // Normalized tag (lowercase, trimmed)
+    createdAt: v.number(),
+    createdBy: v.id("users"),
+  })
+    .index("by_document", ["documentId"])
+    .index("by_tag", ["tag"]),
+
+  // Document version history for audit trail
+  documentVersions: defineTable({
+    documentId: v.id("documents"),
+    version: v.number(), // 1, 2, 3...
+    storageKey: v.string(),
+    convexStorageId: v.optional(v.string()),
+    size: v.number(),
+    uploadedBy: v.id("users"),
+    uploadedAt: v.number(),
+    changeNote: v.optional(v.string()),
+  })
+    .index("by_document", ["documentId"])
+    .index("by_document_version", ["documentId", "version"]),
+
+  // Document access logs for tracking downloads/views
+  documentAccessLogs: defineTable({
+    documentId: v.id("documents"),
+    userId: v.id("users"),
+    action: v.union(
+      v.literal("view"),
+      v.literal("download"),
+      v.literal("preview")
+    ),
+    ipAddress: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_document", ["documentId", "createdAt"])
+    .index("by_user", ["userId", "createdAt"]),
 
   // ============================================
   // TASKS

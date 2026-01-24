@@ -1,7 +1,7 @@
 import { query, mutation, action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
-import type { Id } from "./_generated/dataModel";
+import type { Id, Doc } from "./_generated/dataModel";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
 
 // Document categories for filtering
@@ -14,6 +14,27 @@ export const categories = [
   { value: "other", label: "Other" },
 ] as const;
 
+// Fiscal periods for filtering
+export const fiscalPeriods = [
+  { value: "Q1", label: "Q1 (Jan-Mar)" },
+  { value: "Q2", label: "Q2 (Apr-Jun)" },
+  { value: "Q3", label: "Q3 (Jul-Sep)" },
+  { value: "Q4", label: "Q4 (Oct-Dec)" },
+  { value: "Jan", label: "January" },
+  { value: "Feb", label: "February" },
+  { value: "Mar", label: "March" },
+  { value: "Apr", label: "April" },
+  { value: "May", label: "May" },
+  { value: "Jun", label: "June" },
+  { value: "Jul", label: "July" },
+  { value: "Aug", label: "August" },
+  { value: "Sep", label: "September" },
+  { value: "Oct", label: "October" },
+  { value: "Nov", label: "November" },
+  { value: "Dec", label: "December" },
+  { value: "Annual", label: "Annual" },
+] as const;
+
 // ============================================
 // QUERIES
 // ============================================
@@ -23,6 +44,12 @@ export const list = query({
   args: {
     category: v.optional(v.string()),
     folderId: v.optional(v.id("folders")),
+    serviceTypeId: v.optional(v.id("serviceTypes")),
+    fiscalYear: v.optional(v.string()),
+    searchQuery: v.optional(v.string()),
+    sortBy: v.optional(v.union(v.literal("uploadedAt"), v.literal("name"), v.literal("size"))),
+    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
@@ -33,7 +60,7 @@ export const list = query({
     }
 
     let docsQuery;
-    
+
     if (user.role === "admin" || user.role === "staff") {
       // Admin/staff see all documents (later can filter by org)
       docsQuery = ctx.db.query("documents");
@@ -49,6 +76,11 @@ export const list = query({
     // Filter out deleted
     docs = docs.filter((d) => !d.isDeleted);
 
+    // Filter by service type if specified
+    if (args.serviceTypeId) {
+      docs = docs.filter((d) => d.serviceTypeId?.toString() === args.serviceTypeId?.toString());
+    }
+
     // Filter by category if specified
     if (args.category) {
       docs = docs.filter((d) => d.category === args.category);
@@ -59,10 +91,377 @@ export const list = query({
       docs = docs.filter((d) => d.folderId === args.folderId);
     }
 
-    // Sort by upload date descending
-    docs.sort((a, b) => b.uploadedAt - a.uploadedAt);
+    // Filter by fiscal year if specified
+    if (args.fiscalYear) {
+      docs = docs.filter((d) => d.fiscalYear === args.fiscalYear);
+    }
+
+    // Search by name or description
+    if (args.searchQuery) {
+      const query = args.searchQuery.toLowerCase();
+      docs = docs.filter((d) =>
+        d.name.toLowerCase().includes(query) ||
+        (d.description && d.description.toLowerCase().includes(query))
+      );
+    }
+
+    // Sort
+    const sortBy = args.sortBy ?? "uploadedAt";
+    const sortOrder = args.sortOrder ?? "desc";
+    docs.sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === "uploadedAt") {
+        comparison = a.uploadedAt - b.uploadedAt;
+      } else if (sortBy === "name") {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortBy === "size") {
+        comparison = a.size - b.size;
+      }
+      return sortOrder === "desc" ? -comparison : comparison;
+    });
+
+    // Apply limit
+    if (args.limit && args.limit > 0) {
+      docs = docs.slice(0, args.limit);
+    }
 
     return docs;
+  },
+});
+
+// List documents by service type with enhanced filtering
+export const listByService = query({
+  args: {
+    serviceTypeId: v.optional(v.id("serviceTypes")),
+    organizationId: v.optional(v.id("organizations")),
+    folderId: v.optional(v.id("folders")),
+    category: v.optional(v.string()),
+    fiscalYear: v.optional(v.string()),
+    searchQuery: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    sortBy: v.optional(v.union(v.literal("uploadedAt"), v.literal("name"), v.literal("size"))),
+    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    // Determine organization scope
+    let orgId: Id<"organizations"> | undefined;
+    if (user.role === "client") {
+      if (!user.organizationId) return { documents: [], total: 0 };
+      orgId = user.organizationId;
+    } else if (args.organizationId) {
+      orgId = args.organizationId;
+    }
+
+    // Base query
+    let docs: Doc<"documents">[];
+    if (orgId) {
+      if (args.serviceTypeId) {
+        docs = await ctx.db
+          .query("documents")
+          .withIndex("by_service", (q) =>
+            q.eq("organizationId", orgId!).eq("serviceTypeId", args.serviceTypeId!)
+          )
+          .collect();
+      } else {
+        docs = await ctx.db
+          .query("documents")
+          .withIndex("by_organization", (q) => q.eq("organizationId", orgId!))
+          .collect();
+      }
+    } else {
+      docs = await ctx.db.query("documents").collect();
+    }
+
+    // Filter out deleted
+    docs = docs.filter((d) => !d.isDeleted);
+
+    // Apply filters
+    if (args.serviceTypeId && !orgId) {
+      docs = docs.filter((d) => d.serviceTypeId?.toString() === args.serviceTypeId?.toString());
+    }
+    if (args.category) {
+      docs = docs.filter((d) => d.category === args.category);
+    }
+    if (args.folderId !== undefined) {
+      docs = docs.filter((d) => d.folderId === args.folderId);
+    }
+    if (args.fiscalYear) {
+      docs = docs.filter((d) => d.fiscalYear === args.fiscalYear);
+    }
+    if (args.searchQuery) {
+      const query = args.searchQuery.toLowerCase();
+      docs = docs.filter((d) =>
+        d.name.toLowerCase().includes(query) ||
+        (d.description && d.description.toLowerCase().includes(query))
+      );
+    }
+
+    // Filter by tags if specified
+    if (args.tags && args.tags.length > 0) {
+      const docIds = docs.map((d) => d._id);
+      const allTags = await ctx.db.query("documentTags").collect();
+      const taggedDocIds = new Set(
+        allTags
+          .filter((t) => args.tags!.includes(t.tag.toLowerCase()) && docIds.includes(t.documentId))
+          .map((t) => t.documentId.toString())
+      );
+      docs = docs.filter((d) => taggedDocIds.has(d._id.toString()));
+    }
+
+    const total = docs.length;
+
+    // Sort
+    const sortBy = args.sortBy ?? "uploadedAt";
+    const sortOrder = args.sortOrder ?? "desc";
+    docs.sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === "uploadedAt") {
+        comparison = a.uploadedAt - b.uploadedAt;
+      } else if (sortBy === "name") {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortBy === "size") {
+        comparison = a.size - b.size;
+      }
+      return sortOrder === "desc" ? -comparison : comparison;
+    });
+
+    // Pagination
+    const offset = args.offset ?? 0;
+    const limit = args.limit ?? 50;
+    docs = docs.slice(offset, offset + limit);
+
+    // Fetch tags for each document
+    const docsWithTags = await Promise.all(
+      docs.map(async (doc) => {
+        const tags = await ctx.db
+          .query("documentTags")
+          .withIndex("by_document", (q) => q.eq("documentId", doc._id))
+          .collect();
+        return {
+          ...doc,
+          tags: tags.map((t) => t.tag),
+        };
+      })
+    );
+
+    return { documents: docsWithTags, total };
+  },
+});
+
+// Get document statistics per service type
+export const getServiceStats = query({
+  args: {
+    organizationId: v.optional(v.id("organizations")),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    // Determine organization scope
+    let orgId: Id<"organizations"> | undefined;
+    if (user.role === "client") {
+      if (!user.organizationId) return [];
+      orgId = user.organizationId;
+    } else if (args.organizationId) {
+      orgId = args.organizationId;
+    }
+
+    // Get all service types
+    const serviceTypes = await ctx.db
+      .query("serviceTypes")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+
+    // Get documents
+    let docs: Doc<"documents">[];
+    if (orgId) {
+      docs = await ctx.db
+        .query("documents")
+        .withIndex("by_organization", (q) => q.eq("organizationId", orgId!))
+        .collect();
+    } else {
+      docs = await ctx.db.query("documents").collect();
+    }
+
+    // Filter out deleted
+    docs = docs.filter((d) => !d.isDeleted);
+
+    // Get folders count per service
+    let folders: Doc<"folders">[];
+    if (orgId) {
+      folders = await ctx.db
+        .query("folders")
+        .withIndex("by_organization", (q) => q.eq("organizationId", orgId!))
+        .collect();
+    } else {
+      folders = await ctx.db.query("folders").collect();
+    }
+
+    // Calculate stats per service type
+    const stats = serviceTypes
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .map((serviceType) => {
+        const serviceDocs = docs.filter(
+          (d) => d.serviceTypeId?.toString() === serviceType._id.toString()
+        );
+        const serviceFolders = folders.filter(
+          (f) => f.serviceTypeId?.toString() === serviceType._id.toString()
+        );
+        const lastUpload = serviceDocs.length > 0
+          ? Math.max(...serviceDocs.map((d) => d.uploadedAt))
+          : null;
+
+        return {
+          serviceType,
+          documentCount: serviceDocs.length,
+          folderCount: serviceFolders.length,
+          totalSize: serviceDocs.reduce((sum, d) => sum + d.size, 0),
+          lastUploadAt: lastUpload,
+        };
+      });
+
+    // Also include documents without service type
+    const unassignedDocs = docs.filter((d) => !d.serviceTypeId);
+    if (unassignedDocs.length > 0) {
+      stats.push({
+        serviceType: {
+          _id: null as unknown as Id<"serviceTypes">,
+          code: "unassigned",
+          name: "Uncategorized",
+          description: "Documents without service assignment",
+          icon: "FolderOpen",
+          color: "gray",
+          displayOrder: 999,
+          isActive: true,
+          createdAt: 0,
+          createdBy: null as unknown as Id<"users">,
+        },
+        documentCount: unassignedDocs.length,
+        folderCount: 0,
+        totalSize: unassignedDocs.reduce((sum, d) => sum + d.size, 0),
+        lastUploadAt: Math.max(...unassignedDocs.map((d) => d.uploadedAt)),
+      });
+    }
+
+    return stats;
+  },
+});
+
+// Search documents across all services
+export const search = query({
+  args: {
+    query: v.string(),
+    organizationId: v.optional(v.id("organizations")),
+    serviceTypeId: v.optional(v.id("serviceTypes")),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    if (!args.query.trim()) {
+      return { results: [], total: 0 };
+    }
+
+    // Determine organization scope
+    let orgId: Id<"organizations"> | undefined;
+    if (user.role === "client") {
+      if (!user.organizationId) return { results: [], total: 0 };
+      orgId = user.organizationId;
+    } else if (args.organizationId) {
+      orgId = args.organizationId;
+    }
+
+    // Get documents
+    let docs: Doc<"documents">[];
+    if (orgId) {
+      docs = await ctx.db
+        .query("documents")
+        .withIndex("by_organization", (q) => q.eq("organizationId", orgId!))
+        .collect();
+    } else {
+      docs = await ctx.db.query("documents").collect();
+    }
+
+    // Filter out deleted
+    docs = docs.filter((d) => !d.isDeleted);
+
+    // Filter by service if specified
+    if (args.serviceTypeId) {
+      docs = docs.filter((d) => d.serviceTypeId?.toString() === args.serviceTypeId?.toString());
+    }
+
+    // Search in name, description, and tags
+    const searchQuery = args.query.toLowerCase();
+
+    // Get all tags
+    const allTags = await ctx.db.query("documentTags").collect();
+    const tagsByDoc = new Map<string, string[]>();
+    for (const tag of allTags) {
+      const docId = tag.documentId.toString();
+      if (!tagsByDoc.has(docId)) {
+        tagsByDoc.set(docId, []);
+      }
+      tagsByDoc.get(docId)!.push(tag.tag);
+    }
+
+    // Filter and score results
+    const results = docs
+      .map((doc) => {
+        const docTags = tagsByDoc.get(doc._id.toString()) || [];
+        const nameMatch = doc.name.toLowerCase().includes(searchQuery);
+        const descMatch = doc.description?.toLowerCase().includes(searchQuery);
+        const tagMatch = docTags.some((t) => t.toLowerCase().includes(searchQuery));
+
+        if (!nameMatch && !descMatch && !tagMatch) {
+          return null;
+        }
+
+        // Score: name matches highest, then description, then tags
+        let score = 0;
+        if (nameMatch) score += 3;
+        if (descMatch) score += 2;
+        if (tagMatch) score += 1;
+
+        return { ...doc, tags: docTags, score };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null)
+      .sort((a, b) => b.score - a.score);
+
+    const total = results.length;
+    const limit = args.limit ?? 20;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const limitedResults = results.slice(0, limit).map(({ score, ...doc }) => doc);
+
+    // Group by service type for display
+    const serviceTypes = await ctx.db
+      .query("serviceTypes")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+    const serviceMap = new Map(serviceTypes.map((s) => [s._id.toString(), s]));
+
+    const groupedByService = limitedResults.reduce(
+      (acc, doc) => {
+        const serviceId = doc.serviceTypeId?.toString() ?? "unassigned";
+        if (!acc[serviceId]) {
+          acc[serviceId] = {
+            serviceType: doc.serviceTypeId ? serviceMap.get(serviceId) : null,
+            documents: [],
+          };
+        }
+        acc[serviceId].documents.push(doc);
+        return acc;
+      },
+      {} as Record<string, { serviceType: Doc<"serviceTypes"> | null; documents: typeof limitedResults }>
+    );
+
+    return {
+      results: limitedResults,
+      groupedByService: Object.values(groupedByService),
+      total,
+    };
   },
 });
 
@@ -85,6 +484,34 @@ export const get = query({
     }
 
     return doc;
+  },
+});
+
+// Get download URL for a document (query version for reactive updates)
+export const getDownloadUrl = query({
+  args: { id: v.id("documents") },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.id);
+
+    if (!doc || doc.isDeleted) {
+      return null;
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        return null;
+      }
+    }
+
+    // Get URL from Convex storage
+    if (doc.convexStorageId) {
+      const url = await ctx.storage.getUrl(doc.convexStorageId as Id<"_storage">);
+      return url;
+    }
+
+    return null;
   },
 });
 
@@ -134,6 +561,12 @@ export const create = mutation({
       v.literal("other")
     ),
     folderId: v.optional(v.id("folders")),
+    // New fields for enhanced document metadata
+    serviceTypeId: v.optional(v.id("serviceTypes")),
+    description: v.optional(v.string()),
+    fiscalYear: v.optional(v.string()),
+    fiscalPeriod: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
@@ -151,6 +584,32 @@ export const create = mutation({
       }
     }
 
+    // Validate service type if provided
+    if (args.serviceTypeId) {
+      const serviceType = await ctx.db.get(args.serviceTypeId);
+      if (!serviceType) {
+        throw new Error("Service type not found");
+      }
+      if (!serviceType.isActive) {
+        throw new Error("Service type is not active");
+      }
+
+      // For clients, verify they have access to this service
+      if (user.role === "client") {
+        const subscription = await ctx.db
+          .query("clientSubscriptions")
+          .withIndex("by_org_status", (q) =>
+            q.eq("organizationId", args.organizationId).eq("status", "active")
+          )
+          .filter((q) => q.eq(q.field("serviceTypeId"), args.serviceTypeId!))
+          .first();
+
+        if (!subscription) {
+          throw new Error("Your organization does not have access to this service");
+        }
+      }
+    }
+
     // Validate folder if provided
     if (args.folderId) {
       const folder = await ctx.db.get(args.folderId);
@@ -159,6 +618,12 @@ export const create = mutation({
       }
       if (folder.organizationId.toString() !== args.organizationId.toString()) {
         throw new Error("Folder belongs to different organization");
+      }
+      // If folder has a service type, document should match
+      if (folder.serviceTypeId && args.serviceTypeId) {
+        if (folder.serviceTypeId.toString() !== args.serviceTypeId.toString()) {
+          throw new Error("Document service type must match folder service type");
+        }
       }
     }
 
@@ -173,15 +638,47 @@ export const create = mutation({
     const docId = await ctx.db.insert("documents", {
       organizationId: args.organizationId,
       folderId: args.folderId,
+      serviceTypeId: args.serviceTypeId,
       name: args.name.trim(),
       type: args.type,
       size: args.size,
       storageKey: args.storageKey,
       convexStorageId: args.convexStorageId,
       category: args.category,
+      description: args.description?.trim(),
+      fiscalYear: args.fiscalYear,
+      fiscalPeriod: args.fiscalPeriod,
+      currentVersion: 1,
       uploadedBy: user._id,
       uploadedAt: Date.now(),
     });
+
+    // Create initial version record
+    await ctx.db.insert("documentVersions", {
+      documentId: docId,
+      version: 1,
+      storageKey: args.storageKey,
+      convexStorageId: args.convexStorageId,
+      size: args.size,
+      uploadedBy: user._id,
+      uploadedAt: Date.now(),
+      changeNote: "Initial upload",
+    });
+
+    // Create tags if provided
+    if (args.tags && args.tags.length > 0) {
+      for (const tag of args.tags) {
+        const normalizedTag = tag.toLowerCase().trim();
+        if (normalizedTag) {
+          await ctx.db.insert("documentTags", {
+            documentId: docId,
+            tag: normalizedTag,
+            createdAt: Date.now(),
+            createdBy: user._id,
+          });
+        }
+      }
+    }
 
     // Log activity
     await ctx.db.insert("activityLogs", {
@@ -191,6 +688,11 @@ export const create = mutation({
       resourceType: "document",
       resourceId: docId,
       resourceName: args.name.trim(),
+      metadata: {
+        serviceTypeId: args.serviceTypeId,
+        category: args.category,
+        fiscalYear: args.fiscalYear,
+      },
       createdAt: Date.now(),
     });
 
@@ -252,6 +754,509 @@ export const remove = mutation({
       resourceName: doc.name,
       createdAt: Date.now(),
     });
+  },
+});
+
+// Update document metadata
+export const update = mutation({
+  args: {
+    id: v.id("documents"),
+    name: v.optional(v.string()),
+    description: v.optional(v.string()),
+    category: v.optional(
+      v.union(
+        v.literal("tax_return"),
+        v.literal("financial_statement"),
+        v.literal("invoice"),
+        v.literal("agreement"),
+        v.literal("receipt"),
+        v.literal("other")
+      )
+    ),
+    serviceTypeId: v.optional(v.id("serviceTypes")),
+    folderId: v.optional(v.id("folders")),
+    fiscalYear: v.optional(v.string()),
+    fiscalPeriod: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.id);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    // Validate service type if changing
+    if (args.serviceTypeId !== undefined) {
+      if (args.serviceTypeId) {
+        const serviceType = await ctx.db.get(args.serviceTypeId);
+        if (!serviceType || !serviceType.isActive) {
+          throw new Error("Invalid service type");
+        }
+      }
+    }
+
+    // Validate folder if changing
+    if (args.folderId !== undefined && args.folderId) {
+      const folder = await ctx.db.get(args.folderId);
+      if (!folder) {
+        throw new Error("Folder not found");
+      }
+      if (folder.organizationId.toString() !== doc.organizationId.toString()) {
+        throw new Error("Folder belongs to different organization");
+      }
+    }
+
+    const updates: Partial<typeof doc> = {};
+    if (args.name !== undefined) updates.name = args.name.trim();
+    if (args.description !== undefined) updates.description = args.description?.trim();
+    if (args.category !== undefined) updates.category = args.category;
+    if (args.serviceTypeId !== undefined) updates.serviceTypeId = args.serviceTypeId;
+    if (args.folderId !== undefined) updates.folderId = args.folderId;
+    if (args.fiscalYear !== undefined) updates.fiscalYear = args.fiscalYear;
+    if (args.fiscalPeriod !== undefined) updates.fiscalPeriod = args.fiscalPeriod;
+
+    await ctx.db.patch(args.id, updates);
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: doc.organizationId,
+      userId: user._id,
+      action: "updated_document",
+      resourceType: "document",
+      resourceId: args.id,
+      resourceName: args.name?.trim() ?? doc.name,
+      createdAt: Date.now(),
+    });
+
+    return args.id;
+  },
+});
+
+// Add tags to a document
+export const addTags = mutation({
+  args: {
+    documentId: v.id("documents"),
+    tags: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    // Get existing tags
+    const existingTags = await ctx.db
+      .query("documentTags")
+      .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
+      .collect();
+    const existingTagSet = new Set(existingTags.map((t) => t.tag));
+
+    // Add new tags
+    const addedTags: string[] = [];
+    for (const tag of args.tags) {
+      const normalizedTag = tag.toLowerCase().trim();
+      if (normalizedTag && !existingTagSet.has(normalizedTag)) {
+        await ctx.db.insert("documentTags", {
+          documentId: args.documentId,
+          tag: normalizedTag,
+          createdAt: Date.now(),
+          createdBy: user._id,
+        });
+        addedTags.push(normalizedTag);
+      }
+    }
+
+    return { added: addedTags.length, tags: addedTags };
+  },
+});
+
+// Remove tags from a document
+export const removeTags = mutation({
+  args: {
+    documentId: v.id("documents"),
+    tags: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    const tagsToRemove = new Set(args.tags.map((t) => t.toLowerCase().trim()));
+    const existingTags = await ctx.db
+      .query("documentTags")
+      .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
+      .collect();
+
+    let removed = 0;
+    for (const tag of existingTags) {
+      if (tagsToRemove.has(tag.tag)) {
+        await ctx.db.delete(tag._id);
+        removed++;
+      }
+    }
+
+    return { removed };
+  },
+});
+
+// Get tags for a document
+export const getTags = query({
+  args: {
+    documentId: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    const tags = await ctx.db
+      .query("documentTags")
+      .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
+      .collect();
+
+    return tags.map((t) => t.tag);
+  },
+});
+
+// Get version history for a document
+export const getVersionHistory = query({
+  args: {
+    documentId: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    const versions = await ctx.db
+      .query("documentVersions")
+      .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
+      .collect();
+
+    // Fetch uploader names
+    const versionsWithUploaders = await Promise.all(
+      versions.map(async (v) => {
+        const uploader = await ctx.db.get(v.uploadedBy);
+        return {
+          ...v,
+          uploaderName: uploader?.name ?? "Unknown",
+        };
+      })
+    );
+
+    // Sort by version descending
+    return versionsWithUploaders.sort((a, b) => b.version - a.version);
+  },
+});
+
+// Get download URL for a specific version
+export const getVersionDownloadUrl = query({
+  args: {
+    versionId: v.id("documentVersions"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const version = await ctx.db.get(args.versionId);
+
+    if (!version) {
+      return null;
+    }
+
+    // Get parent document to check access
+    const doc = await ctx.db.get(version.documentId);
+    if (!doc || doc.isDeleted) {
+      return null;
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        return null;
+      }
+    }
+
+    // Get URL from Convex storage
+    if (version.convexStorageId) {
+      const url = await ctx.storage.getUrl(version.convexStorageId as Id<"_storage">);
+      return url;
+    }
+
+    return null;
+  },
+});
+
+// Upload a new version of a document
+export const uploadNewVersion = mutation({
+  args: {
+    documentId: v.id("documents"),
+    storageKey: v.string(),
+    convexStorageId: v.optional(v.string()),
+    size: v.number(),
+    changeNote: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    const newVersion = (doc.currentVersion ?? 1) + 1;
+
+    // Create version record
+    await ctx.db.insert("documentVersions", {
+      documentId: args.documentId,
+      version: newVersion,
+      storageKey: args.storageKey,
+      convexStorageId: args.convexStorageId,
+      size: args.size,
+      uploadedBy: user._id,
+      uploadedAt: Date.now(),
+      changeNote: args.changeNote?.trim(),
+    });
+
+    // Update document with new version info
+    await ctx.db.patch(args.documentId, {
+      storageKey: args.storageKey,
+      convexStorageId: args.convexStorageId,
+      size: args.size,
+      currentVersion: newVersion,
+      uploadedBy: user._id,
+      uploadedAt: Date.now(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: doc.organizationId,
+      userId: user._id,
+      action: "uploaded_new_version",
+      resourceType: "document",
+      resourceId: args.documentId,
+      resourceName: doc.name,
+      metadata: { version: newVersion },
+      createdAt: Date.now(),
+    });
+
+    return { version: newVersion };
+  },
+});
+
+// Log document access (for audit trail)
+export const logAccess = mutation({
+  args: {
+    documentId: v.id("documents"),
+    action: v.union(v.literal("view"), v.literal("download"), v.literal("preview")),
+    ipAddress: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    await ctx.db.insert("documentAccessLogs", {
+      documentId: args.documentId,
+      userId: user._id,
+      action: args.action,
+      ipAddress: args.ipAddress,
+      userAgent: args.userAgent,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Get access logs for a document (admin only)
+export const getAccessLogs = query({
+  args: {
+    documentId: v.id("documents"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    await requireAdminOrStaff(ctx);
+
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    const logs = await ctx.db
+      .query("documentAccessLogs")
+      .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
+      .order("desc")
+      .take(args.limit ?? 50);
+
+    // Fetch user names
+    const logsWithUsers = await Promise.all(
+      logs.map(async (log) => {
+        const user = await ctx.db.get(log.userId);
+        return {
+          ...log,
+          userName: user?.name ?? "Unknown",
+          userEmail: user?.email ?? "Unknown",
+        };
+      })
+    );
+
+    return logsWithUsers;
+  },
+});
+
+// Move document to a different folder
+export const moveToFolder = mutation({
+  args: {
+    documentId: v.id("documents"),
+    folderId: v.optional(v.id("folders")),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (doc.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    // Validate new folder if provided
+    if (args.folderId) {
+      const folder = await ctx.db.get(args.folderId);
+      if (!folder) {
+        throw new Error("Folder not found");
+      }
+      if (folder.organizationId.toString() !== doc.organizationId.toString()) {
+        throw new Error("Cannot move document to folder in different organization");
+      }
+    }
+
+    await ctx.db.patch(args.documentId, {
+      folderId: args.folderId,
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: doc.organizationId,
+      userId: user._id,
+      action: "moved_document",
+      resourceType: "document",
+      resourceId: args.documentId,
+      resourceName: doc.name,
+      createdAt: Date.now(),
+    });
+
+    return { success: true };
+  },
+});
+
+// Move document to a different service
+export const moveToService = mutation({
+  args: {
+    documentId: v.id("documents"),
+    serviceTypeId: v.optional(v.id("serviceTypes")),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAdminOrStaff(ctx);
+    const doc = await ctx.db.get(args.documentId);
+
+    if (!doc) {
+      throw new Error("Document not found");
+    }
+
+    // Validate new service type if provided
+    if (args.serviceTypeId) {
+      const serviceType = await ctx.db.get(args.serviceTypeId);
+      if (!serviceType || !serviceType.isActive) {
+        throw new Error("Invalid service type");
+      }
+    }
+
+    await ctx.db.patch(args.documentId, {
+      serviceTypeId: args.serviceTypeId,
+      folderId: undefined, // Clear folder when changing service
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: doc.organizationId,
+      userId: user._id,
+      action: "changed_document_service",
+      resourceType: "document",
+      resourceId: args.documentId,
+      resourceName: doc.name,
+      metadata: { newServiceTypeId: args.serviceTypeId },
+      createdAt: Date.now(),
+    });
+
+    return { success: true };
   },
 });
 

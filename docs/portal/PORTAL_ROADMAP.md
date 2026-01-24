@@ -1,7 +1,7 @@
 # Client Portal Roadmap
 ## Amjad & Hazli - AI-Native Chartered Accounting Firm
 
-> **Status:** Enhancement Phase 1 Complete
+> **Status:** Enhancement Phase 2 Complete
 > **Last Updated:** 2026-01-24
 > **Current Phase:** Production with Enhancements
 
@@ -21,7 +21,7 @@ A secure client portal for Amjad & Hazli's accounting clients to access document
 |-------|------------|--------|
 | **Frontend** | React 19 + Vite 7 | Fast SPA, excellent Convex integration |
 | **Routing** | React Router v7 | Standard, well-supported |
-| **Styling** | Tailwind CSS v3 + shadcn/ui | Utility-first, beautiful components |
+| **Styling** | Tailwind CSS v4 + shadcn/ui | Utility-first, beautiful components |
 | **Forms** | React Hook Form + Zod | Type-safe validation |
 | **Backend** | Convex | Real-time, serverless, TypeScript-native |
 | **Auth** | WorkOS AuthKit | Google OAuth, email/password, enterprise SSO ready |
@@ -215,22 +215,87 @@ Core improvements for accounting firm workflows based on product audit.
 
 ---
 
+### Enhancement Phase 2: Service-Based Document Management
+**Status:** Complete
+
+Major restructuring of document management with service-based organization.
+
+- [x] **Service Types System** - Categorize documents by accounting services
+  - New `serviceTypes` table for service definitions (Tax Returns, Bookkeeping, etc.)
+  - Service icons and colors with admin configuration
+  - Admin service management page (`/admin/services`)
+
+- [x] **Client Subscriptions** - Track which services each client subscribes to
+  - New `clientSubscriptions` table linking organizations to services
+  - Admin UI for managing client service subscriptions
+  - Service-filtered document views
+
+- [x] **Folder Organization** - Hierarchical document storage
+  - New `folders` table with parent/child relationships
+  - Folder browser with breadcrumb navigation
+  - Create, rename, delete folders within services
+  - Color-coded folders with document counts
+
+- [x] **Document Versioning** - Track document history
+  - New `documentVersions` table for version tracking
+  - Version history modal with download access
+  - Automatic version incrementing on re-upload
+
+- [x] **Enhanced Document UI** - Completely redesigned document experience
+  - Service tabs navigation with document counts
+  - Service overview grid showing all subscribed services
+  - Folder browser with visual hierarchy
+  - Document cards with service badges and metadata
+  - Category and search filtering
+  - Preview modal for PDFs and images
+
+- [x] **Code Refactoring** - Major code quality improvements
+  - Extracted `UploadDocumentDialog` component (~620 lines → separate file)
+  - Reduced `Documents.tsx` from 1,335 lines to 705 lines (47% reduction)
+  - Centralized constants: `lib/constants/services.ts`, `lib/constants/categories.ts`
+  - Created `useTableFilters` hook for reusable table filtering
+  - Added missing UI components: `switch.tsx`, `sheet.tsx`
+
+**Key Files Added:**
+- `convex/serviceTypes.ts` - Service type CRUD operations
+- `convex/subscriptions.ts` - Client subscription management
+- `convex/folders.ts` - Folder CRUD with breadcrumb queries
+- `src/pages/admin/AdminServices.tsx` - Service management admin page
+- `src/components/documents/UploadDocumentDialog.tsx` - Extracted upload dialog
+- `src/components/documents/ServiceTabsNav.tsx` - Service tab navigation
+- `src/components/documents/ServiceOverviewCard.tsx` - Service overview grid
+- `src/components/documents/FolderCard.tsx` - Folder display components
+- `src/components/documents/FolderBrowser.tsx` - Folder navigation
+- `src/components/documents/Breadcrumb.tsx` - Breadcrumb navigation
+- `src/components/documents/DocumentVersionHistory.tsx` - Version history modal
+- `src/lib/constants/services.ts` - Service icon/color mappings
+- `src/lib/constants/categories.ts` - Document category constants
+- `src/hooks/useTableFilters.ts` - Reusable table filtering hook
+
+**Schema Changes:**
+- Added `serviceTypes` table with icon, color, displayOrder
+- Added `clientSubscriptions` table linking orgs to services
+- Added `folders` table with parentId for hierarchy
+- Added `documentVersions` table for version history
+- Updated `documents` table with serviceTypeId, folderId, currentVersion
+
+---
+
 ## Future Enhancements
 
-### Enhancement Phase 2 (Planned)
-- [ ] Folder organization for documents
+### Enhancement Phase 3 (Planned)
 - [ ] Task reminders & due date alerts (cron jobs)
 - [ ] Stripe payment integration (payment links, webhooks)
 - [ ] Document search (full-text on name/description)
 
-### Enhancement Phase 3 (Planned)
+### Enhancement Phase 4 (Planned)
 - [ ] Task templates for common workflows
 - [ ] Recurring tasks (weekly, monthly, quarterly)
 - [ ] Client financial summary dashboard
 - [ ] Multi-party signatures
 
-### Enhancement Phase 4 (Planned)
-- [ ] Bulk operations (assign, update, status change)
+### Enhancement Phase 5 (Planned)
+- [ ] Advanced bulk operations (assign, update, status change)
 - [ ] Client onboarding templates
 - [ ] Activity analytics and reporting
 
@@ -246,6 +311,13 @@ Core improvements for accounting firm workflows based on product audit.
 
 | Date | Phase | Changes |
 |------|-------|---------|
+| 2026-01-24 | Enhancement 2 | Added service types system for document categorization |
+| 2026-01-24 | Enhancement 2 | Added client subscriptions linking clients to services |
+| 2026-01-24 | Enhancement 2 | Added folder organization with hierarchical navigation |
+| 2026-01-24 | Enhancement 2 | Added document versioning with history modal |
+| 2026-01-24 | Enhancement 2 | Redesigned Documents page with service tabs and folder browser |
+| 2026-01-24 | Enhancement 2 | Major code refactoring: extracted components, centralized constants |
+| 2026-01-24 | Enhancement 2 | Created admin service management page |
 | 2026-01-24 | Enhancement 1 | Added document request workflow with status tracking |
 | 2026-01-24 | Enhancement 1 | Added task comments for collaboration |
 | 2026-01-24 | Enhancement 1 | Implemented Resend email notifications with user preferences |

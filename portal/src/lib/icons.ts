@@ -14,9 +14,12 @@
 export {
   // Navigation & Layout
   LayoutDashboard,
+  LayoutGrid,
+  Layers,
   Menu,
   X,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   ChevronUp,
   ArrowRight,
@@ -67,9 +70,11 @@ export {
 
   // Business & Finance
   Building2,
+  Calculator,
   Receipt,
   CreditCard,
   TrendingUp,
+  Lightbulb,
 
   // Actions & Tools
   Search,
@@ -84,6 +89,8 @@ export {
   MoreHorizontal,
   RefreshCw,
   Loader2,
+  SlidersHorizontal,
+  ArrowUpDown,
 
   // Content & Info
   Calendar,
@@ -100,4 +107,8 @@ export {
   ScrollText,
   Maximize2,
   Minimize2,
+  Tag,
+  ZoomIn,
+  ZoomOut,
+  RotateCw,
 } from "lucide-react";
