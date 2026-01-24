@@ -189,7 +189,7 @@
     }
     .btn-primary { background: var(--color-accent); color: white; }
     .btn-primary:hover { background: var(--color-accent-hover); }
-    .btn-secondary { background: var(--color-white); color: var(--color-text-primary); border: 1px solid var(--color-gray-400); }
+    .btn-secondary { background: #ffffff; color: var(--color-text-primary); border: 1px solid var(--color-gray-400); }
 
     /* Page Header */
     .page-header {
@@ -227,12 +227,12 @@
     /* Calendar Section */
     .calendar-section {
       padding: var(--space-16) 0 var(--space-20);
-      background: var(--color-white);
+      background: #ffffff;
     }
     .calendar-container {
       max-width: 1000px;
       margin: 0 auto;
-      background: var(--color-white);
+      background: #ffffff;
       border-radius: var(--radius-md);
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
       overflow: hidden;
@@ -245,7 +245,7 @@
     /* Footer */
     .footer {
       padding: var(--space-16) 0;
-      background: var(--color-white);
+      background: #ffffff;
       border-top: 1px solid var(--color-border-light);
     }
     .footer-content {
@@ -391,7 +391,10 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: var(--color-white);
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: #ffffff;
         padding: 80px var(--space-6) var(--space-8);
         padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
         flex-direction: column;
@@ -600,7 +603,7 @@
       align-items: center;
       gap: var(--space-3);
       padding: var(--space-3) var(--space-4);
-      background: var(--color-white);
+      background: #ffffff;
       border: 1px solid var(--color-gray-200);
       border-radius: 6px;
     }
@@ -651,7 +654,7 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: var(--color-white);
+      background: #ffffff;
       border: 1px solid var(--color-gray-200);
       color: var(--color-text-tertiary);
       transition: all 0.15s ease;
