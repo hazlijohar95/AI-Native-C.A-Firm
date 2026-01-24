@@ -563,7 +563,7 @@
         min-height: 44px;
       }
       .nav-links {
-        display: none; /* Hidden by default on mobile */
+        display: flex; /* Always flex, use visibility to hide */
         position: fixed;
         top: 0;
         left: 0;
@@ -579,6 +579,7 @@
         transform: translateX(100%);
         opacity: 0;
         visibility: hidden;
+        pointer-events: none;
         transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1),
                     opacity 0.25s ease,
                     visibility 0.35s;
@@ -586,10 +587,10 @@
         -webkit-overflow-scrolling: touch;
       }
       .nav-links.active {
-        display: flex;
         transform: translateX(0);
         opacity: 1;
         visibility: visible;
+        pointer-events: auto;
       }
       .nav-links .nav-link {
         display: flex;
