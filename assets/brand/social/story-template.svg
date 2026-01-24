@@ -31,7 +31,7 @@
     <!-- H crossbar -->
     <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
     <!-- Inner curve -->
-    <path d="M30 100Q60 120 90 100" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+    <path d="M40 102Q60 110 80 102" stroke="url(#gold)" stroke-width="1.5" fill="none" opacity="0.4"/>
   </g>
 
   <!-- Horizontal divider line -->
