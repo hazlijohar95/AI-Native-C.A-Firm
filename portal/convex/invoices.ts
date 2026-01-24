@@ -138,6 +138,162 @@ export const countPending = query({
   },
 });
 
+// Get financial summary for dashboard
+export const getFinancialSummary = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+    const now = Date.now();
+
+    // Get date boundaries
+    const today = new Date(now);
+    const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1).getTime();
+    const lastMonthEnd = currentMonthStart - 1;
+    const yearStart = new Date(today.getFullYear(), 0, 1).getTime();
+
+    // Aging buckets (in days)
+    const thirtyDaysAgo = now - (30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = now - (60 * 24 * 60 * 60 * 1000);
+    const ninetyDaysAgo = now - (90 * 24 * 60 * 60 * 1000);
+
+    let invoices;
+    let payments;
+
+    if (user.role === "admin" || user.role === "staff") {
+      invoices = await ctx.db.query("invoices").collect();
+      payments = await ctx.db.query("payments").collect();
+    } else if (user.organizationId) {
+      invoices = await ctx.db
+        .query("invoices")
+        .withIndex("by_organization", (q) => q.eq("organizationId", user.organizationId!))
+        .collect();
+      payments = await ctx.db
+        .query("payments")
+        .withIndex("by_organization", (q) => q.eq("organizationId", user.organizationId!))
+        .collect();
+      // Exclude drafts for clients
+      invoices = invoices.filter((inv) => inv.status !== "draft");
+    } else {
+      return {
+        currentMonth: { invoiced: 0, paid: 0 },
+        lastMonth: { invoiced: 0, paid: 0 },
+        ytd: { invoiced: 0, paid: 0 },
+        outstanding: {
+          total: 0,
+          aging: { current: 0, thirtyDays: 0, sixtyDays: 0, ninetyPlus: 0 },
+        },
+        avgDaysToPayment: 0,
+        monthlyTrend: [],
+      };
+    }
+
+    // Calculate totals
+    // Current month invoiced
+    const currentMonthInvoiced = invoices
+      .filter((inv) => inv.issuedDate >= currentMonthStart && inv.status !== "cancelled")
+      .reduce((sum, inv) => sum + inv.amount, 0);
+
+    // Current month paid
+    const currentMonthPaid = payments
+      .filter((p) => p.paidAt >= currentMonthStart && p.status === "completed")
+      .reduce((sum, p) => sum + p.amount, 0);
+
+    // Last month invoiced
+    const lastMonthInvoiced = invoices
+      .filter((inv) => inv.issuedDate >= lastMonthStart && inv.issuedDate <= lastMonthEnd && inv.status !== "cancelled")
+      .reduce((sum, inv) => sum + inv.amount, 0);
+
+    // Last month paid
+    const lastMonthPaid = payments
+      .filter((p) => p.paidAt >= lastMonthStart && p.paidAt <= lastMonthEnd && p.status === "completed")
+      .reduce((sum, p) => sum + p.amount, 0);
+
+    // YTD invoiced
+    const ytdInvoiced = invoices
+      .filter((inv) => inv.issuedDate >= yearStart && inv.status !== "cancelled")
+      .reduce((sum, inv) => sum + inv.amount, 0);
+
+    // YTD paid
+    const ytdPaid = payments
+      .filter((p) => p.paidAt >= yearStart && p.status === "completed")
+      .reduce((sum, p) => sum + p.amount, 0);
+
+    // Outstanding invoices with aging
+    const outstandingInvoices = invoices.filter(
+      (inv) => inv.status === "pending" || inv.status === "overdue"
+    );
+
+    const totalOutstanding = outstandingInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+
+    // Aging buckets based on due date
+    const aging = {
+      current: 0,      // Not yet due
+      thirtyDays: 0,   // 1-30 days overdue
+      sixtyDays: 0,    // 31-60 days overdue
+      ninetyPlus: 0,   // 90+ days overdue
+    };
+
+    for (const inv of outstandingInvoices) {
+      if (inv.dueDate >= now) {
+        aging.current += inv.amount;
+      } else if (inv.dueDate >= thirtyDaysAgo) {
+        aging.thirtyDays += inv.amount;
+      } else if (inv.dueDate >= sixtyDaysAgo) {
+        aging.sixtyDays += inv.amount;
+      } else {
+        aging.ninetyPlus += inv.amount;
+      }
+    }
+
+    // Average days to payment for paid invoices
+    const paidInvoices = invoices.filter((inv) => inv.status === "paid" && inv.paidAt);
+    let avgDaysToPayment = 0;
+    if (paidInvoices.length > 0) {
+      const totalDays = paidInvoices.reduce((sum, inv) => {
+        const daysToPay = Math.floor((inv.paidAt! - inv.issuedDate) / (24 * 60 * 60 * 1000));
+        return sum + Math.max(0, daysToPay);
+      }, 0);
+      avgDaysToPayment = Math.round(totalDays / paidInvoices.length);
+    }
+
+    // Monthly trend (last 6 months)
+    const monthlyTrend = [];
+    for (let i = 5; i >= 0; i--) {
+      const monthDate = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const monthStart = monthDate.getTime();
+      const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1).getTime() - 1;
+
+      const monthInvoiced = invoices
+        .filter((inv) => inv.issuedDate >= monthStart && inv.issuedDate <= monthEnd && inv.status !== "cancelled")
+        .reduce((sum, inv) => sum + inv.amount, 0);
+
+      const monthPaid = payments
+        .filter((p) => p.paidAt >= monthStart && p.paidAt <= monthEnd && p.status === "completed")
+        .reduce((sum, p) => sum + p.amount, 0);
+
+      monthlyTrend.push({
+        month: monthDate.toLocaleString("default", { month: "short" }),
+        year: monthDate.getFullYear(),
+        invoiced: monthInvoiced,
+        paid: monthPaid,
+      });
+    }
+
+    return {
+      currentMonth: { invoiced: currentMonthInvoiced, paid: currentMonthPaid },
+      lastMonth: { invoiced: lastMonthInvoiced, paid: lastMonthPaid },
+      ytd: { invoiced: ytdInvoiced, paid: ytdPaid },
+      outstanding: {
+        total: totalOutstanding,
+        aging,
+      },
+      avgDaysToPayment,
+      monthlyTrend,
+    };
+  },
+});
+
 // Get payment history for an invoice
 export const getPayments = query({
   args: { invoiceId: v.id("invoices") },

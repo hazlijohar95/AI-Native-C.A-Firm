@@ -108,6 +108,9 @@ export const listTemplateSubscribers = query({
   },
 });
 
+// Alias for admin UI compatibility
+export const listSubscriptions = listTemplateSubscribers;
+
 // ============================================
 // MUTATIONS
 // ============================================
@@ -391,6 +394,29 @@ export const unsubscribeOrganization = mutation({
     }
 
     await ctx.db.delete(args.subscriptionId);
+  },
+});
+
+// Alternative unsubscribe using template and organization IDs (for admin UI)
+export const unsubscribeByIds = mutation({
+  args: {
+    templateId: v.id("taskTemplates"),
+    organizationId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    await requireAdminOrStaff(ctx);
+
+    const subscription = await ctx.db
+      .query("organizationTemplates")
+      .withIndex("by_template", (q) => q.eq("templateId", args.templateId))
+      .filter((q) => q.eq(q.field("organizationId"), args.organizationId))
+      .first();
+
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
+
+    await ctx.db.delete(subscription._id);
   },
 });
 

@@ -511,6 +511,23 @@ export const sign = action({
       throw new Error("User not found");
     }
 
+    // Validate signing authorization
+    // Users can only sign if they are a member of the organization OR a designated signer
+    const isOrgMember = user.organizationId?.toString() === request.organizationId.toString();
+
+    // Check if user is a designated signer (for multi-party signatures)
+    let isDesignatedSigner = false;
+    if (request.signerCount && request.signerCount > 1) {
+      const signers = await ctx.runQuery(api.signatures.getSigners, { requestId: args.requestId });
+      isDesignatedSigner = signers.some(
+        (s) => s.userId?.toString() === user._id.toString() || s.email.toLowerCase() === user.email.toLowerCase()
+      );
+    }
+
+    if (!isOrgMember && !isDesignatedSigner) {
+      throw new Error("You are not authorized to sign this document. Only organization members or designated signers can sign.");
+    }
+
     // Validate inputs
     if (!args.legalName.trim()) {
       throw new Error("Legal name is required");
@@ -551,12 +568,15 @@ export const sign = action({
           );
         }
       } catch (error) {
-        // If it's a document integrity error, re-throw it (security-critical)
+        // All hash verification failures should block signing for security
         if (error instanceof DocumentIntegrityError) {
           throw error;
         }
-        // For other errors (network issues, etc.), log but continue
-        console.error("Hash verification error (non-fatal):", error);
+        // Treat any other error as an integrity failure to prevent signing unverified documents
+        console.error("Hash verification error:", error);
+        throw new DocumentIntegrityError(
+          "Cannot verify document integrity. Please try again or contact support."
+        );
       }
     }
 
@@ -647,6 +667,468 @@ export const cancel = mutation({
       resourceId: args.id,
       resourceName: request.title,
     });
+  },
+});
+
+// ============================================
+// MULTI-PARTY SIGNATURE QUERIES
+// ============================================
+
+// Get all signers for a signature request
+export const getSigners = query({
+  args: { requestId: v.id("signatureRequests") },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const request = await ctx.db.get(args.requestId);
+
+    if (!request) {
+      return [];
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (request.organizationId.toString() !== user.organizationId?.toString()) {
+        throw new Error("Access denied");
+      }
+    }
+
+    const signers = await ctx.db
+      .query("signatureRequestSigners")
+      .withIndex("by_request", (q) => q.eq("signatureRequestId", args.requestId))
+      .collect();
+
+    // Sort by sequence
+    signers.sort((a, b) => a.sequence - b.sequence);
+
+    return signers;
+  },
+});
+
+// Check if the current user can sign a request (for sequential signing)
+export const canUserSign = query({
+  args: { requestId: v.id("signatureRequests") },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const request = await ctx.db.get(args.requestId);
+
+    if (!request) {
+      return { canSign: false, reason: "Request not found" };
+    }
+
+    if (request.status !== "pending") {
+      return { canSign: false, reason: `Request is ${request.status}` };
+    }
+
+    // Check access
+    if (user.role === "client") {
+      if (request.organizationId.toString() !== user.organizationId?.toString()) {
+        return { canSign: false, reason: "Access denied" };
+      }
+    }
+
+    // If not a multi-party request, any user in org can sign
+    if (!request.signerCount || request.signerCount <= 1) {
+      return { canSign: true, reason: null };
+    }
+
+    // Find this user in the signers list
+    const signers = await ctx.db
+      .query("signatureRequestSigners")
+      .withIndex("by_request", (q) => q.eq("signatureRequestId", args.requestId))
+      .collect();
+
+    const userSigner = signers.find(
+      (s) => s.userId?.toString() === user._id.toString() || s.email === user.email
+    );
+
+    if (!userSigner) {
+      return { canSign: false, reason: "You are not a designated signer for this request" };
+    }
+
+    if (userSigner.status === "signed") {
+      return { canSign: false, reason: "You have already signed this document" };
+    }
+
+    if (userSigner.status === "declined") {
+      return { canSign: false, reason: "You have declined this request" };
+    }
+
+    // If sequential signing is required, check if it's this user's turn
+    if (request.requireSequential) {
+      // Get all signers with lower sequence numbers
+      const priorSigners = signers.filter((s) => s.sequence < userSigner.sequence);
+      const allPriorSigned = priorSigners.every((s) => s.status === "signed");
+
+      if (!allPriorSigned) {
+        return { canSign: false, reason: "Waiting for previous signers to complete" };
+      }
+    }
+
+    return { canSign: true, reason: null };
+  },
+});
+
+// ============================================
+// MULTI-PARTY SIGNATURE MUTATIONS
+// ============================================
+
+// Create a multi-party signature request
+export const createMultiParty = mutation({
+  args: {
+    organizationId: v.id("organizations"),
+    documentId: v.id("documents"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    expiresAt: v.optional(v.number()),
+    signers: v.array(v.object({
+      userId: v.optional(v.id("users")),
+      email: v.string(),
+      name: v.string(),
+      sequence: v.number(),
+    })),
+    requireAll: v.boolean(),
+    requireSequential: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAdminOrStaff(ctx);
+
+    // Validate organization exists
+    const org = await ctx.db.get(args.organizationId);
+    if (!org) {
+      throw new Error("Organization not found");
+    }
+
+    // Validate document exists
+    const document = await ctx.db.get(args.documentId);
+    if (!document) {
+      throw new Error("Document not found");
+    }
+    if (document.organizationId.toString() !== args.organizationId.toString()) {
+      throw new Error("Document does not belong to this organization");
+    }
+
+    // Validate title
+    if (!args.title.trim()) {
+      throw new Error("Title is required");
+    }
+    if (args.title.length > 200) {
+      throw new Error("Title too long (max 200 characters)");
+    }
+
+    // Validate signers
+    if (args.signers.length < 2) {
+      throw new Error("Multi-party signature requires at least 2 signers");
+    }
+    if (args.signers.length > 10) {
+      throw new Error("Maximum 10 signers allowed");
+    }
+
+    // Check for duplicate emails
+    const emails = args.signers.map((s) => s.email.toLowerCase());
+    if (new Set(emails).size !== emails.length) {
+      throw new Error("Duplicate signer emails are not allowed");
+    }
+
+    // Check for existing pending request
+    const existingRequest = await ctx.db
+      .query("signatureRequests")
+      .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .first();
+
+    if (existingRequest) {
+      throw new Error("A pending signature request already exists for this document");
+    }
+
+    // Create the signature request
+    const requestId = await ctx.db.insert("signatureRequests", {
+      organizationId: args.organizationId,
+      documentId: args.documentId,
+      title: args.title.trim(),
+      description: args.description?.trim(),
+      status: "pending",
+      requestedBy: user._id,
+      requestedAt: Date.now(),
+      expiresAt: args.expiresAt,
+      signerCount: args.signers.length,
+      completedCount: 0,
+      requireAll: args.requireAll,
+      requireSequential: args.requireSequential,
+    });
+
+    // Create signer records
+    for (const signer of args.signers) {
+      await ctx.db.insert("signatureRequestSigners", {
+        signatureRequestId: requestId,
+        userId: signer.userId,
+        email: signer.email.toLowerCase().trim(),
+        name: signer.name.trim(),
+        sequence: signer.sequence,
+        status: "pending",
+      });
+    }
+
+    // Log activity
+    await logActivity(ctx, {
+      organizationId: args.organizationId,
+      userId: user._id,
+      action: "requested_multi_party_signature",
+      resourceType: "signature_request",
+      resourceId: requestId,
+      resourceName: args.title.trim(),
+      metadata: { signerCount: args.signers.length },
+    });
+
+    // Notify the first signer(s)
+    const firstSequence = Math.min(...args.signers.map((s) => s.sequence));
+    const firstSigners = args.signers.filter((s) => s.sequence === firstSequence);
+
+    for (const signer of firstSigners) {
+      if (signer.userId) {
+        await ctx.db.insert("notifications", {
+          userId: signer.userId,
+          type: "system",
+          title: "Signature Required",
+          message: `Please sign: "${args.title.trim()}"`,
+          link: "/signatures",
+          relatedId: requestId.toString(),
+          isRead: false,
+          createdAt: Date.now(),
+        });
+      }
+    }
+
+    return requestId;
+  },
+});
+
+// Add a signer to an existing request
+export const addSigner = mutation({
+  args: {
+    requestId: v.id("signatureRequests"),
+    userId: v.optional(v.id("users")),
+    email: v.string(),
+    name: v.string(),
+    sequence: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    await requireAdminOrStaff(ctx);
+
+    const request = await ctx.db.get(args.requestId);
+    if (!request) {
+      throw new Error("Signature request not found");
+    }
+
+    if (request.status !== "pending") {
+      throw new Error("Cannot add signer to a non-pending request");
+    }
+
+    // Get existing signers
+    const existingSigners = await ctx.db
+      .query("signatureRequestSigners")
+      .withIndex("by_request", (q) => q.eq("signatureRequestId", args.requestId))
+      .collect();
+
+    // Check for duplicate email
+    const emailLower = args.email.toLowerCase().trim();
+    if (existingSigners.some((s) => s.email === emailLower)) {
+      throw new Error("This email is already a signer");
+    }
+
+    // Determine sequence number
+    const maxSequence = existingSigners.length > 0
+      ? Math.max(...existingSigners.map((s) => s.sequence))
+      : 0;
+    const sequence = args.sequence ?? (maxSequence + 1);
+
+    // Create signer record
+    const signerId = await ctx.db.insert("signatureRequestSigners", {
+      signatureRequestId: args.requestId,
+      userId: args.userId,
+      email: emailLower,
+      name: args.name.trim(),
+      sequence,
+      status: "pending",
+    });
+
+    // Update signer count
+    await ctx.db.patch(args.requestId, {
+      signerCount: (request.signerCount || 1) + 1,
+    });
+
+    return signerId;
+  },
+});
+
+// Remove a signer from a request
+export const removeSigner = mutation({
+  args: {
+    requestId: v.id("signatureRequests"),
+    signerId: v.id("signatureRequestSigners"),
+  },
+  handler: async (ctx, args) => {
+    await requireAdminOrStaff(ctx);
+
+    const request = await ctx.db.get(args.requestId);
+    if (!request) {
+      throw new Error("Signature request not found");
+    }
+
+    if (request.status !== "pending") {
+      throw new Error("Cannot remove signer from a non-pending request");
+    }
+
+    const signer = await ctx.db.get(args.signerId);
+    if (!signer) {
+      throw new Error("Signer not found");
+    }
+
+    if (signer.signatureRequestId.toString() !== args.requestId.toString()) {
+      throw new Error("Signer does not belong to this request");
+    }
+
+    if (signer.status === "signed") {
+      throw new Error("Cannot remove a signer who has already signed");
+    }
+
+    // Get remaining signers
+    const existingSigners = await ctx.db
+      .query("signatureRequestSigners")
+      .withIndex("by_request", (q) => q.eq("signatureRequestId", args.requestId))
+      .collect();
+
+    if (existingSigners.length <= 1) {
+      throw new Error("Cannot remove the last signer");
+    }
+
+    // Delete the signer
+    await ctx.db.delete(args.signerId);
+
+    // Update signer count
+    await ctx.db.patch(args.requestId, {
+      signerCount: Math.max(1, (request.signerCount || 1) - 1),
+    });
+  },
+});
+
+// Internal mutation for multi-party signing
+export const signMultiPartyInternal = internalMutation({
+  args: {
+    requestId: v.id("signatureRequests"),
+    signerId: v.id("signatureRequestSigners"),
+    userId: v.id("users"),
+    userName: v.string(),
+    signatureType: v.union(
+      v.literal("draw"),
+      v.literal("type"),
+      v.literal("upload")
+    ),
+    signatureData: v.string(),
+    legalName: v.string(),
+    agreedToTerms: v.boolean(),
+    ipAddress: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    signedDocumentHash: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const request = await ctx.db.get(args.requestId);
+    if (!request) {
+      throw new Error("Signature request not found");
+    }
+
+    const signer = await ctx.db.get(args.signerId);
+    if (!signer) {
+      throw new Error("Signer not found");
+    }
+
+    const now = Date.now();
+
+    // Create signature record
+    await ctx.db.insert("signatures", {
+      signatureRequestId: args.requestId,
+      userId: args.userId,
+      signatureType: args.signatureType,
+      signatureData: args.signatureData,
+      legalName: args.legalName.trim(),
+      agreedToTerms: args.agreedToTerms,
+      ipAddress: args.ipAddress,
+      userAgent: args.userAgent,
+      timestamp: now,
+    });
+
+    // Update signer status
+    await ctx.db.patch(args.signerId, {
+      status: "signed",
+      signedAt: now,
+    });
+
+    // Update completed count
+    const newCompletedCount = (request.completedCount || 0) + 1;
+    const allSigned = newCompletedCount >= (request.signerCount || 1);
+
+    const updates: Record<string, unknown> = {
+      completedCount: newCompletedCount,
+    };
+
+    // If all required signers have signed, mark request as complete
+    if (request.requireAll && allSigned) {
+      updates.status = "signed";
+      updates.signedAt = now;
+      updates.signedDocumentHash = args.signedDocumentHash;
+    } else if (!request.requireAll) {
+      // If any signer is enough, mark as complete
+      updates.status = "signed";
+      updates.signedAt = now;
+      updates.signedDocumentHash = args.signedDocumentHash;
+    }
+
+    await ctx.db.patch(args.requestId, updates);
+
+    // Log activity
+    await logActivity(ctx, {
+      organizationId: request.organizationId,
+      userId: args.userId,
+      action: "signed_document",
+      resourceType: "signature_request",
+      resourceId: args.requestId,
+      resourceName: request.title,
+      metadata: { signedCount: newCompletedCount, totalSigners: request.signerCount },
+    });
+
+    // Notify admins
+    await notifyAdmins(ctx, {
+      type: "system",
+      title: allSigned && request.requireAll ? "Document Fully Signed" : "Document Signed",
+      message: allSigned && request.requireAll
+        ? `All signers have signed "${request.title}"`
+        : `${args.userName} signed "${request.title}" (${newCompletedCount}/${request.signerCount})`,
+      link: "/signatures",
+      relatedId: args.requestId,
+    }, args.userId);
+
+    // If sequential and not complete, notify next signer
+    if (request.requireSequential && !allSigned) {
+      const allSigners = await ctx.db
+        .query("signatureRequestSigners")
+        .withIndex("by_request", (q) => q.eq("signatureRequestId", args.requestId))
+        .collect();
+
+      allSigners.sort((a, b) => a.sequence - b.sequence);
+
+      const nextSigner = allSigners.find((s) => s.status === "pending");
+      if (nextSigner?.userId) {
+        await ctx.db.insert("notifications", {
+          userId: nextSigner.userId,
+          type: "system",
+          title: "Your Turn to Sign",
+          message: `Please sign: "${request.title}"`,
+          link: "/signatures",
+          relatedId: args.requestId.toString(),
+          isRead: false,
+          createdAt: now,
+        });
+      }
+    }
   },
 });
 

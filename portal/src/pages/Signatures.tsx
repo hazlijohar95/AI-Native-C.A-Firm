@@ -46,6 +46,7 @@ import {
   Download,
   Upload,
   ImageIcon,
+  Users,
 } from "@/lib/icons";
 import { cn, formatDistanceToNow } from "@/lib/utils";
 import type { Id } from "../../convex/_generated/dataModel";
@@ -422,6 +423,17 @@ export function Signatures() {
     selectedRequest ? { id: selectedRequest } : "skip"
   );
 
+  // Multi-party signature queries
+  const selectedRequestSigners = useQuery(
+    api.signatures.getSigners,
+    selectedRequest ? { requestId: selectedRequest } : "skip"
+  );
+
+  const canUserSignResult = useQuery(
+    api.signatures.canUserSign,
+    selectedRequest ? { requestId: selectedRequest } : "skip"
+  );
+
   const signAction = useAction(api.signatures.sign);
   const declineMutation = useMutation(api.signatures.decline);
   const getDocumentPreview = useAction(api.signatures.getDocumentPreview);
@@ -694,6 +706,21 @@ export function Signatures() {
                           {request.documentName}
                         </div>
                         <span>Requested {formatDistanceToNow(request.requestedAt)}</span>
+                        {/* Multi-party signer progress */}
+                        {request.signerCount && request.signerCount > 1 && (
+                          <span className={cn(
+                            "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                            request.completedCount === request.signerCount
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-blue-50 text-blue-700"
+                          )}>
+                            <Users className="h-3 w-3" />
+                            {request.completedCount || 0}/{request.signerCount} signed
+                            {request.requireSequential && (
+                              <span className="text-[#9d9da6]">(sequential)</span>
+                            )}
+                          </span>
+                        )}
                         {request.expiresAt && request.status === "pending" && (
                           <span className="text-amber-600">
                             Expires {formatDistanceToNow(request.expiresAt)}
@@ -810,6 +837,59 @@ export function Signatures() {
                   >
                     View again
                   </button>
+                </div>
+              )}
+
+              {/* Multi-party signer list */}
+              {selectedRequestSigners && selectedRequestSigners.length > 1 && (
+                <div className="rounded-lg border border-[#EBEBEB] overflow-hidden">
+                  <div className="px-3 py-2 bg-[#f8f8f8] border-b border-[#EBEBEB]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-[#6b6b76] uppercase tracking-wide">
+                        Signers ({selectedRequestData?.completedCount || 0}/{selectedRequestData?.signerCount || 0})
+                      </span>
+                      {selectedRequestData?.requireSequential && (
+                        <span className="text-[10px] text-[#9d9da6] bg-white px-2 py-0.5 rounded">Sequential</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="divide-y divide-[#EBEBEB]">
+                    {selectedRequestSigners.map((signer, idx) => (
+                      <div key={signer._id} className="px-3 py-2 flex items-center gap-3">
+                        <span className="w-5 h-5 rounded-full bg-[#f8f8f8] flex items-center justify-center text-[10px] font-medium text-[#6b6b76]">
+                          {selectedRequestData?.requireSequential ? signer.sequence : idx + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#0f0f12] truncate">{signer.name}</p>
+                          <p className="text-xs text-[#9d9da6] truncate">{signer.email}</p>
+                        </div>
+                        {signer.status === "signed" ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-medium">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Signed
+                          </span>
+                        ) : signer.status === "declined" ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-medium">
+                            <XCircle className="h-3 w-3" />
+                            Declined
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-medium">
+                            <Clock className="h-3 w-3" />
+                            Pending
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Cannot sign warning for sequential requests */}
+              {canUserSignResult && !canUserSignResult.canSign && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-100">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm text-amber-700">{canUserSignResult.reason}</span>
                 </div>
               )}
 
@@ -967,7 +1047,7 @@ export function Signatures() {
                 </button>
                 <button
                   onClick={handleSign}
-                  disabled={isSigning}
+                  disabled={isSigning || (canUserSignResult && !canUserSignResult.canSign)}
                   className="h-10 px-5 rounded-lg bg-[#0f0f12] hover:bg-[#1a1a1f] disabled:bg-[#e5e5e7] disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-2"
                 >
                   {isSigning ? (

@@ -14,6 +14,8 @@ import {
   User,
   TrendingUp,
   Sparkles,
+  DollarSign,
+  AlertCircle,
 } from "@/lib/icons";
 import { formatDistanceToNow } from "@/lib/utils";
 
@@ -28,6 +30,7 @@ export function Dashboard() {
   const overdueTaskCount = useQuery(api.tasks.countOverdue);
   const unreadAnnouncementCount = useQuery(api.announcements.countUnread);
   const invoiceCounts = useQuery(api.invoices.countPending);
+  const financialSummary = useQuery(api.invoices.getFinancialSummary);
   const recentActivityResult = useQuery(api.activity.list, { limit: 5 });
   const recentActivity = recentActivityResult?.activities;
 
@@ -45,12 +48,7 @@ export function Dashboard() {
   return (
     <div className="space-y-8 lg:space-y-10">
       {/* Welcome Section */}
-      <div
-        className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between motion-safe-slide-up">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
@@ -116,20 +114,121 @@ export function Dashboard() {
             color: "emerald" as const,
             delay: 0.25,
           },
-        ]).map((card) => (
-          <StatusCard key={card.title} {...card} />
+        ]).map((card, index) => (
+          <StatusCard key={card.title} {...card} index={index} />
         ))}
       </div>
+
+      {/* Financial Summary Section */}
+      {financialSummary && (financialSummary.outstanding.total > 0 || financialSummary.ytd.invoiced > 0) && (
+        <div className="bg-white rounded-2xl border border-black/5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02),0_8px_16px_rgba(0,0,0,0.03)] overflow-hidden motion-safe-slide-up motion-safe-slide-up-delay-5">
+          <div className="p-6 border-b border-black/5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                <DollarSign className="h-4 w-4 text-emerald-600" />
+              </div>
+              <div>
+                <h2 className="font-serif text-lg text-[#0f0f12]">Financial Summary</h2>
+                <p className="text-[#9d9da6] text-sm">Your invoice and payment overview</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Outstanding Balance */}
+              <div className={`p-4 rounded-xl ${financialSummary.outstanding.total > 0 ? "bg-amber-50 border border-amber-100" : "bg-emerald-50 border border-emerald-100"}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  {financialSummary.outstanding.total > 0 ? (
+                    <AlertCircle className="h-4 w-4 text-amber-600" />
+                  ) : (
+                    <CheckSquare className="h-4 w-4 text-emerald-600" />
+                  )}
+                  <span className="text-xs font-medium text-[#6b6b76] uppercase tracking-wide">Outstanding</span>
+                </div>
+                <p className={`text-2xl font-semibold tabular-nums ${financialSummary.outstanding.total > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                  {formatCurrency(financialSummary.outstanding.total)}
+                </p>
+                {financialSummary.outstanding.aging.ninetyPlus > 0 && (
+                  <p className="text-xs text-red-600 mt-1">
+                    {formatCurrency(financialSummary.outstanding.aging.ninetyPlus)} over 90 days
+                  </p>
+                )}
+              </div>
+
+              {/* This Month Invoiced */}
+              <div className="p-4 rounded-xl bg-[#f8f8f8] border border-black/5">
+                <span className="text-xs font-medium text-[#6b6b76] uppercase tracking-wide">Invoiced This Month</span>
+                <p className="text-2xl font-semibold text-[#0f0f12] tabular-nums mt-2">
+                  {formatCurrency(financialSummary.currentMonth.invoiced)}
+                </p>
+                {financialSummary.lastMonth.invoiced > 0 && (
+                  <p className="text-xs text-[#9d9da6] mt-1">
+                    Last month: {formatCurrency(financialSummary.lastMonth.invoiced)}
+                  </p>
+                )}
+              </div>
+
+              {/* This Month Paid */}
+              <div className="p-4 rounded-xl bg-[#f8f8f8] border border-black/5">
+                <span className="text-xs font-medium text-[#6b6b76] uppercase tracking-wide">Paid This Month</span>
+                <p className="text-2xl font-semibold text-emerald-600 tabular-nums mt-2">
+                  {formatCurrency(financialSummary.currentMonth.paid)}
+                </p>
+                {financialSummary.lastMonth.paid > 0 && (
+                  <p className="text-xs text-[#9d9da6] mt-1">
+                    Last month: {formatCurrency(financialSummary.lastMonth.paid)}
+                  </p>
+                )}
+              </div>
+
+              {/* YTD Summary */}
+              <div className="p-4 rounded-xl bg-[#f8f8f8] border border-black/5">
+                <span className="text-xs font-medium text-[#6b6b76] uppercase tracking-wide">Year to Date</span>
+                <p className="text-2xl font-semibold text-[#0f0f12] tabular-nums mt-2">
+                  {formatCurrency(financialSummary.ytd.invoiced)}
+                </p>
+                <p className="text-xs text-[#9d9da6] mt-1">
+                  Paid: {formatCurrency(financialSummary.ytd.paid)}
+                </p>
+              </div>
+            </div>
+
+            {/* Aging breakdown if there's outstanding balance */}
+            {financialSummary.outstanding.total > 0 && (
+              <div className="mt-4 pt-4 border-t border-black/5">
+                <p className="text-xs font-medium text-[#6b6b76] uppercase tracking-wide mb-3">Aging Breakdown</p>
+                <div className="flex gap-2 flex-wrap">
+                  {financialSummary.outstanding.aging.current > 0 && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
+                      Current: {formatCurrency(financialSummary.outstanding.aging.current)}
+                    </span>
+                  )}
+                  {financialSummary.outstanding.aging.thirtyDays > 0 && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">
+                      1-30 days: {formatCurrency(financialSummary.outstanding.aging.thirtyDays)}
+                    </span>
+                  )}
+                  {financialSummary.outstanding.aging.sixtyDays > 0 && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-medium">
+                      31-60 days: {formatCurrency(financialSummary.outstanding.aging.sixtyDays)}
+                    </span>
+                  )}
+                  {financialSummary.outstanding.aging.ninetyPlus > 0 && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-red-50 text-red-700 text-xs font-medium">
+                      90+ days: {formatCurrency(financialSummary.outstanding.aging.ninetyPlus)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions & Recent Activity */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Quick Actions */}
-        <div
-          className="bg-white rounded-2xl border border-black/5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02),0_8px_16px_rgba(0,0,0,0.03)] overflow-hidden opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards",
-          }}
-        >
+        <div className="bg-white rounded-2xl border border-black/5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02),0_8px_16px_rgba(0,0,0,0.03)] overflow-hidden motion-safe-slide-up motion-safe-slide-up-delay-6">
           <div className="p-6 border-b border-black/5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#0f0f12] flex items-center justify-center">
@@ -164,12 +263,7 @@ export function Dashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div
-          className="bg-white rounded-2xl border border-black/5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02),0_8px_16px_rgba(0,0,0,0.03)] overflow-hidden opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards",
-          }}
-        >
+        <div className="bg-white rounded-2xl border border-black/5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02),0_8px_16px_rgba(0,0,0,0.03)] overflow-hidden motion-safe-slide-up motion-safe-slide-up-delay-7">
           <div className="p-6 border-b border-black/5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#0f0f12] flex items-center justify-center">
@@ -199,21 +293,18 @@ export function Dashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {recentActivity.map((activity, index) => (
+                {recentActivity.map((activity) => (
                   <div
                     key={activity._id}
-                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#f8f8f8] transition-colors"
-                    style={{
-                      animation: "slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-                      animationDelay: `${0.4 + index * 0.05}s`,
-                      opacity: 0,
-                    }}
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#f8f8f8] transition-colors motion-safe-slide-up motion-safe-slide-up-delay-8"
                   >
                     <div className="w-9 h-9 rounded-lg bg-[#f8f8f8] border border-black/5 flex items-center justify-center flex-shrink-0">
                       {activity.userAvatar ? (
                         <img
                           src={activity.userAvatar}
                           alt=""
+                          width={36}
+                          height={36}
                           className="w-9 h-9 rounded-lg object-cover"
                         />
                       ) : (
@@ -241,12 +332,7 @@ export function Dashboard() {
       </div>
 
       {/* Getting Started Card */}
-      <div
-        className="bg-[#0f0f12] rounded-2xl p-6 sm:p-8 relative overflow-hidden opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards",
-        }}
-      >
+      <div className="bg-[#0f0f12] rounded-2xl p-6 sm:p-8 relative overflow-hidden motion-safe-slide-up motion-safe-slide-up-delay-8">
         {/* Pattern overlay */}
         <div
           className="absolute inset-0 opacity-5"
@@ -271,12 +357,6 @@ export function Dashboard() {
         </div>
       </div>
 
-      <style>{`
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -289,7 +369,15 @@ interface StatusCardProps {
   href: string;
   color: "blue" | "emerald" | "amber" | "violet";
   delay: number;
+  index: number;
 }
+
+const delayClasses = [
+  "motion-safe-slide-up-delay-2",
+  "motion-safe-slide-up-delay-3",
+  "motion-safe-slide-up-delay-4",
+  "motion-safe-slide-up-delay-5",
+];
 
 const colorConfig = {
   blue: {
@@ -314,16 +402,13 @@ const colorConfig = {
   },
 };
 
-function StatusCard({ title, value, description, icon: Icon, href, color, delay }: StatusCardProps) {
+function StatusCard({ title, value, description, icon: Icon, href, color, index }: StatusCardProps) {
   const colors = colorConfig[color];
 
   return (
     <Link
       to={href}
-      className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f0f12] focus-visible:ring-offset-2 rounded-2xl opacity-0"
-      style={{
-        animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s forwards`,
-      }}
+      className={`group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f0f12] focus-visible:ring-offset-2 rounded-2xl motion-safe-slide-up ${delayClasses[index] || ""}`}
     >
       <div className="bg-white rounded-2xl border border-black/5 p-5 transition-all duration-200 group-hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] group-hover:-translate-y-0.5 h-full">
         <div className="flex items-start justify-between mb-4">
@@ -377,4 +462,11 @@ function formatActivityAction(action: string): string {
     deleted_task: "deleted task",
   };
   return actions[action] || action.replace(/_/g, " ");
+}
+
+function formatCurrency(amount: number, currency: string = "MYR"): string {
+  return new Intl.NumberFormat("en-MY", {
+    style: "currency",
+    currency,
+  }).format(amount / 100); // Amount is in cents
 }

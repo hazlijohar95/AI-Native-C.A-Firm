@@ -477,10 +477,34 @@ export default defineSchema({
     // Document integrity verification
     documentHash: v.optional(v.string()), // SHA-256 hash of document at time of request
     signedDocumentHash: v.optional(v.string()), // SHA-256 hash verified at signing
+    // Multi-party signature support
+    signerCount: v.optional(v.number()), // Total number of signers required
+    completedCount: v.optional(v.number()), // Number of signers who have signed
+    requireAll: v.optional(v.boolean()), // True = all must sign, false = any can sign
+    requireSequential: v.optional(v.boolean()), // True = must sign in order
   })
     .index("by_organization", ["organizationId"])
     .index("by_document", ["documentId"])
     .index("by_status", ["organizationId", "status"]),
+
+  // Individual signers for multi-party signature requests
+  signatureRequestSigners: defineTable({
+    signatureRequestId: v.id("signatureRequests"),
+    userId: v.optional(v.id("users")), // Optional - may be external signer
+    email: v.string(),
+    name: v.string(),
+    sequence: v.number(), // Order in signing sequence (1, 2, 3...)
+    status: v.union(
+      v.literal("pending"),
+      v.literal("signed"),
+      v.literal("declined")
+    ),
+    signedAt: v.optional(v.number()),
+    notifiedAt: v.optional(v.number()),
+  })
+    .index("by_request", ["signatureRequestId"])
+    .index("by_user", ["userId"])
+    .index("by_request_sequence", ["signatureRequestId", "sequence"]),
 
   // Signature records (the actual signatures)
   signatures: defineTable({

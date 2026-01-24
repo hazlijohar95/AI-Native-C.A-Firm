@@ -77,6 +77,7 @@ export {
   TrendingUp,
   Lightbulb,
   Scale,
+  DollarSign,
 
   // Actions & Tools
   Search,
