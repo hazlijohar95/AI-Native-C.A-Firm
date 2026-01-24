@@ -69,19 +69,20 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Backdrop for mobile */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
+      {/* Backdrop for mobile - covers entire screen */}
+      <div
+        className={cn(
+          "fixed inset-0 z-[60] bg-black/50 lg:hidden transition-opacity duration-300",
+          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        )}
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-      {/* Mobile sidebar */}
+      {/* Mobile sidebar - slides in from left */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 transform bg-gradient-to-b from-white to-[#FAF8F5] border-r border-[rgba(184,152,107,0.1)] motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-in-out lg:hidden",
+          "fixed inset-y-0 left-0 z-[70] w-64 bg-gradient-to-b from-white to-[#FAF8F5] border-r border-[rgba(184,152,107,0.1)] shadow-xl lg:hidden transition-transform duration-300 ease-in-out",
           open ? "translate-x-0" : "-translate-x-full"
         )}
         aria-label="Mobile navigation"
