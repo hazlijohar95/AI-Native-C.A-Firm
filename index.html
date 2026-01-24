@@ -591,6 +591,7 @@
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
+        background: red !important; /* DEBUG - remove after testing */
       }
       .nav-links .nav-link {
         display: flex;
@@ -6234,9 +6235,10 @@
     let scrollPosition = 0;
     
     if (mobileMenuBtn && navLinks) {
-      mobileMenuBtn.addEventListener('click', () => {
+      const toggleMenu = (e) => {
+        e.preventDefault();
         const isOpening = !navLinks.classList.contains('active');
-        
+
         if (isOpening) {
           // Save scroll position and lock body
           scrollPosition = window.scrollY;
@@ -6248,10 +6250,13 @@
           document.body.style.top = '';
           window.scrollTo(0, scrollPosition);
         }
-        
+
         mobileMenuBtn.classList.toggle('active');
         navLinks.classList.toggle('active');
-      });
+      };
+
+      // Use click - works on both desktop and mobile
+      mobileMenuBtn.addEventListener('click', toggleMenu);
       
       // Close menu when clicking a link
       navLinks.querySelectorAll('.nav-link').forEach(link => {
