@@ -19,6 +19,7 @@ import {
   Megaphone,
   HelpCircle,
   Layers,
+  RefreshCw,
 } from "@/lib/icons";
 
 interface SidebarProps {
@@ -41,6 +42,7 @@ const adminNavigation = [
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Services", href: "/admin/services", icon: Layers },
   { name: "Tasks", href: "/admin/tasks", icon: CheckSquare },
+  { name: "Task Templates", href: "/admin/task-templates", icon: RefreshCw },
   { name: "Invoices", href: "/admin/invoices", icon: Receipt },
   { name: "Signatures", href: "/admin/signatures", icon: PenTool },
   { name: "Announcements", href: "/admin/announcements", icon: Megaphone },

@@ -13,7 +13,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { useMutationWithToast } from "@/hooks";
 import {
   CheckSquare,
@@ -28,6 +31,11 @@ import {
   Send,
   User,
   Shield,
+  Plus,
+  HelpCircle,
+  X,
+  Loader2,
+  Bell,
 } from "@/lib/icons";
 import { cn, formatDistanceToNow } from "@/lib/utils";
 import { toast } from "sonner";
@@ -36,6 +44,7 @@ import type { Id } from "../../convex/_generated/dataModel";
 // Local types matching Convex schema
 type TaskStatus = "pending" | "in_progress" | "completed";
 type TaskPriority = "low" | "medium" | "high";
+type RequestStatus = "pending_approval" | "approved" | "rejected";
 
 const statusOptions = [
   { value: "all", label: "All Tasks" },
@@ -63,10 +72,17 @@ const statusIcons: Record<string, React.ReactNode> = {
   completed: <CheckCircle2 className="h-5 w-5 text-[#22c55e]" aria-hidden="true" />,
 };
 
+const requestStatusColors: Record<RequestStatus, { bg: string; text: string; label: string }> = {
+  pending_approval: { bg: "bg-amber-50", text: "text-amber-700", label: "Pending Approval" },
+  approved: { bg: "bg-green-50", text: "text-green-700", label: "Approved" },
+  rejected: { bg: "bg-red-50", text: "text-red-700", label: "Rejected" },
+};
+
 export function Tasks() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [selectedTaskId, setSelectedTaskId] = useState<Id<"tasks"> | null>(null);
+  const [showRequestDialog, setShowRequestDialog] = useState(false);
 
   const tasks = useQuery(api.tasks.list, {
     status: statusFilter === "all" ? undefined : statusFilter as TaskStatus,
@@ -83,8 +99,20 @@ export function Tasks() {
     }
   );
 
+  const cancelRequestMutation = useMutation(api.tasks.cancelRequest);
+  const { execute: cancelRequest } = useMutationWithToast(
+    (args: { id: Id<"tasks"> }) => cancelRequestMutation(args),
+    {
+      successMessage: "Request cancelled",
+    }
+  );
+
   const handleStatusChange = async (taskId: Id<"tasks">, newStatus: TaskStatus) => {
     await updateStatus({ id: taskId, status: newStatus });
+  };
+
+  const handleCancelRequest = async (taskId: Id<"tasks">) => {
+    await cancelRequest({ id: taskId });
   };
 
   const isOverdue = (dueDate?: number) => {
@@ -101,16 +129,27 @@ export function Tasks() {
           animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         }}
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
-          <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
-          <span className="text-xs font-medium text-[#6b6b76]">Tasks</span>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
+              <span className="text-xs font-medium text-[#6b6b76]">Tasks</span>
+            </div>
+            <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
+              Your <span className="italic text-[#6b6b76]">Tasks</span>
+            </h1>
+            <p className="mt-2 text-[#6b6b76]">
+              View and manage your assigned tasks
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowRequestDialog(true)}
+            className="h-10 bg-[#253FF6] hover:bg-[#1e35d4] text-white rounded-xl text-sm font-medium shadow-sm"
+          >
+            <HelpCircle className="h-4 w-4 mr-2" />
+            Request Help
+          </Button>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
-          Your <span className="italic text-[#6b6b76]">Tasks</span>
-        </h1>
-        <p className="mt-2 text-[#6b6b76]">
-          View and manage your assigned tasks
-        </p>
       </div>
 
       {/* Filters */}
@@ -187,6 +226,7 @@ export function Tasks() {
               index={index}
               onStatusChange={handleStatusChange}
               onSelect={() => setSelectedTaskId(task._id)}
+              onCancelRequest={handleCancelRequest}
               isOverdue={isOverdue}
             />
           ))}
@@ -200,6 +240,12 @@ export function Tasks() {
           onClose={() => setSelectedTaskId(null)}
         />
       )}
+
+      {/* Request Help Dialog */}
+      <RequestHelpDialog
+        open={showRequestDialog}
+        onClose={() => setShowRequestDialog(false)}
+      />
 
       <style>{`
         @keyframes slide-up {
@@ -222,38 +268,72 @@ interface TaskCardProps {
     dueDate?: number;
     createdAt: number;
     completedAt?: number;
+    isClientRequest?: boolean;
+    requestStatus?: RequestStatus;
+    rejectionReason?: string;
+    remindersSent?: {
+      sevenDays?: number;
+      threeDays?: number;
+      oneDay?: number;
+      onDue?: number;
+      overdue?: number[];
+    };
   };
   index: number;
   onStatusChange: (id: Id<"tasks">, status: TaskStatus) => void;
   onSelect: () => void;
+  onCancelRequest: (id: Id<"tasks">) => void;
   isOverdue: (dueDate?: number) => boolean;
 }
 
-function TaskCard({ task, index, onStatusChange, onSelect, isOverdue }: TaskCardProps) {
+function TaskCard({ task, index, onStatusChange, onSelect, onCancelRequest, isOverdue }: TaskCardProps) {
   const priorityColor = priorityColors[task.priority] || priorityColors.low;
   const commentCount = useQuery(api.tasks.countComments, { taskId: task._id });
+
+  // Check if this is a pending client request
+  const isPendingRequest = task.isClientRequest && task.requestStatus === "pending_approval";
+  const isRejectedRequest = task.isClientRequest && task.requestStatus === "rejected";
+
+  // Count reminders sent
+  const reminderCount = task.remindersSent
+    ? (task.remindersSent.sevenDays ? 1 : 0) +
+      (task.remindersSent.threeDays ? 1 : 0) +
+      (task.remindersSent.oneDay ? 1 : 0) +
+      (task.remindersSent.onDue ? 1 : 0) +
+      (task.remindersSent.overdue?.length || 0)
+    : 0;
 
   return (
     <div
       className={cn(
         "group bg-white rounded-2xl border border-black/5 p-5 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] opacity-0",
-        task.status === "completed" && "opacity-60"
+        task.status === "completed" && "opacity-60",
+        isPendingRequest && "border-amber-200 bg-amber-50/30",
+        isRejectedRequest && "border-red-200 bg-red-50/30 opacity-70"
       )}
       style={{
         animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${0.15 + index * 0.03}s forwards`,
       }}
     >
       <div className="flex items-start gap-4">
-        {/* Status Toggle */}
+        {/* Status Toggle - disabled for pending/rejected requests */}
         <button
           type="button"
-          onClick={() =>
-            onStatusChange(
-              task._id,
-              task.status === "completed" ? "pending" : "completed"
-            )
-          }
-          className="mt-0.5 flex-shrink-0 rounded-full transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#253FF6] focus-visible:ring-offset-2"
+          onClick={() => {
+            if (!isPendingRequest && !isRejectedRequest) {
+              onStatusChange(
+                task._id,
+                task.status === "completed" ? "pending" : "completed"
+              );
+            }
+          }}
+          disabled={isPendingRequest || isRejectedRequest}
+          className={cn(
+            "mt-0.5 flex-shrink-0 rounded-full transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#253FF6] focus-visible:ring-offset-2",
+            isPendingRequest || isRejectedRequest
+              ? "cursor-not-allowed opacity-50"
+              : "hover:scale-110"
+          )}
           aria-label={`Mark task "${task.title}" as ${task.status === "completed" ? "pending" : "completed"}`}
         >
           {statusIcons[task.status]}
@@ -274,13 +354,31 @@ function TaskCard({ task, index, onStatusChange, onSelect, isOverdue }: TaskCard
             >
               {task.title}
             </h3>
+            {/* Client Request Badge */}
+            {task.isClientRequest && task.requestStatus && (
+              <span className={cn(
+                "inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium",
+                requestStatusColors[task.requestStatus].bg,
+                requestStatusColors[task.requestStatus].text
+              )}>
+                <HelpCircle className="h-3 w-3" aria-hidden="true" />
+                {requestStatusColors[task.requestStatus].label}
+              </span>
+            )}
             <span className={cn("inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide", priorityColor.bg, priorityColor.text)}>
               {task.priority}
             </span>
-            {task.status !== "completed" && isOverdue(task.dueDate) && (
+            {task.status !== "completed" && isOverdue(task.dueDate) && !isPendingRequest && !isRejectedRequest && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-50 text-red-700 text-[10px] font-medium uppercase tracking-wide">
                 <AlertCircle className="h-3 w-3" aria-hidden="true" />
                 Overdue
+              </span>
+            )}
+            {/* Reminder indicator */}
+            {reminderCount > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-[10px] font-medium" title={`${reminderCount} reminder(s) sent`}>
+                <Bell className="h-3 w-3" aria-hidden="true" />
+                {reminderCount}
               </span>
             )}
             {commentCount !== undefined && commentCount > 0 && (
@@ -294,6 +392,13 @@ function TaskCard({ task, index, onStatusChange, onSelect, isOverdue }: TaskCard
           {task.description && (
             <p className="mt-1.5 text-sm text-[#6b6b76] line-clamp-2">
               {task.description}
+            </p>
+          )}
+
+          {/* Rejection reason */}
+          {isRejectedRequest && task.rejectionReason && (
+            <p className="mt-2 text-sm text-red-600 bg-red-50 rounded px-2 py-1">
+              <span className="font-medium">Reason:</span> {task.rejectionReason}
             </p>
           )}
 
@@ -313,8 +418,18 @@ function TaskCard({ task, index, onStatusChange, onSelect, isOverdue }: TaskCard
           </div>
         </button>
 
-        {/* Status Select */}
-        {task.status !== "completed" && (
+        {/* Cancel button for pending requests, or Status Select for regular tasks */}
+        {isPendingRequest ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onCancelRequest(task._id)}
+            className="h-9 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+          >
+            <X className="h-4 w-4 mr-1" />
+            Cancel
+          </Button>
+        ) : task.status !== "completed" && !isRejectedRequest ? (
           <Select
             value={task.status}
             onValueChange={(value) =>
@@ -330,7 +445,7 @@ function TaskCard({ task, index, onStatusChange, onSelect, isOverdue }: TaskCard
               <SelectItem value="completed">Completed</SelectItem>
             </SelectContent>
           </Select>
-        )}
+        ) : null}
       </div>
     </div>
   );
@@ -489,6 +604,128 @@ function TaskDetailDialog({ task, onClose }: Omit<TaskDetailDialogProps, "onStat
             </button>
           </form>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Request Help Dialog
+interface RequestHelpDialogProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+function RequestHelpDialog({ open, onClose }: RequestHelpDialogProps) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createRequestMutation = useMutation(api.tasks.createRequest);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) return;
+
+    setIsSubmitting(true);
+    try {
+      await createRequestMutation({
+        title: trimmedTitle,
+        description: description.trim() || undefined,
+      });
+      toast.success("Help request submitted! Our team will review it shortly.");
+      setTitle("");
+      setDescription("");
+      onClose();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to submit request");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isSubmitting) {
+      setTitle("");
+      setDescription("");
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-serif text-xl flex items-center gap-2">
+            <HelpCircle className="h-5 w-5 text-[#253FF6]" />
+            Request Help
+          </DialogTitle>
+          <DialogDescription className="text-[#6b6b76]">
+            Need assistance with something? Submit a request and our team will review it.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          <div>
+            <label htmlFor="request-title" className="block text-sm font-medium text-[#0f0f12] mb-1.5">
+              What do you need help with? <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="request-title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g., Need help with tax documents"
+              className="w-full h-10 px-3 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#253FF6] focus:border-transparent"
+              disabled={isSubmitting}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="request-description" className="block text-sm font-medium text-[#0f0f12] mb-1.5">
+              Additional details <span className="text-[#9d9da6]">(optional)</span>
+            </label>
+            <textarea
+              id="request-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Provide any additional context that might help us assist you better..."
+              rows={4}
+              className="w-full px-3 py-2 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#253FF6] focus:border-transparent resize-none"
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="rounded-lg"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={!title.trim() || isSubmitting}
+              className="bg-[#253FF6] hover:bg-[#1e35d4] text-white rounded-lg"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Submit Request
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -208,11 +208,87 @@ export default defineSchema({
     createdAt: v.number(),
     completedAt: v.optional(v.number()),
     completedBy: v.optional(v.id("users")),
+    // === REMINDER TRACKING ===
+    remindersSent: v.optional(v.object({
+      sevenDays: v.optional(v.number()),   // timestamp when sent
+      threeDays: v.optional(v.number()),
+      oneDay: v.optional(v.number()),
+      onDue: v.optional(v.number()),
+      overdue: v.optional(v.array(v.number())), // array of overdue reminder timestamps
+    })),
+    escalatedAt: v.optional(v.number()),  // when staff was notified
+    escalatedTo: v.optional(v.id("users")), // which staff member
+    // === CLIENT REQUESTS ===
+    isClientRequest: v.optional(v.boolean()),
+    requestStatus: v.optional(v.union(
+      v.literal("pending_approval"),
+      v.literal("approved"),
+      v.literal("rejected")
+    )),
+    requestedBy: v.optional(v.id("users")),
+    approvedBy: v.optional(v.id("users")),
+    approvedAt: v.optional(v.number()),
+    rejectionReason: v.optional(v.string()),
+    // === RECURRING TASKS ===
+    generatedFromTemplate: v.optional(v.id("taskTemplates")),
+    generatedFromSubscription: v.optional(v.id("organizationTemplates")),
   })
     .index("by_organization", ["organizationId"])
     .index("by_status", ["organizationId", "status"])
     .index("by_assigned", ["assignedTo"])
-    .index("by_due_date", ["organizationId", "dueDate"]),
+    .index("by_due_date", ["organizationId", "dueDate"])
+    .index("by_escalated", ["escalatedAt"])
+    .index("by_request_status", ["organizationId", "isClientRequest", "requestStatus"]),
+
+  // Task templates for recurring workflows
+  taskTemplates: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    category: v.union(
+      v.literal("tax"),
+      v.literal("bookkeeping"),
+      v.literal("compliance"),
+      v.literal("advisory"),
+      v.literal("onboarding")
+    ),
+    recurrence: v.object({
+      frequency: v.union(
+        v.literal("monthly"),
+        v.literal("quarterly"),
+        v.literal("yearly")
+      ),
+      dayOfMonth: v.optional(v.number()), // 1-28 for monthly
+      monthOfYear: v.optional(v.number()), // 1-12 for yearly
+      quarterMonth: v.optional(v.number()), // 1, 2, or 3 (month within quarter)
+    }),
+    taskDefaults: v.object({
+      title: v.string(),
+      description: v.optional(v.string()),
+      priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+      dueDaysAfterGeneration: v.number(), // e.g., 14 days to complete
+    }),
+    isActive: v.boolean(),
+    isBuiltIn: v.boolean(), // true for pre-built templates
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_category", ["category"])
+    .index("by_active", ["isActive"]),
+
+  // Link organizations to templates they subscribe to
+  organizationTemplates: defineTable({
+    organizationId: v.id("organizations"),
+    templateId: v.id("taskTemplates"),
+    isActive: v.boolean(),
+    lastGeneratedAt: v.optional(v.number()),
+    nextGenerationAt: v.optional(v.number()),
+    customTitle: v.optional(v.string()), // override template title
+    customDescription: v.optional(v.string()),
+    assignToUserId: v.optional(v.id("users")), // auto-assign to this user
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_template", ["templateId"])
+    .index("by_next_generation", ["nextGenerationAt"]),
 
   // ============================================
   // ANNOUNCEMENTS
@@ -222,10 +298,12 @@ export default defineSchema({
     title: v.string(),
     content: v.string(), // Markdown supported
     type: v.union(
-      v.literal("general"),
-      v.literal("tax_update"),
-      v.literal("deadline"),
-      v.literal("news")
+      v.literal("general"),       // Blue - general updates
+      v.literal("tax_deadline"),  // Red - urgent tax dates
+      v.literal("regulatory"),    // Amber - compliance changes
+      v.literal("firm_news"),     // Purple - firm updates
+      v.literal("maintenance"),   // Gray - system updates
+      v.literal("tip")            // Green - helpful tips
     ),
     // null = visible to all, array = specific orgs only
     targetOrganizations: v.optional(v.array(v.id("organizations"))),
@@ -259,6 +337,12 @@ export default defineSchema({
       v.literal("new_task"),
       v.literal("task_due"),
       v.literal("task_completed"),
+      v.literal("task_reminder"),      // Reminder before due date
+      v.literal("task_overdue"),       // Task is past due
+      v.literal("task_escalated"),     // Escalated to staff
+      v.literal("task_request"),       // Client submitted request
+      v.literal("task_request_approved"), // Request was approved
+      v.literal("task_request_rejected"), // Request was rejected
       v.literal("new_announcement"),
       v.literal("invoice_due"),
       v.literal("payment_received"),

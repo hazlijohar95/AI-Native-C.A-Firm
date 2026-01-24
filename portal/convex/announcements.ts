@@ -1,6 +1,16 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
+
+// Valid announcement types
+const announcementTypes = v.union(
+  v.literal("general"),
+  v.literal("tax_deadline"),
+  v.literal("regulatory"),
+  v.literal("firm_news"),
+  v.literal("maintenance"),
+  v.literal("tip")
+);
 
 // ============================================
 // QUERIES
@@ -9,12 +19,7 @@ import { requireAuth, requireAdminOrStaff } from "./lib/auth";
 // List announcements visible to current user
 export const list = query({
   args: {
-    type: v.optional(v.union(
-      v.literal("general"),
-      v.literal("tax_update"),
-      v.literal("deadline"),
-      v.literal("news")
-    )),
+    type: v.optional(announcementTypes),
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
@@ -183,12 +188,7 @@ export const create = mutation({
   args: {
     title: v.string(),
     content: v.string(),
-    type: v.union(
-      v.literal("general"),
-      v.literal("tax_update"),
-      v.literal("deadline"),
-      v.literal("news")
-    ),
+    type: announcementTypes,
     targetOrganizations: v.optional(v.array(v.id("organizations"))),
     publishedAt: v.optional(v.number()),
     expiresAt: v.optional(v.number()),
@@ -318,12 +318,7 @@ export const update = mutation({
     id: v.id("announcements"),
     title: v.optional(v.string()),
     content: v.optional(v.string()),
-    type: v.optional(v.union(
-      v.literal("general"),
-      v.literal("tax_update"),
-      v.literal("deadline"),
-      v.literal("news")
-    )),
+    type: v.optional(announcementTypes),
     targetOrganizations: v.optional(v.array(v.id("organizations"))),
     publishedAt: v.optional(v.number()),
     expiresAt: v.optional(v.number()),
@@ -386,5 +381,88 @@ export const remove = mutation({
 
     // Delete the announcement
     await ctx.db.delete(args.id);
+  },
+});
+
+// ============================================
+// INTERNAL FUNCTIONS (for cron job)
+// ============================================
+
+// Publish scheduled announcements - called by cron job
+export const publishScheduled = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+
+    // Get all announcements that are scheduled but not yet "published" (publishedAt > now when created)
+    // Since publishedAt is always set, we look for announcements where:
+    // - createdAt < publishedAt (was scheduled for future)
+    // - publishedAt <= now (now ready to publish)
+    // - No notifications have been sent yet (we track this by checking if notifications exist)
+
+    const announcements = await ctx.db
+      .query("announcements")
+      .withIndex("by_published")
+      .collect();
+
+    let publishedCount = 0;
+
+    for (const announcement of announcements) {
+      // Check if this was a scheduled announcement that just became active
+      // We identify scheduled announcements as those where createdAt < publishedAt
+      // and publishedAt is within the last hour (to avoid re-processing old ones)
+      const wasScheduled = announcement.createdAt < announcement.publishedAt;
+      const justPublished = announcement.publishedAt <= now &&
+                           announcement.publishedAt > (now - 60 * 60 * 1000); // Within last hour
+
+      if (!wasScheduled || !justPublished) continue;
+
+      // Check if notifications were already sent (by checking if any exist)
+      const existingNotifications = await ctx.db
+        .query("notifications")
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("type"), "new_announcement"),
+            q.eq(q.field("relatedId"), announcement._id)
+          )
+        )
+        .first();
+
+      if (existingNotifications) continue; // Already sent notifications
+
+      // Send notifications now
+      let targetUsers;
+      if (announcement.targetOrganizations && announcement.targetOrganizations.length > 0) {
+        const allUsers = await ctx.db.query("users").collect();
+        targetUsers = allUsers.filter((u) =>
+          u.organizationId &&
+          announcement.targetOrganizations!.some(
+            (orgId) => orgId.toString() === u.organizationId?.toString()
+          )
+        );
+      } else {
+        targetUsers = await ctx.db
+          .query("users")
+          .filter((q) => q.eq(q.field("role"), "client"))
+          .collect();
+      }
+
+      for (const targetUser of targetUsers) {
+        await ctx.db.insert("notifications", {
+          userId: targetUser._id,
+          type: "new_announcement",
+          title: "New Announcement",
+          message: announcement.title,
+          link: `/announcements`,
+          relatedId: announcement._id,
+          isRead: false,
+          createdAt: now,
+        });
+      }
+
+      publishedCount++;
+    }
+
+    return { publishedCount };
   },
 });

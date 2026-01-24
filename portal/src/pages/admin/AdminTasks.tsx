@@ -59,6 +59,11 @@ import {
   MessageSquare,
   Send,
   Shield,
+  HelpCircle,
+  Bell,
+  Check,
+  X,
+  AlertTriangle,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { formatDate, formatDistanceToNow, cn } from "@/lib/utils";
@@ -69,6 +74,7 @@ import type { Id } from "../../../convex/_generated/dataModel";
 // Types
 type TaskStatus = "pending" | "in_progress" | "completed";
 type TaskPriority = "low" | "medium" | "high";
+type RequestStatus = "pending_approval" | "approved" | "rejected";
 
 type TaskType = {
   _id: Id<"tasks">;
@@ -82,6 +88,22 @@ type TaskType = {
   createdBy: Id<"users">;
   createdAt: number;
   completedAt?: number;
+  // Client request fields
+  isClientRequest?: boolean;
+  requestStatus?: RequestStatus;
+  requestedBy?: Id<"users">;
+  rejectionReason?: string;
+  // Escalation fields
+  escalatedAt?: number;
+  escalatedTo?: Id<"users">;
+  // Reminder tracking
+  remindersSent?: {
+    sevenDays?: number;
+    threeDays?: number;
+    oneDay?: number;
+    onDue?: number;
+    overdue?: number[];
+  };
 };
 
 const statusOptions = [
@@ -89,6 +111,8 @@ const statusOptions = [
   { value: "pending", label: "Pending" },
   { value: "in_progress", label: "In Progress" },
   { value: "completed", label: "Completed" },
+  { value: "pending_requests", label: "🔔 Pending Requests" },
+  { value: "escalated", label: "⚠️ Escalated" },
 ];
 
 const priorityOptions = [
@@ -114,6 +138,7 @@ export function AdminTasks() {
   const tasks = useQuery(api.tasks.list, {});
   const organizations = useQuery(api.organizations.list);
   const users = useQuery(api.users.list);
+  const pendingRequestsCount = useQuery(api.tasks.countPendingRequests);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -125,7 +150,10 @@ export function AdminTasks() {
   const editDialog = useDialog<TaskType>();
   const deleteDialog = useDialog<TaskType>();
   const commentsDialog = useDialog<TaskType>();
+  const approveDialog = useDialog<TaskType>();
+  const rejectDialog = useDialog<TaskType>();
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   // Create org lookup map
   const orgMap = useMemo(() =>
@@ -139,7 +167,17 @@ export function AdminTasks() {
       const matchesSearch =
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
-      const matchesStatus = statusFilter === "all" || task.status === statusFilter;
+
+      // Handle special filter values
+      let matchesStatus = true;
+      if (statusFilter === "pending_requests") {
+        matchesStatus = task.isClientRequest === true && task.requestStatus === "pending_approval";
+      } else if (statusFilter === "escalated") {
+        matchesStatus = task.escalatedAt !== undefined;
+      } else if (statusFilter !== "all") {
+        matchesStatus = task.status === statusFilter;
+      }
+
       const matchesPriority = priorityFilter === "all" || task.priority === priorityFilter;
       const matchesOrg = orgFilter === "all" || task.organizationId.toString() === orgFilter;
       return matchesSearch && matchesStatus && matchesPriority && matchesOrg;
@@ -169,11 +207,46 @@ export function AdminTasks() {
     }
   );
 
+  // Request approval mutations
+  const approveRequestMutation = useMutation(api.tasks.approveRequest);
+  const { execute: approveRequest, isLoading: isApproving } = useMutationWithToast(
+    (args: { id: Id<"tasks"> }) => approveRequestMutation(args),
+    {
+      successMessage: "Request approved - task is now active",
+      onSuccess: () => approveDialog.close(),
+    }
+  );
+
+  const rejectRequestMutation = useMutation(api.tasks.rejectRequest);
+  const { execute: rejectRequest, isLoading: isRejecting } = useMutationWithToast(
+    (args: { id: Id<"tasks">; reason?: string }) => rejectRequestMutation(args),
+    {
+      successMessage: "Request rejected",
+      onSuccess: () => {
+        rejectDialog.close();
+        setRejectionReason("");
+      },
+    }
+  );
+
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteDialog.data) return;
     await deleteTask({ id: deleteDialog.data._id });
+  };
+
+  const handleApprove = async () => {
+    if (!approveDialog.data) return;
+    await approveRequest({ id: approveDialog.data._id });
+  };
+
+  const handleReject = async () => {
+    if (!rejectDialog.data) return;
+    await rejectRequest({
+      id: rejectDialog.data._id,
+      reason: rejectionReason.trim() || undefined,
+    });
   };
 
   // Bulk delete using Promise.allSettled for parallel processing
@@ -229,8 +302,13 @@ export function AdminTasks() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl flex items-center gap-3">
             Tasks
+            {pendingRequestsCount !== undefined && pendingRequestsCount > 0 && (
+              <Badge variant="warning" className="text-xs">
+                {pendingRequestsCount} pending request{pendingRequestsCount > 1 ? "s" : ""}
+              </Badge>
+            )}
           </h1>
           <p className="mt-1 text-muted-foreground">
             Manage client tasks and assignments
@@ -375,13 +453,25 @@ export function AdminTasks() {
                 {filteredTasks?.map((task) => {
                   const selected = isSelected(task._id);
                   const overdue = isOverdue(task.dueDate, task.status);
+                  const isPendingRequest = task.isClientRequest && task.requestStatus === "pending_approval";
+                  const isEscalated = task.escalatedAt !== undefined;
+                  const reminderCount = task.remindersSent
+                    ? (task.remindersSent.sevenDays ? 1 : 0) +
+                      (task.remindersSent.threeDays ? 1 : 0) +
+                      (task.remindersSent.oneDay ? 1 : 0) +
+                      (task.remindersSent.onDue ? 1 : 0) +
+                      (task.remindersSent.overdue?.length || 0)
+                    : 0;
+
                   return (
                     <tr
                       key={task._id}
                       className={cn(
                         "border-b last:border-0 hover:bg-muted/30",
                         task.status === "completed" && "opacity-60",
-                        selected && "bg-primary/5"
+                        selected && "bg-primary/5",
+                        isPendingRequest && "bg-amber-50/50",
+                        isEscalated && "bg-red-50/50"
                       )}
                     >
                       <td className="px-4 py-3">
@@ -397,15 +487,44 @@ export function AdminTasks() {
                             {statusIcons[task.status]}
                           </div>
                           <div>
-                            <p className={cn(
-                              "font-medium",
-                              task.status === "completed" && "line-through text-muted-foreground"
-                            )}>
-                              {task.title}
-                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className={cn(
+                                "font-medium",
+                                task.status === "completed" && "line-through text-muted-foreground"
+                              )}>
+                                {task.title}
+                              </p>
+                              {/* Client Request Badge */}
+                              {isPendingRequest && (
+                                <Badge variant="warning" className="text-[10px] px-1.5 py-0">
+                                  <HelpCircle className="h-3 w-3 mr-1" />
+                                  Request
+                                </Badge>
+                              )}
+                              {/* Escalated Badge */}
+                              {isEscalated && (
+                                <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                                  <AlertTriangle className="h-3 w-3 mr-1" />
+                                  Escalated
+                                </Badge>
+                              )}
+                              {/* Reminder Count */}
+                              {reminderCount > 0 && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0" title={`${reminderCount} reminder(s) sent`}>
+                                  <Bell className="h-3 w-3 mr-1" />
+                                  {reminderCount}
+                                </Badge>
+                              )}
+                            </div>
                             {task.description && (
                               <p className="text-sm text-muted-foreground line-clamp-1">
                                 {task.description}
+                              </p>
+                            )}
+                            {/* Escalation info */}
+                            {isEscalated && task.escalatedAt && (
+                              <p className="text-xs text-destructive mt-1">
+                                Escalated {formatDistanceToNow(task.escalatedAt)}
                               </p>
                             )}
                           </div>
@@ -445,31 +564,69 @@ export function AdminTasks() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" aria-label={`Actions for ${task.title}`}>
-                              <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => commentsDialog.open(task)}>
-                              <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
-                              Comments
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => editDialog.open(task)}>
-                              <Edit className="h-4 w-4 mr-2" aria-hidden="true" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => deleteDialog.open(task)}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex items-center gap-1">
+                          {/* Quick approve/reject buttons for pending requests */}
+                          {isPendingRequest && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => approveDialog.open(task)}
+                                className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                aria-label="Approve request"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => rejectDialog.open(task)}
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                aria-label="Reject request"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" aria-label={`Actions for ${task.title}`}>
+                                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {isPendingRequest && (
+                                <>
+                                  <DropdownMenuItem onClick={() => approveDialog.open(task)} className="text-green-600">
+                                    <Check className="h-4 w-4 mr-2" aria-hidden="true" />
+                                    Approve Request
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => rejectDialog.open(task)} className="text-red-600">
+                                    <X className="h-4 w-4 mr-2" aria-hidden="true" />
+                                    Reject Request
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                </>
+                              )}
+                              <DropdownMenuItem onClick={() => commentsDialog.open(task)}>
+                                <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
+                                Comments
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => editDialog.open(task)}>
+                                <Edit className="h-4 w-4 mr-2" aria-hidden="true" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => deleteDialog.open(task)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -489,6 +646,14 @@ export function AdminTasks() {
           <span>Completed: {tasks.filter(t => t.status === "completed").length}</span>
           <span className="text-destructive">
             Overdue: {tasks.filter(t => isOverdue(t.dueDate, t.status)).length}
+          </span>
+          {pendingRequestsCount !== undefined && pendingRequestsCount > 0 && (
+            <span className="text-amber-600">
+              Pending Requests: {pendingRequestsCount}
+            </span>
+          )}
+          <span className="text-destructive">
+            Escalated: {tasks.filter(t => t.escalatedAt !== undefined).length}
           </span>
         </div>
       )}
@@ -547,6 +712,76 @@ export function AdminTasks() {
             >
               {isBulkDeleting ? <Spinner size="sm" className="mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
               Delete {selectedCount}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Approve Request Dialog */}
+      <AlertDialog open={approveDialog.isOpen} onOpenChange={approveDialog.setIsOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Check className="h-5 w-5 text-green-600" />
+              Approve Request
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Approve the client's request "{approveDialog.data?.title}"?
+              This will convert the request into an active task.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isApproving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleApprove}
+              disabled={isApproving}
+              className="bg-green-600 text-white hover:bg-green-700"
+            >
+              {isApproving ? <Spinner size="sm" className="mr-2" /> : <Check className="h-4 w-4 mr-2" />}
+              Approve
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reject Request Dialog */}
+      <AlertDialog open={rejectDialog.isOpen} onOpenChange={(open) => {
+        rejectDialog.setIsOpen(open);
+        if (!open) setRejectionReason("");
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <X className="h-5 w-5 text-red-600" />
+              Reject Request
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Reject the client's request "{rejectDialog.data?.title}"?
+              The client will be notified of the rejection.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="rejectionReason" className="text-sm font-medium">
+              Reason (optional)
+            </Label>
+            <Textarea
+              id="rejectionReason"
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Explain why this request was rejected..."
+              className="mt-2"
+              rows={3}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRejecting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleReject}
+              disabled={isRejecting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isRejecting ? <Spinner size="sm" className="mr-2" /> : <X className="h-4 w-4 mr-2" />}
+              Reject
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

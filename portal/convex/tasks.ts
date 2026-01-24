@@ -1,5 +1,6 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { requireAuth, requireAdminOrStaff } from "./lib/auth";
 
 // ============================================
@@ -623,3 +624,472 @@ export const deleteComment = mutation({
     });
   },
 });
+
+// ============================================
+// CLIENT TASK REQUESTS
+// ============================================
+
+// Create a help request (client only)
+export const createRequest = mutation({
+  args: {
+    title: v.string(),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    // Only clients can create requests
+    if (user.role !== "client") {
+      throw new Error("Only clients can submit help requests");
+    }
+
+    if (!user.organizationId) {
+      throw new Error("You must be part of an organization to submit requests");
+    }
+
+    // Validate title
+    if (!args.title.trim()) {
+      throw new Error("Request title is required");
+    }
+    if (args.title.length > 200) {
+      throw new Error("Request title too long (max 200 characters)");
+    }
+
+    const taskId = await ctx.db.insert("tasks", {
+      organizationId: user.organizationId,
+      title: args.title.trim(),
+      description: args.description?.trim(),
+      status: "pending",
+      priority: "medium", // Default priority for requests
+      createdBy: user._id,
+      createdAt: Date.now(),
+      // Client request fields
+      isClientRequest: true,
+      requestStatus: "pending_approval",
+      requestedBy: user._id,
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: user.organizationId,
+      userId: user._id,
+      action: "submitted_request",
+      resourceType: "task",
+      resourceId: taskId,
+      resourceName: args.title.trim(),
+      createdAt: Date.now(),
+    });
+
+    // Notify admins/staff about the new request
+    const admins = await ctx.db
+      .query("users")
+      .filter((q) => q.or(q.eq(q.field("role"), "admin"), q.eq(q.field("role"), "staff")))
+      .collect();
+
+    for (const admin of admins) {
+      await ctx.db.insert("notifications", {
+        userId: admin._id,
+        type: "task_request",
+        title: "New Help Request",
+        message: `${user.name} submitted a help request: "${args.title.trim()}"`,
+        link: `/admin/tasks`,
+        relatedId: taskId,
+        isRead: false,
+        createdAt: Date.now(),
+      });
+    }
+
+    return taskId;
+  },
+});
+
+// Approve a client request (admin/staff only)
+export const approveRequest = mutation({
+  args: {
+    id: v.id("tasks"),
+    title: v.optional(v.string()), // Allow editing title on approval
+    description: v.optional(v.string()),
+    priority: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
+    dueDate: v.optional(v.number()),
+    assignedTo: v.optional(v.id("users")),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAdminOrStaff(ctx);
+    const task = await ctx.db.get(args.id);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    if (!task.isClientRequest || task.requestStatus !== "pending_approval") {
+      throw new Error("This task is not a pending request");
+    }
+
+    // Build updates
+    const updates: Record<string, unknown> = {
+      requestStatus: "approved",
+      approvedBy: user._id,
+      approvedAt: Date.now(),
+    };
+
+    if (args.title) updates.title = args.title.trim();
+    if (args.description !== undefined) updates.description = args.description?.trim();
+    if (args.priority) updates.priority = args.priority;
+    if (args.dueDate !== undefined) updates.dueDate = args.dueDate;
+    if (args.assignedTo !== undefined) updates.assignedTo = args.assignedTo;
+
+    await ctx.db.patch(args.id, updates);
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: task.organizationId,
+      userId: user._id,
+      action: "approved_request",
+      resourceType: "task",
+      resourceId: args.id,
+      resourceName: args.title?.trim() ?? task.title,
+      createdAt: Date.now(),
+    });
+
+    // Notify the client who submitted the request
+    if (task.requestedBy) {
+      await ctx.db.insert("notifications", {
+        userId: task.requestedBy,
+        type: "task_request_approved",
+        title: "Request Approved",
+        message: `Your help request "${task.title}" has been approved`,
+        link: `/tasks`,
+        relatedId: args.id,
+        isRead: false,
+        createdAt: Date.now(),
+      });
+    }
+  },
+});
+
+// Reject a client request (admin/staff only)
+export const rejectRequest = mutation({
+  args: {
+    id: v.id("tasks"),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAdminOrStaff(ctx);
+    const task = await ctx.db.get(args.id);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    if (!task.isClientRequest || task.requestStatus !== "pending_approval") {
+      throw new Error("This task is not a pending request");
+    }
+
+    await ctx.db.patch(args.id, {
+      requestStatus: "rejected",
+      rejectionReason: args.reason?.trim(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: task.organizationId,
+      userId: user._id,
+      action: "rejected_request",
+      resourceType: "task",
+      resourceId: args.id,
+      resourceName: task.title,
+      createdAt: Date.now(),
+    });
+
+    // Notify the client who submitted the request
+    if (task.requestedBy) {
+      await ctx.db.insert("notifications", {
+        userId: task.requestedBy,
+        type: "task_request_rejected",
+        title: "Request Declined",
+        message: args.reason
+          ? `Your help request "${task.title}" was declined: ${args.reason}`
+          : `Your help request "${task.title}" was declined`,
+        link: `/tasks`,
+        relatedId: args.id,
+        isRead: false,
+        createdAt: Date.now(),
+      });
+    }
+  },
+});
+
+// Cancel a pending request (client who submitted it)
+export const cancelRequest = mutation({
+  args: { id: v.id("tasks") },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const task = await ctx.db.get(args.id);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    if (!task.isClientRequest || task.requestStatus !== "pending_approval") {
+      throw new Error("This task is not a pending request");
+    }
+
+    // Only the requester can cancel
+    if (task.requestedBy?.toString() !== user._id.toString()) {
+      throw new Error("You can only cancel your own requests");
+    }
+
+    // Delete the task entirely since it was never approved
+    await ctx.db.delete(args.id);
+
+    // Log activity
+    await ctx.db.insert("activityLogs", {
+      organizationId: task.organizationId,
+      userId: user._id,
+      action: "cancelled_request",
+      resourceType: "task",
+      resourceId: args.id,
+      resourceName: task.title,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Count pending requests (for admin badge)
+export const countPendingRequests = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+
+    // Only admins/staff see request counts
+    if (user.role !== "admin" && user.role !== "staff") {
+      return 0;
+    }
+
+    const pendingRequests = await ctx.db
+      .query("tasks")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("isClientRequest"), true),
+          q.eq(q.field("requestStatus"), "pending_approval")
+        )
+      )
+      .collect();
+
+    return pendingRequests.length;
+  },
+});
+
+// ============================================
+// TASK REMINDERS (Internal Functions for Cron)
+// ============================================
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Process task reminders - called by cron job
+export const processReminders = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+
+    // Get all incomplete tasks with due dates
+    const tasks = await ctx.db
+      .query("tasks")
+      .filter((q) =>
+        q.and(
+          q.neq(q.field("status"), "completed"),
+          q.neq(q.field("dueDate"), undefined)
+        )
+      )
+      .collect();
+
+    let remindersProcessed = 0;
+    let escalationsProcessed = 0;
+
+    for (const task of tasks) {
+      if (!task.dueDate) continue;
+
+      // Skip client requests that aren't approved yet
+      if (task.isClientRequest && task.requestStatus !== "approved") continue;
+
+      const daysUntilDue = Math.floor((task.dueDate - now) / DAY_MS);
+      const daysOverdue = Math.floor((now - task.dueDate) / DAY_MS);
+      const remindersSent = task.remindersSent ?? {};
+
+      let shouldUpdate = false;
+      const updates: Record<string, unknown> = {};
+      const newRemindersSent = { ...remindersSent };
+
+      // 7 days before
+      if (daysUntilDue === 7 && !remindersSent.sevenDays) {
+        newRemindersSent.sevenDays = now;
+        await sendTaskReminder(ctx, task, "7 days");
+        shouldUpdate = true;
+        remindersProcessed++;
+      }
+
+      // 3 days before
+      if (daysUntilDue === 3 && !remindersSent.threeDays) {
+        newRemindersSent.threeDays = now;
+        await sendTaskReminder(ctx, task, "3 days");
+        shouldUpdate = true;
+        remindersProcessed++;
+      }
+
+      // 1 day before
+      if (daysUntilDue === 1 && !remindersSent.oneDay) {
+        newRemindersSent.oneDay = now;
+        await sendTaskReminder(ctx, task, "1 day");
+        shouldUpdate = true;
+        remindersProcessed++;
+      }
+
+      // On due date
+      if (daysUntilDue === 0 && !remindersSent.onDue) {
+        newRemindersSent.onDue = now;
+        await sendTaskReminder(ctx, task, "today");
+        shouldUpdate = true;
+        remindersProcessed++;
+      }
+
+      // Overdue handling
+      if (daysOverdue > 0 && daysOverdue <= 7) {
+        // Send daily overdue reminders for first 7 days
+        const overdueReminders = remindersSent.overdue ?? [];
+        const todayStart = new Date(now).setHours(0, 0, 0, 0);
+        const alreadySentToday = overdueReminders.some(
+          (ts) => new Date(ts).setHours(0, 0, 0, 0) === todayStart
+        );
+
+        if (!alreadySentToday) {
+          newRemindersSent.overdue = [...overdueReminders, now];
+          await sendOverdueReminder(ctx, task, daysOverdue);
+          shouldUpdate = true;
+          remindersProcessed++;
+        }
+      }
+
+      // Escalate after 7 days overdue
+      if (daysOverdue >= 7 && !task.escalatedAt) {
+        await escalateTask(ctx, task);
+        updates.escalatedAt = now;
+        shouldUpdate = true;
+        escalationsProcessed++;
+      }
+
+      if (shouldUpdate) {
+        updates.remindersSent = newRemindersSent;
+        await ctx.db.patch(task._id, updates);
+      }
+    }
+
+    return { remindersProcessed, escalationsProcessed };
+  },
+});
+
+// Helper: Send task reminder notification
+async function sendTaskReminder(
+  ctx: { db: { get: (id: unknown) => Promise<unknown>; insert: (table: string, data: unknown) => Promise<unknown>; query: (table: string) => { withIndex: (name: string, fn: (q: unknown) => unknown) => { collect: () => Promise<unknown[]> } } } },
+  task: { _id: unknown; title: string; organizationId: unknown; assignedTo?: unknown },
+  timing: string
+) {
+  // Get users to notify (assigned user or all org users)
+  let usersToNotify: Array<{ _id: unknown; name: string }> = [];
+
+  if (task.assignedTo) {
+    const assignee = await ctx.db.get(task.assignedTo);
+    if (assignee) {
+      usersToNotify = [assignee as { _id: unknown; name: string }];
+    }
+  } else {
+    usersToNotify = await ctx.db
+      .query("users")
+      .withIndex("by_organization", (q: { eq: (field: string, value: unknown) => unknown }) =>
+        q.eq("organizationId", task.organizationId)
+      )
+      .collect() as Array<{ _id: unknown; name: string }>;
+  }
+
+  for (const user of usersToNotify) {
+    await ctx.db.insert("notifications", {
+      userId: user._id,
+      type: "task_reminder",
+      title: "Task Reminder",
+      message: `"${task.title}" is due in ${timing}`,
+      link: `/tasks`,
+      relatedId: task._id,
+      isRead: false,
+      createdAt: Date.now(),
+    });
+  }
+}
+
+// Helper: Send overdue reminder notification
+async function sendOverdueReminder(
+  ctx: { db: { get: (id: unknown) => Promise<unknown>; insert: (table: string, data: unknown) => Promise<unknown>; query: (table: string) => { withIndex: (name: string, fn: (q: unknown) => unknown) => { collect: () => Promise<unknown[]> } } } },
+  task: { _id: unknown; title: string; organizationId: unknown; assignedTo?: unknown },
+  daysOverdue: number
+) {
+  // Get users to notify
+  let usersToNotify: Array<{ _id: unknown }> = [];
+
+  if (task.assignedTo) {
+    const assignee = await ctx.db.get(task.assignedTo);
+    if (assignee) {
+      usersToNotify = [assignee as { _id: unknown }];
+    }
+  } else {
+    usersToNotify = await ctx.db
+      .query("users")
+      .withIndex("by_organization", (q: { eq: (field: string, value: unknown) => unknown }) =>
+        q.eq("organizationId", task.organizationId)
+      )
+      .collect() as Array<{ _id: unknown }>;
+  }
+
+  const dayText = daysOverdue === 1 ? "1 day" : `${daysOverdue} days`;
+
+  for (const user of usersToNotify) {
+    await ctx.db.insert("notifications", {
+      userId: user._id,
+      type: "task_overdue",
+      title: "Task Overdue",
+      message: `"${task.title}" is ${dayText} overdue`,
+      link: `/tasks`,
+      relatedId: task._id,
+      isRead: false,
+      createdAt: Date.now(),
+    });
+  }
+}
+
+// Helper: Escalate task to staff
+async function escalateTask(
+  ctx: { db: { get: (id: unknown) => Promise<unknown>; insert: (table: string, data: unknown) => Promise<unknown>; query: (table: string) => { filter: (fn: (q: unknown) => unknown) => { collect: () => Promise<unknown[]> }; withIndex: (name: string, fn: (q: unknown) => unknown) => { collect: () => Promise<unknown[]> } } } },
+  task: { _id: unknown; title: string; organizationId: unknown }
+) {
+  // Get all admins/staff to notify
+  const admins = await ctx.db
+    .query("users")
+    .filter((q: { or: (...args: unknown[]) => unknown; eq: (a: unknown, b: unknown) => unknown; field: (name: string) => unknown }) =>
+      q.or(q.eq(q.field("role"), "admin"), q.eq(q.field("role"), "staff"))
+    )
+    .collect() as Array<{ _id: unknown }>;
+
+  // Get organization name for context
+  const org = await ctx.db.get(task.organizationId) as { name: string } | null;
+  const orgName = org?.name ?? "Unknown Organization";
+
+  for (const admin of admins) {
+    await ctx.db.insert("notifications", {
+      userId: admin._id,
+      type: "task_escalated",
+      title: "Task Escalated",
+      message: `"${task.title}" for ${orgName} is 7+ days overdue and needs attention`,
+      link: `/admin/tasks`,
+      relatedId: task._id,
+      isRead: false,
+      createdAt: Date.now(),
+    });
+  }
+}

@@ -1,55 +1,87 @@
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Bell,
   Megaphone,
   AlertTriangle,
-  Calendar,
-  Newspaper,
   Pin,
   Check,
   Sparkles,
+  Building2,
+  Settings,
+  Lightbulb,
+  Scale,
+  Filter,
 } from "@/lib/icons";
 import { cn, formatDistanceToNow } from "@/lib/utils";
 
+// Updated type configuration matching the expanded announcement types
 const typeConfig: Record<string, { icon: React.ReactNode; bg: string; text: string; iconBg: string; label: string }> = {
   general: {
     icon: <Megaphone className="h-4 w-4 text-blue-600" />,
     bg: "bg-blue-50",
     text: "text-blue-700",
-    iconBg: "bg-blue-50",
+    iconBg: "bg-blue-100",
     label: "General",
   },
-  tax_update: {
-    icon: <AlertTriangle className="h-4 w-4 text-amber-600" />,
-    bg: "bg-amber-50",
-    text: "text-amber-700",
-    iconBg: "bg-amber-50",
-    label: "Tax Update",
-  },
-  deadline: {
-    icon: <Calendar className="h-4 w-4 text-red-600" />,
+  tax_deadline: {
+    icon: <AlertTriangle className="h-4 w-4 text-red-600" />,
     bg: "bg-red-50",
     text: "text-red-700",
-    iconBg: "bg-red-50",
-    label: "Deadline",
+    iconBg: "bg-red-100",
+    label: "Tax Deadline",
   },
-  news: {
-    icon: <Newspaper className="h-4 w-4 text-emerald-600" />,
-    bg: "bg-emerald-50",
-    text: "text-emerald-700",
-    iconBg: "bg-emerald-50",
-    label: "News",
+  regulatory: {
+    icon: <Scale className="h-4 w-4 text-amber-600" />,
+    bg: "bg-amber-50",
+    text: "text-amber-700",
+    iconBg: "bg-amber-100",
+    label: "Regulatory",
+  },
+  firm_news: {
+    icon: <Building2 className="h-4 w-4 text-purple-600" />,
+    bg: "bg-purple-50",
+    text: "text-purple-700",
+    iconBg: "bg-purple-100",
+    label: "Firm News",
+  },
+  maintenance: {
+    icon: <Settings className="h-4 w-4 text-gray-600" />,
+    bg: "bg-gray-100",
+    text: "text-gray-700",
+    iconBg: "bg-gray-200",
+    label: "Maintenance",
+  },
+  tip: {
+    icon: <Lightbulb className="h-4 w-4 text-green-600" />,
+    bg: "bg-green-50",
+    text: "text-green-700",
+    iconBg: "bg-green-100",
+    label: "Tip",
   },
 };
 
 export function Announcements() {
   const announcements = useQuery(api.announcements.list, {});
   const markRead = useMutation(api.announcements.markRead);
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
   const handleMarkRead = async (id: string) => {
     await markRead({ id: id as any });
   };
+
+  // Filter announcements by type
+  const filteredAnnouncements = announcements?.filter(
+    (a) => typeFilter === "all" || a.type === typeFilter
+  );
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -60,16 +92,40 @@ export function Announcements() {
           animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         }}
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
-          <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
-          <span className="text-xs font-medium text-[#6b6b76]">Updates</span>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
+              <span className="text-xs font-medium text-[#6b6b76]">Updates</span>
+            </div>
+            <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
+              Announcements
+            </h1>
+            <p className="mt-2 text-[#6b6b76]">
+              Important updates from Amjad & Hazli
+            </p>
+          </div>
+          {/* Type Filter */}
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-[#9d9da6]" />
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[160px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {Object.entries(typeConfig).map(([key, config]) => (
+                  <SelectItem key={key} value={key}>
+                    <div className="flex items-center gap-2">
+                      {config.icon}
+                      {config.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
-          Announcements
-        </h1>
-        <p className="mt-2 text-[#6b6b76]">
-          Important updates from Amjad & Hazli
-        </p>
       </div>
 
       {/* Announcements List */}
@@ -80,7 +136,7 @@ export function Announcements() {
             <span className="text-[#9d9da6] text-sm">Loading announcements...</span>
           </div>
         </div>
-      ) : announcements.length === 0 ? (
+      ) : filteredAnnouncements?.length === 0 ? (
         <div
           className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] opacity-0"
           style={{
@@ -90,12 +146,16 @@ export function Announcements() {
           <div className="w-14 h-14 rounded-xl bg-[#e5e5e7] flex items-center justify-center mb-4">
             <Bell className="h-6 w-6 text-[#6b6b76]" />
           </div>
-          <p className="text-base font-medium text-[#0f0f12]">No announcements</p>
-          <p className="text-sm text-[#9d9da6] mt-1">Check back later for updates</p>
+          <p className="text-base font-medium text-[#0f0f12]">
+            {typeFilter !== "all" ? "No matching announcements" : "No announcements"}
+          </p>
+          <p className="text-sm text-[#9d9da6] mt-1">
+            {typeFilter !== "all" ? "Try selecting a different type" : "Check back later for updates"}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {announcements.map((announcement, index) => {
+          {filteredAnnouncements?.map((announcement, index) => {
             const config = typeConfig[announcement.type] || typeConfig.general;
             return (
               <div

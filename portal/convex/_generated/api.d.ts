@@ -12,6 +12,7 @@ import type * as activity from "../activity.js";
 import type * as admin from "../admin.js";
 import type * as announcements from "../announcements.js";
 import type * as auth from "../auth.js";
+import type * as crons from "../crons.js";
 import type * as documents from "../documents.js";
 import type * as emails from "../emails.js";
 import type * as files from "../files.js";
@@ -25,6 +26,7 @@ import type * as organizations from "../organizations.js";
 import type * as serviceTypes from "../serviceTypes.js";
 import type * as signatures from "../signatures.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as taskTemplates from "../taskTemplates.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
 
@@ -39,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   announcements: typeof announcements;
   auth: typeof auth;
+  crons: typeof crons;
   documents: typeof documents;
   emails: typeof emails;
   files: typeof files;
@@ -52,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   serviceTypes: typeof serviceTypes;
   signatures: typeof signatures;
   subscriptions: typeof subscriptions;
+  taskTemplates: typeof taskTemplates;
   tasks: typeof tasks;
   users: typeof users;
 }>;

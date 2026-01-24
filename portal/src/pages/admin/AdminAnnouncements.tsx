@@ -45,12 +45,27 @@ import {
   Edit,
   Trash,
   Calendar,
+  Clock,
+  AlertTriangle,
+  Scale,
+  Lightbulb,
+  Settings,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
 
-type AnnouncementType = "general" | "tax_update" | "deadline" | "news";
+type AnnouncementType = "general" | "tax_deadline" | "regulatory" | "firm_news" | "maintenance" | "tip";
+
+// Type configuration with icons and colors
+const announcementTypeConfig: Record<AnnouncementType, { label: string; icon: typeof Megaphone; color: string; badgeVariant: "default" | "destructive" | "secondary" | "outline" }> = {
+  general: { label: "General", icon: Megaphone, color: "bg-blue-500", badgeVariant: "default" },
+  tax_deadline: { label: "Tax Deadline", icon: AlertTriangle, color: "bg-red-500", badgeVariant: "destructive" },
+  regulatory: { label: "Regulatory", icon: Scale, color: "bg-amber-500", badgeVariant: "default" },
+  firm_news: { label: "Firm News", icon: Building2, color: "bg-purple-500", badgeVariant: "default" },
+  maintenance: { label: "Maintenance", icon: Settings, color: "bg-gray-500", badgeVariant: "secondary" },
+  tip: { label: "Tip", icon: Lightbulb, color: "bg-green-500", badgeVariant: "default" },
+};
 
 export function AdminAnnouncements() {
   const announcements = useQuery(api.admin.listAllAnnouncements);
@@ -72,16 +87,14 @@ export function AdminAnnouncements() {
   });
 
   const getTypeBadge = (type: AnnouncementType) => {
-    switch (type) {
-      case "general":
-        return <Badge variant="secondary">General</Badge>;
-      case "tax_update":
-        return <Badge className="bg-blue-500">Tax Update</Badge>;
-      case "deadline":
-        return <Badge variant="destructive">Deadline</Badge>;
-      case "news":
-        return <Badge className="bg-purple-500">News</Badge>;
-    }
+    const config = announcementTypeConfig[type] || announcementTypeConfig.general;
+    const Icon = config.icon;
+    return (
+      <Badge className={`${config.color} text-white gap-1`}>
+        <Icon className="h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
   };
 
   const getStatusBadge = (status: string) => {
@@ -141,9 +154,11 @@ export function AdminAnnouncements() {
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="general">General</SelectItem>
-            <SelectItem value="tax_update">Tax Update</SelectItem>
-            <SelectItem value="deadline">Deadline</SelectItem>
-            <SelectItem value="news">News</SelectItem>
+            <SelectItem value="tax_deadline">Tax Deadline</SelectItem>
+            <SelectItem value="regulatory">Regulatory</SelectItem>
+            <SelectItem value="firm_news">Firm News</SelectItem>
+            <SelectItem value="maintenance">Maintenance</SelectItem>
+            <SelectItem value="tip">Tip</SelectItem>
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -206,10 +221,17 @@ export function AdminAnnouncements() {
                       {announcement.content}
                     </p>
                     <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        Published {formatDate(announcement.publishedAt)}
-                      </span>
+                      {announcement.adminStatus === "scheduled" && announcement.scheduledFor ? (
+                        <span className="flex items-center gap-1 text-amber-600">
+                          <Clock className="h-3 w-3" />
+                          Scheduled for {formatDate(announcement.scheduledFor)}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          Published {formatDate(announcement.publishedAt)}
+                        </span>
+                      )}
                       {announcement.expiresAt && (
                         <span>Expires {formatDate(announcement.expiresAt)}</span>
                       )}
@@ -294,6 +316,8 @@ interface AnnouncementDialogProps {
     targetOrganizations?: Id<"organizations">[];
     isPinned: boolean;
     expiresAt?: number;
+    scheduledFor?: number;
+    adminStatus?: string;
   };
   organizations: Array<{ _id: Id<"organizations">; name: string }>;
   onClose: () => void;
@@ -302,7 +326,7 @@ interface AnnouncementDialogProps {
 function AnnouncementDialog({ announcement, organizations, onClose }: AnnouncementDialogProps) {
   const createAnnouncement = useMutation(api.announcements.create);
   const updateAnnouncement = useMutation(api.announcements.update);
-  
+
   const [title, setTitle] = useState(announcement?.title || "");
   const [content, setContent] = useState(announcement?.content || "");
   const [type, setType] = useState<AnnouncementType>((announcement?.type as AnnouncementType) || "general");
@@ -312,26 +336,58 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
   );
   const [isPinned, setIsPinned] = useState(announcement?.isPinned || false);
   const [expiresAt, setExpiresAt] = useState(
-    announcement?.expiresAt 
+    announcement?.expiresAt
       ? new Date(announcement.expiresAt).toISOString().split("T")[0]
       : ""
+  );
+  // Scheduling state
+  const [publishOption, setPublishOption] = useState<"now" | "schedule">(
+    announcement?.adminStatus === "scheduled" ? "schedule" : "now"
+  );
+  const [scheduledDate, setScheduledDate] = useState(
+    announcement?.scheduledFor
+      ? new Date(announcement.scheduledFor).toISOString().split("T")[0]
+      : ""
+  );
+  const [scheduledTime, setScheduledTime] = useState(
+    announcement?.scheduledFor
+      ? new Date(announcement.scheduledFor).toTimeString().slice(0, 5)
+      : "09:00"
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!announcement;
+  const isScheduled = announcement?.adminStatus === "scheduled";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!title.trim() || !content.trim()) {
       toast.error("Title and content are required");
       return;
     }
 
+    // Validate scheduling
+    if (publishOption === "schedule" && !scheduledDate) {
+      toast.error("Please select a date for scheduling");
+      return;
+    }
+
+    // Calculate scheduledFor timestamp
+    let scheduledFor: number | undefined;
+    if (publishOption === "schedule" && scheduledDate) {
+      const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime || "09:00"}`);
+      if (scheduledDateTime <= new Date()) {
+        toast.error("Scheduled time must be in the future");
+        return;
+      }
+      scheduledFor = scheduledDateTime.getTime();
+    }
+
     setIsSubmitting(true);
     try {
-      const targetOrganizations = targetAll 
-        ? undefined 
+      const targetOrganizations = targetAll
+        ? undefined
         : selectedOrgs.map(id => id as Id<"organizations">);
 
       if (isEditing) {
@@ -343,8 +399,9 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
           targetOrganizations,
           isPinned,
           expiresAt: expiresAt ? new Date(expiresAt).getTime() : undefined,
+          scheduledFor,
         });
-        toast.success("Announcement updated");
+        toast.success(scheduledFor ? "Announcement scheduled" : "Announcement updated");
       } else {
         await createAnnouncement({
           title: title.trim(),
@@ -353,8 +410,9 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
           targetOrganizations,
           isPinned,
           expiresAt: expiresAt ? new Date(expiresAt).getTime() : undefined,
+          scheduledFor,
         });
-        toast.success("Announcement created");
+        toast.success(scheduledFor ? "Announcement scheduled" : "Announcement published");
       }
       onClose();
     } catch (error) {
@@ -413,10 +471,17 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="tax_update">Tax Update</SelectItem>
-                <SelectItem value="deadline">Deadline</SelectItem>
-                <SelectItem value="news">News</SelectItem>
+                {Object.entries(announcementTypeConfig).map(([key, config]) => {
+                  const Icon = config.icon;
+                  return (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4" />
+                        {config.label}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
@@ -484,6 +549,66 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
               Leave empty for no expiration
             </p>
           </div>
+
+          {/* Scheduling Options */}
+          <div className="grid gap-3 pt-2 border-t">
+            <Label>Publishing</Label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="publishOption"
+                  value="now"
+                  checked={publishOption === "now"}
+                  onChange={() => setPublishOption("now")}
+                  className="h-4 w-4 text-primary"
+                />
+                <span className="text-sm">Publish immediately</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="publishOption"
+                  value="schedule"
+                  checked={publishOption === "schedule"}
+                  onChange={() => setPublishOption("schedule")}
+                  className="h-4 w-4 text-primary"
+                />
+                <span className="text-sm flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  Schedule for later
+                </span>
+              </label>
+            </div>
+
+            {publishOption === "schedule" && (
+              <div className="grid grid-cols-2 gap-3 pl-6">
+                <div className="grid gap-1">
+                  <Label htmlFor="scheduledDate" className="text-xs">Date</Label>
+                  <Input
+                    id="scheduledDate"
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    min={new Date().toISOString().split("T")[0]}
+                    required={publishOption === "schedule"}
+                  />
+                </div>
+                <div className="grid gap-1">
+                  <Label htmlFor="scheduledTime" className="text-xs">Time</Label>
+                  <Input
+                    id="scheduledTime"
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                  />
+                </div>
+                <p className="col-span-2 text-xs text-muted-foreground">
+                  Your timezone: {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         <DialogFooter>
@@ -492,7 +617,11 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? <Spinner size="sm" className="mr-2" /> : null}
-            {isEditing ? "Save Changes" : "Publish"}
+            {isEditing
+              ? "Save Changes"
+              : publishOption === "schedule"
+                ? "Schedule"
+                : "Publish Now"}
           </Button>
         </DialogFooter>
       </form>

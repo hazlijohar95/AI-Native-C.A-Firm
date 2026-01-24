@@ -30,6 +30,7 @@ const AdminTasks = lazy(() => import("@/pages/admin/AdminTasks").then(m => ({ de
 const AdminSignatures = lazy(() => import("@/pages/admin/AdminSignatures").then(m => ({ default: m.AdminSignatures })));
 const AdminDocuments = lazy(() => import("@/pages/admin/AdminDocuments").then(m => ({ default: m.AdminDocuments })));
 const AdminServices = lazy(() => import("@/pages/admin/AdminServices").then(m => ({ default: m.AdminServices })));
+const AdminTaskTemplates = lazy(() => import("@/pages/admin/AdminTaskTemplates").then(m => ({ default: m.AdminTaskTemplates })));
 
 // Loading fallback for lazy-loaded components
 function PageLoader() {
@@ -207,6 +208,13 @@ function AuthenticatedRoutes() {
             <AdminRoute>
               <Suspense fallback={<PageLoader />}>
                 <AdminServices />
+              </Suspense>
+            </AdminRoute>
+          } />
+          <Route path="/admin/task-templates" element={
+            <AdminRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminTaskTemplates />
               </Suspense>
             </AdminRoute>
           } />
