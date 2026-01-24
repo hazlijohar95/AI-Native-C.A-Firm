@@ -4,7 +4,7 @@
 
 ### AI-Native Chartered Accounting Firm
 
-[![Website](https://img.shields.io/badge/Website-amjadhazli.com-253FF6?style=for-the-badge&logo=google-chrome&logoColor=white)](https://amjadhazli.com)
+[![Website](https://img.shields.io/badge/Website-amjadhazli.com-2B3A55?style=for-the-badge&logo=google-chrome&logoColor=white)](https://amjadhazli.com)
 [![Portal](https://img.shields.io/badge/Portal-portal.amjadhazli.com-0f0f12?style=for-the-badge&logo=shield&logoColor=white)](https://portal.amjadhazli.com)
 [![License](https://img.shields.io/badge/License-Proprietary-gray?style=for-the-badge)](LICENSE)
 
@@ -163,10 +163,10 @@ python3 -m http.server 3000
 **Colors**
 | Token | Value |
 |-------|-------|
-| Primary | `#253FF6` |
-| Dark | `#0f0f12` |
-| Gray | `#6b6b76` |
-| Border | `#EBEBEB` |
+| Navy | `#2B3A55` |
+| Gold | `#B8986B` |
+| Cream | `#FAF8F5` |
+| Ink | `#1A1A1A` |
 
 </td>
 <td>
