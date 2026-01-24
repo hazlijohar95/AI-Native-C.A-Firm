@@ -89,7 +89,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       {/* Desktop sidebar */}
       <aside
-        className="hidden lg:flex lg:w-64 lg:flex-col"
+        className="hidden lg:flex lg:w-64 lg:flex-col lg:shrink-0"
         aria-label="Main navigation"
       >
         <div className="flex min-h-0 flex-1 flex-col border-r border-[#F1F1F1] bg-white">
