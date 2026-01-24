@@ -27,20 +27,11 @@ export function Shell({ children }: ShellProps) {
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Skip link for accessibility */}
       <SkipLink />
-      
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-          aria-hidden="true"
-        />
-      )}
 
-      {/* Sidebar */}
-      <Sidebar 
-        open={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
+      {/* Sidebar (includes its own backdrop) */}
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Main content area */}

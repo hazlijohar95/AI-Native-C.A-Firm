@@ -878,14 +878,16 @@
     .hero-actions {
       display: flex;
       flex-direction: column; /* Mobile: stack vertically */
-      align-items: stretch;
+      align-items: center; /* Center buttons on mobile */
       gap: var(--space-3);
       margin-bottom: var(--space-4);
       width: 100%;
+      padding: 0 var(--space-4); /* Add padding for mobile */
     }
 
     .hero-actions .btn {
       width: 100%; /* Mobile: full width */
+      max-width: 320px; /* But not too wide */
       justify-content: center;
     }
 
@@ -919,10 +921,12 @@
         flex-direction: row;
         justify-content: center;
         width: auto;
+        padding: 0; /* Remove mobile padding */
       }
-      
+
       .hero-actions .btn {
         width: auto;
+        max-width: none;
       }
     }
 
@@ -1983,7 +1987,14 @@
     @media (min-width: 480px) and (max-width: 639px) {
       .services-grid { grid-template-columns: repeat(2, 1fr); }
       .footer-grid { grid-template-columns: repeat(2, 1fr); }
-      .hero-actions { flex-direction: row; }
+      .hero-actions {
+        flex-direction: row;
+        justify-content: center;
+      }
+      .hero-actions .btn {
+        width: auto;
+        max-width: none;
+      }
     }
 
     /* ========================================
