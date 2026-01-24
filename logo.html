@@ -886,6 +886,9 @@
     .reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.18s; opacity: 1; transform: translateY(0); }
     .reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.24s; opacity: 1; transform: translateY(0); }
     .reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.30s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(7) { transition-delay: 0.36s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(8) { transition-delay: 0.42s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(9) { transition-delay: 0.48s; opacity: 1; transform: translateY(0); }
 
     /* ══════════════════════════════════════════════════════════════
        RESPONSIVE REFINEMENTS
@@ -930,6 +933,527 @@
         transform: none;
       }
     }
+
+    /* ══════════════════════════════════════════════════════════════
+       SOCIAL MEDIA KIT — Grid Layout
+       ══════════════════════════════════════════════════════════════ */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-5);
+    }
+
+    @media (max-width: 900px) {
+      .social-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      .social-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .social-card {
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      transition:
+        transform var(--duration-slow) var(--ease-out-expo),
+        box-shadow var(--duration-slow) var(--ease-out-expo);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .social-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .social-preview {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      background: var(--cream-200);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      border-radius: 6px 6px 0 0;
+      pointer-events: none;
+    }
+
+    .social-preview.wide {
+      height: 80px;
+    }
+
+    .social-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform var(--duration-slow) var(--ease-out-expo);
+    }
+
+    .social-card:hover .social-preview img {
+      transform: scale(1.04);
+    }
+
+    .social-info {
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--cream-300);
+    }
+
+    .social-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .social-name {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--ink-800);
+    }
+
+    .social-size {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      color: var(--ink-400);
+      letter-spacing: 0.05em;
+    }
+
+    .social-download {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--navy-700);
+      color: var(--gold-400);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .social-download:hover {
+      background: var(--gold-500);
+      color: var(--navy-900);
+      transform: scale(1.08);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       EMAIL SIGNATURE GENERATOR
+       ══════════════════════════════════════════════════════════════ */
+    .signature-builder {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: var(--space-8);
+      background: white;
+      border-radius: 6px;
+      padding: var(--space-8);
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media (max-width: 800px) {
+      .signature-builder {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .signature-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .signature-form label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-600);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-1);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .signature-form input,
+    .signature-form select {
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--cream-300);
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: var(--ink-800);
+      background: var(--cream-100);
+      transition: border-color var(--duration-fast) var(--ease-out-quart);
+    }
+
+    .signature-form input:focus,
+    .signature-form select:focus {
+      outline: none;
+      border-color: var(--gold-500);
+      box-shadow: 0 0 0 3px rgba(184, 152, 107, 0.15);
+    }
+
+    .signature-form input::placeholder {
+      color: var(--ink-400);
+    }
+
+    .preset-btns {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      padding: var(--space-2) var(--space-4);
+      border: 1px solid var(--cream-300);
+      border-radius: 4px;
+      background: var(--cream-100);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--ink-600);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out-quart);
+    }
+
+    .preset-btn:hover {
+      border-color: var(--gold-500);
+      color: var(--gold-600);
+    }
+
+    .preset-btn.active {
+      background: var(--navy-700);
+      border-color: var(--navy-700);
+      color: white;
+    }
+
+    .signature-output {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .signature-preview-label {
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-weight: 400;
+      color: var(--ink-400);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-3);
+    }
+
+    .signature-preview-box {
+      background: var(--cream-100);
+      border: 1px solid var(--cream-300);
+      border-radius: 4px;
+      padding: var(--space-6);
+      min-height: 160px;
+      display: flex;
+      align-items: center;
+      flex: 1;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .signature-actions {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      background: var(--gold-500);
+      color: var(--navy-900);
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .copy-btn:hover {
+      background: var(--gold-400);
+      transform: translateY(-1px);
+    }
+
+    .copy-btn.secondary {
+      background: var(--navy-700);
+      color: white;
+    }
+
+    .copy-btn.secondary:hover {
+      background: var(--navy-600);
+    }
+
+    .copy-btn i {
+      font-size: 1rem;
+    }
+
+    .style-select {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .style-btn {
+      flex: 1;
+      padding: var(--space-3);
+      border: 1px solid var(--cream-300);
+      border-radius: 4px;
+      background: var(--cream-100);
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      color: var(--ink-600);
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--duration-fast) var(--ease-out-quart);
+    }
+
+    .style-btn:hover {
+      border-color: var(--gold-500);
+    }
+
+    .style-btn.active {
+      background: var(--navy-700);
+      border-color: var(--navy-700);
+      color: white;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DOCUMENT TEMPLATES
+       ══════════════════════════════════════════════════════════════ */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+
+    @media (max-width: 900px) {
+      .templates-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .template-card {
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      transition:
+        transform var(--duration-slow) var(--ease-out-expo),
+        box-shadow var(--duration-slow) var(--ease-out-expo);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .template-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .template-preview {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      background: var(--cream-200);
+      overflow: hidden;
+    }
+
+    .template-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 2px;
+      box-shadow: var(--shadow-md);
+      transition: transform var(--duration-slow) var(--ease-out-expo);
+    }
+
+    .template-card:hover .template-preview img {
+      transform: scale(1.03);
+    }
+
+    .template-info {
+      padding: var(--space-5) var(--space-6);
+      border-top: 1px solid var(--cream-300);
+    }
+
+    .template-name {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 1rem;
+      color: var(--ink-800);
+      margin-bottom: var(--space-2);
+    }
+
+    .template-desc {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--ink-400);
+      margin-bottom: var(--space-4);
+      line-height: 1.5;
+    }
+
+    .template-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      background: var(--navy-700);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .template-btn:hover {
+      background: var(--navy-600);
+      transform: translateY(-1px);
+    }
+
+    .template-btn i {
+      font-size: 1rem;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       BRAND GUIDELINES PDF SECTION
+       ══════════════════════════════════════════════════════════════ */
+    .guidelines-cta {
+      background: linear-gradient(135deg, var(--navy-800) 0%, var(--navy-700) 100%);
+      border-radius: 6px;
+      padding: var(--space-12);
+      display: flex;
+      align-items: center;
+      gap: var(--space-10);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+      transition: border-color var(--duration-normal) var(--ease-out-quart),
+                  box-shadow var(--duration-normal) var(--ease-out-quart);
+    }
+
+    .guidelines-cta:hover {
+      border-color: rgba(184, 152, 107, 0.3);
+      box-shadow: 0 0 40px rgba(184, 152, 107, 0.08);
+    }
+
+    @media (max-width: 700px) {
+      .guidelines-cta {
+        flex-direction: column;
+        text-align: center;
+        padding: var(--space-8);
+        gap: var(--space-6);
+      }
+    }
+
+    .guidelines-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold-400), var(--gold-600));
+    }
+
+    .guidelines-cta-icon {
+      width: 80px;
+      height: 100px;
+      background: rgba(184, 152, 107, 0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .guidelines-cta:hover .guidelines-cta-icon {
+      background: rgba(184, 152, 107, 0.18);
+      transform: scale(1.05);
+    }
+
+    .guidelines-cta-icon i {
+      font-size: 2.5rem;
+      color: var(--gold-400);
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .guidelines-cta:hover .guidelines-cta-icon i {
+      transform: translateY(-2px);
+    }
+
+    .guidelines-cta-content {
+      flex: 1;
+    }
+
+    .guidelines-cta-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: white;
+      margin-bottom: var(--space-2);
+    }
+
+    .guidelines-cta-desc {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    .guidelines-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-8);
+      background: var(--gold-500);
+      color: var(--navy-900);
+      text-decoration: none;
+      border-radius: 4px;
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+      flex-shrink: 0;
+    }
+
+    .guidelines-cta-btn:hover {
+      background: var(--gold-400);
+      transform: translateY(-2px);
+    }
+
+    .guidelines-cta-btn i {
+      font-size: 1.25rem;
+    }
   </style>
 </head>
 <body>
@@ -963,14 +1487,29 @@
     <div class="logo-grid reveal-stagger">
       <div class="logo-card">
         <div class="logo-preview dark">
-          <img src="assets/brand/logo-stacked-white.svg" alt="Full Logo">
+          <img src="assets/brand/logo-stacked-white.svg" alt="Full Logo White">
         </div>
         <div class="logo-info">
           <div class="logo-meta">
-            <span class="logo-name">Full Logo (Stacked)</span>
-            <span class="logo-format">SVG</span>
+            <span class="logo-name">Stacked (White)</span>
+            <span class="logo-format">SVG • Dark BG</span>
           </div>
-          <a href="assets/brand/logo-stacked-white.svg" download class="logo-download" aria-label="Download">
+          <a href="assets/brand/logo-stacked-white.svg" download class="logo-download" aria-label="Download Stacked White Logo" tabindex="0">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-preview">
+          <img src="assets/brand/logo-stacked.svg" alt="Full Logo Dark">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Stacked (Dark)</span>
+            <span class="logo-format">SVG • Light BG</span>
+          </div>
+          <a href="assets/brand/logo-stacked.svg" download class="logo-download" aria-label="Download Stacked Dark Logo" tabindex="0">
             <i class="ph ph-download-simple"></i>
           </a>
         </div>
@@ -982,10 +1521,25 @@
         </div>
         <div class="logo-info">
           <div class="logo-meta">
-            <span class="logo-name">Horizontal Logo</span>
-            <span class="logo-format">SVG</span>
+            <span class="logo-name">Horizontal (Dark)</span>
+            <span class="logo-format">SVG • Light BG</span>
           </div>
-          <a href="assets/brand/logo-primary.svg" download class="logo-download" aria-label="Download">
+          <a href="assets/brand/logo-primary.svg" download class="logo-download" aria-label="Download Horizontal Logo" tabindex="0">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-preview dark">
+          <img src="assets/brand/logo-primary-white.svg" alt="Horizontal Logo White">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Horizontal (White)</span>
+            <span class="logo-format">SVG • Dark BG</span>
+          </div>
+          <a href="assets/brand/logo-primary-white.svg" download class="logo-download" aria-label="Download Horizontal White Logo" tabindex="0">
             <i class="ph ph-download-simple"></i>
           </a>
         </div>
@@ -998,9 +1552,9 @@
         <div class="logo-info">
           <div class="logo-meta">
             <span class="logo-name">Monogram</span>
-            <span class="logo-format">SVG</span>
+            <span class="logo-format">SVG • Universal</span>
           </div>
-          <a href="assets/brand/logo-monogram.svg" download class="logo-download" aria-label="Download">
+          <a href="assets/brand/logo-monogram.svg" download class="logo-download" aria-label="Download Monogram" tabindex="0">
             <i class="ph ph-download-simple"></i>
           </a>
         </div>
@@ -1012,10 +1566,10 @@
         </div>
         <div class="logo-info">
           <div class="logo-meta">
-            <span class="logo-name">Wordmark</span>
-            <span class="logo-format">SVG</span>
+            <span class="logo-name">Wordmark (Dark)</span>
+            <span class="logo-format">SVG • Light BG</span>
           </div>
-          <a href="assets/brand/logo-wordmark.svg" download class="logo-download" aria-label="Download">
+          <a href="assets/brand/logo-wordmark.svg" download class="logo-download" aria-label="Download Wordmark" tabindex="0">
             <i class="ph ph-download-simple"></i>
           </a>
         </div>
@@ -1028,9 +1582,9 @@
         <div class="logo-info">
           <div class="logo-meta">
             <span class="logo-name">Wordmark (White)</span>
-            <span class="logo-format">SVG</span>
+            <span class="logo-format">SVG • Dark BG</span>
           </div>
-          <a href="assets/brand/logo-wordmark-white.svg" download class="logo-download" aria-label="Download">
+          <a href="assets/brand/logo-wordmark-white.svg" download class="logo-download" aria-label="Download White Wordmark" tabindex="0">
             <i class="ph ph-download-simple"></i>
           </a>
         </div>
@@ -1043,9 +1597,140 @@
         <div class="logo-info">
           <div class="logo-meta">
             <span class="logo-name">Favicon</span>
-            <span class="logo-format">SVG</span>
+            <span class="logo-format">SVG • 32px</span>
           </div>
-          <a href="assets/brand/favicon-32.svg" download class="logo-download" aria-label="Download">
+          <a href="assets/brand/favicon-32.svg" download class="logo-download" aria-label="Download Favicon" tabindex="0">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Media Kit -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Social</span>
+      <h2 class="section-title">Social Media Kit</h2>
+      <p class="section-desc">Ready-to-use assets optimized for each platform.</p>
+    </div>
+
+    <div class="social-grid reveal-stagger">
+      <div class="social-card">
+        <div class="social-preview">
+          <img src="assets/brand/social/linkedin-profile.svg" alt="LinkedIn Profile">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">LinkedIn Profile</span>
+            <span class="social-size">400 × 400</span>
+          </div>
+          <a href="assets/brand/social/linkedin-profile.svg" download class="social-download" aria-label="Download LinkedIn Profile">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-card">
+        <div class="social-preview wide">
+          <img src="assets/brand/social/linkedin-cover.svg" alt="LinkedIn Cover">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">LinkedIn Cover</span>
+            <span class="social-size">1584 × 396</span>
+          </div>
+          <a href="assets/brand/social/linkedin-cover.svg" download class="social-download" aria-label="Download LinkedIn Cover">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-card">
+        <div class="social-preview">
+          <img src="assets/brand/social/instagram-profile.svg" alt="Instagram Profile">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">Instagram Profile</span>
+            <span class="social-size">320 × 320</span>
+          </div>
+          <a href="assets/brand/social/instagram-profile.svg" download class="social-download" aria-label="Download Instagram Profile">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-card">
+        <div class="social-preview">
+          <img src="assets/brand/social/twitter-profile.svg" alt="X/Twitter Profile">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">X Profile</span>
+            <span class="social-size">400 × 400</span>
+          </div>
+          <a href="assets/brand/social/twitter-profile.svg" download class="social-download" aria-label="Download X Profile">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-card">
+        <div class="social-preview wide">
+          <img src="assets/brand/social/twitter-header.svg" alt="X/Twitter Header">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">X Header</span>
+            <span class="social-size">1500 × 500</span>
+          </div>
+          <a href="assets/brand/social/twitter-header.svg" download class="social-download" aria-label="Download X Header">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-card">
+        <div class="social-preview">
+          <img src="assets/brand/social/facebook-profile.svg" alt="Facebook Profile">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">Facebook Profile</span>
+            <span class="social-size">180 × 180</span>
+          </div>
+          <a href="assets/brand/social/facebook-profile.svg" download class="social-download" aria-label="Download Facebook Profile">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-card">
+        <div class="social-preview wide">
+          <img src="assets/brand/social/facebook-cover.svg" alt="Facebook Cover">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">Facebook Cover</span>
+            <span class="social-size">820 × 312</span>
+          </div>
+          <a href="assets/brand/social/facebook-cover.svg" download class="social-download" aria-label="Download Facebook Cover">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-card">
+        <div class="social-preview">
+          <img src="assets/brand/social/story-template.svg" alt="Story Template">
+        </div>
+        <div class="social-info">
+          <div class="social-meta">
+            <span class="social-name">Story Template</span>
+            <span class="social-size">1080 × 1920</span>
+          </div>
+          <a href="assets/brand/social/story-template.svg" download class="social-download" aria-label="Download Story Template">
             <i class="ph ph-download-simple"></i>
           </a>
         </div>
@@ -1121,10 +1806,136 @@
     </div>
 
     <div class="type-specimen reveal">
-      <p class="type-label">Playfair Display</p>
+      <p class="type-label">Established Since 2026</p>
       <p class="type-display">AMJAD & HAZLI</p>
       <div class="type-divider"></div>
-      <p class="type-sample">Chartered Accountants — Trusted expertise since establishment.</p>
+      <p class="type-sample">Chartered Accountants</p>
+    </div>
+  </section>
+
+  <!-- Email Signature Generator -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Email</span>
+      <h2 class="section-title">Signature Generator</h2>
+      <p class="section-desc">Create a professional email signature in seconds.</p>
+    </div>
+
+    <div class="signature-builder reveal">
+      <div class="signature-form">
+        <div class="form-group">
+          <label>Team Presets</label>
+          <div class="preset-btns">
+            <button class="preset-btn" onclick="loadPreset('hazli')">Hazli Johar</button>
+            <button class="preset-btn" onclick="loadPreset('amjad')">Amjad Najib</button>
+            <button class="preset-btn active" onclick="loadPreset('custom')">Custom</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="sig-name">Full Name</label>
+          <input type="text" id="sig-name" placeholder="e.g. Hazli Johar" oninput="updateSignature()">
+        </div>
+
+        <div class="form-group">
+          <label for="sig-title">Job Title</label>
+          <input type="text" id="sig-title" placeholder="e.g. Senior Partner" oninput="updateSignature()">
+        </div>
+
+        <div class="form-group">
+          <label for="sig-credentials">Credentials (optional)</label>
+          <input type="text" id="sig-credentials" placeholder="e.g. C.A.(M), CPA (Aust.)" oninput="updateSignature()">
+        </div>
+
+        <div class="form-group">
+          <label for="sig-phone">Phone</label>
+          <input type="tel" id="sig-phone" placeholder="+60 12-345 6789" oninput="updateSignature()">
+        </div>
+
+        <div class="form-group">
+          <label for="sig-email">Email</label>
+          <input type="email" id="sig-email" placeholder="name@amjadhazli.com" oninput="updateSignature()">
+        </div>
+
+        <div class="form-group">
+          <label>Signature Style</label>
+          <div class="style-select">
+            <button class="style-btn" onclick="setStyle('minimal')">Minimal</button>
+            <button class="style-btn active" onclick="setStyle('standard')">Standard</button>
+            <button class="style-btn" onclick="setStyle('full')">Full</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="signature-output">
+        <p class="signature-preview-label">Live Preview</p>
+        <div class="signature-preview-box" id="sig-preview">
+          <!-- Signature preview renders here -->
+        </div>
+        <div class="signature-actions">
+          <button class="copy-btn" onclick="copySignature()">
+            <i class="ph ph-copy"></i>
+            Copy HTML
+          </button>
+          <button class="copy-btn secondary" onclick="copySignatureText()">
+            <i class="ph ph-text-aa"></i>
+            Copy Text
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Document Templates -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Templates</span>
+      <h2 class="section-title">Document Templates</h2>
+      <p class="section-desc">Professional templates for business documents. Edit in Canva.</p>
+    </div>
+
+    <div class="templates-grid reveal-stagger">
+      <div class="template-card">
+        <div class="template-preview">
+          <img src="assets/brand/templates/letterhead-preview.svg" alt="Letterhead Template">
+        </div>
+        <div class="template-info">
+          <h3 class="template-name">Letterhead</h3>
+          <p class="template-desc">A4 letterhead with branded header and footer. Perfect for official correspondence.</p>
+          <a href="https://www.canva.com/design/letterhead-template" target="_blank" rel="noopener" class="template-btn">
+            <i class="ph ph-pen"></i>
+            Edit in Canva
+          </a>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-preview">
+          <img src="assets/brand/templates/business-card-preview.svg" alt="Business Card Template">
+        </div>
+        <div class="template-info">
+          <h3 class="template-name">Business Card</h3>
+          <p class="template-desc">3.5" × 2" double-sided card design. Front with monogram, back with contact details.</p>
+          <a href="https://www.canva.com/design/business-card-template" target="_blank" rel="noopener" class="template-btn">
+            <i class="ph ph-pen"></i>
+            Edit in Canva
+          </a>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-preview">
+          <img src="assets/brand/templates/invoice-header-preview.svg" alt="Invoice Header Template">
+        </div>
+        <div class="template-info">
+          <h3 class="template-name">Invoice Header</h3>
+          <p class="template-desc">Branded header block for invoices. Logo left, company details right.</p>
+          <a href="https://www.canva.com/design/invoice-template" target="_blank" rel="noopener" class="template-btn">
+            <i class="ph ph-pen"></i>
+            Edit in Canva
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1171,42 +1982,65 @@
   <section class="section-dark">
     <div class="section-inner">
       <div class="section-header reveal">
-        <span class="section-label">Downloads</span>
-        <h2 class="section-title">Download Packs</h2>
-        <p class="section-desc">Get all brand assets in one convenient package.</p>
+        <span class="section-label">Quick Downloads</span>
+        <h2 class="section-title">Most Used Assets</h2>
+        <p class="section-desc">Quick access to frequently requested brand assets.</p>
       </div>
 
       <div class="download-grid reveal-stagger">
         <div class="download-card">
           <div class="download-icon"><i class="ph ph-file-svg"></i></div>
-          <h3 class="download-title">SVG Pack</h3>
-          <p class="download-desc">All vector logos in SVG format. Perfect for web and print.</p>
+          <h3 class="download-title">Primary Logo</h3>
+          <p class="download-desc">Full stacked logo with monogram. Best for presentations and hero sections.</p>
           <a href="assets/brand/logo-stacked-white.svg" download class="download-btn">
             <i class="ph ph-download-simple"></i>
-            Download
+            Download SVG
           </a>
         </div>
 
         <div class="download-card">
           <div class="download-icon"><i class="ph ph-shapes"></i></div>
           <h3 class="download-title">Monogram</h3>
-          <p class="download-desc">The A&H monogram for icons and brand marks.</p>
+          <p class="download-desc">The A&H interlocking monogram. Ideal for icons, watermarks, and compact spaces.</p>
           <a href="assets/brand/logo-monogram.svg" download class="download-btn">
             <i class="ph ph-download-simple"></i>
-            Download
+            Download SVG
           </a>
         </div>
 
         <div class="download-card">
           <div class="download-icon"><i class="ph ph-app-window"></i></div>
-          <h3 class="download-title">Favicons</h3>
-          <p class="download-desc">Browser and app icons in multiple sizes.</p>
+          <h3 class="download-title">Favicon</h3>
+          <p class="download-desc">Browser tab and bookmark icon. Standard 32px size.</p>
           <a href="assets/brand/favicon-32.svg" download class="download-btn">
             <i class="ph ph-download-simple"></i>
-            Download
+            Download SVG
           </a>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Brand Guidelines PDF -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Documentation</span>
+      <h2 class="section-title">Brand Guidelines</h2>
+      <p class="section-desc">Comprehensive brand standards document for consistent usage.</p>
+    </div>
+
+    <div class="guidelines-cta reveal">
+      <div class="guidelines-cta-icon">
+        <i class="ph ph-file-pdf"></i>
+      </div>
+      <div class="guidelines-cta-content">
+        <h3 class="guidelines-cta-title">Complete Brand Guidelines</h3>
+        <p class="guidelines-cta-desc">Everything you need to know about using the Amjad & Hazli brand correctly. Includes logo usage, color specifications, typography, and application examples. Opens as a printable document.</p>
+      </div>
+      <a href="assets/brand/brand-guidelines.html" target="_blank" class="guidelines-cta-btn">
+        <i class="ph ph-arrow-square-out"></i>
+        View Guidelines
+      </a>
     </div>
   </section>
 
@@ -1258,6 +2092,16 @@
       });
     });
 
+    // Handle keyboard interaction for logo download buttons
+    document.querySelectorAll('.logo-download').forEach(btn => {
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+
     // Toast notification
     let toastTimeout;
     function showToast(message) {
@@ -1269,6 +2113,202 @@
         toast.classList.remove('show');
       }, 2200);
     }
+
+    // ══════════════════════════════════════════════════════════════
+    // EMAIL SIGNATURE GENERATOR
+    // ══════════════════════════════════════════════════════════════
+
+    // Team presets
+    const presets = {
+      hazli: {
+        name: 'Hazli Johar',
+        title: 'Senior Partner',
+        credentials: 'C.A.(M), CPA (Aust.)',
+        phone: '+60 12-345 6789',
+        email: 'hazli@amjadhazli.com'
+      },
+      amjad: {
+        name: 'Amjad Najib',
+        title: 'Managing Partner',
+        credentials: 'C.A.(M), ACCA (UK)',
+        phone: '+60 12-987 6543',
+        email: 'amjad@amjadhazli.com'
+      },
+      custom: {
+        name: '',
+        title: '',
+        credentials: '',
+        phone: '',
+        email: ''
+      }
+    };
+
+    let currentStyle = 'standard';
+    let currentPreset = 'custom';
+
+    // Load preset data
+    function loadPreset(preset) {
+      currentPreset = preset;
+      const data = presets[preset];
+      document.getElementById('sig-name').value = data.name;
+      document.getElementById('sig-title').value = data.title;
+      document.getElementById('sig-credentials').value = data.credentials;
+      document.getElementById('sig-phone').value = data.phone;
+      document.getElementById('sig-email').value = data.email;
+
+      // Update active state
+      document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      updateSignature();
+    }
+
+    // Set signature style
+    function setStyle(style) {
+      currentStyle = style;
+      document.querySelectorAll('.style-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      updateSignature();
+    }
+
+    // Generate signature HTML
+    function generateSignatureHTML() {
+      const name = document.getElementById('sig-name').value || 'Your Name';
+      const title = document.getElementById('sig-title').value || 'Job Title';
+      const credentials = document.getElementById('sig-credentials').value;
+      const phone = document.getElementById('sig-phone').value || '+60 12-345 6789';
+      const email = document.getElementById('sig-email').value || 'name@amjadhazli.com';
+
+      const logoUrl = 'https://amjadhazli.com/assets/brand/logo-monogram.svg';
+
+      if (currentStyle === 'minimal') {
+        return `<table cellpadding="0" cellspacing="0" style="font-family: Georgia, 'Times New Roman', serif;">
+  <tr>
+    <td>
+      <span style="color: #1a1a1a; font-weight: 600;">${name}</span>
+      <span style="color: #8a8a8a;"> | </span>
+      <span style="color: #2B3A55;">${title}</span>
+      <span style="color: #8a8a8a;"> | </span>
+      <span style="color: #4a4a4a;">${phone}</span>
+    </td>
+  </tr>
+</table>`;
+      }
+
+      if (currentStyle === 'standard') {
+        return `<table cellpadding="0" cellspacing="0" style="font-family: Georgia, 'Times New Roman', serif;">
+  <tr>
+    <td style="padding-right: 16px; border-right: 2px solid #B8986B; vertical-align: middle;">
+      <img src="${logoUrl}" width="48" height="56" alt="A&H" style="display: block;">
+    </td>
+    <td style="padding-left: 16px; vertical-align: middle;">
+      <strong style="color: #1a1a1a; font-size: 15px;">${name}</strong><br>
+      <span style="color: #2B3A55; font-size: 13px;">${title}</span>${credentials ? `<br><span style="color: #B8986B; font-size: 12px; font-style: italic;">${credentials}</span>` : ''}<br>
+      <span style="color: #4a4a4a; font-size: 12px;">${phone} | ${email}</span>
+    </td>
+  </tr>
+</table>`;
+      }
+
+      // Full style
+      return `<table cellpadding="0" cellspacing="0" style="font-family: Georgia, 'Times New Roman', serif; max-width: 500px;">
+  <tr>
+    <td colspan="2" style="padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
+      <table cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding-right: 16px; vertical-align: middle;">
+            <img src="${logoUrl}" width="56" height="65" alt="A&H" style="display: block;">
+          </td>
+          <td style="vertical-align: middle;">
+            <span style="font-size: 16px; letter-spacing: 2px; color: #1a1a1a;">AMJAD</span>
+            <span style="font-size: 14px; color: #B8986B;"> & </span>
+            <span style="font-size: 16px; letter-spacing: 2px; color: #1a1a1a;">HAZLI</span><br>
+            <span style="font-size: 10px; letter-spacing: 2px; color: #8a8a8a;">CHARTERED ACCOUNTANTS</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-top: 12px;">
+      <strong style="color: #1a1a1a; font-size: 15px;">${name}</strong><br>
+      <span style="color: #2B3A55; font-size: 13px;">${title}</span>${credentials ? `<br><span style="color: #B8986B; font-size: 12px; font-style: italic;">${credentials}</span>` : ''}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-top: 8px;">
+      <table cellpadding="0" cellspacing="0" style="font-size: 12px; color: #4a4a4a;">
+        <tr>
+          <td style="padding-right: 8px;">P:</td>
+          <td>${phone}</td>
+        </tr>
+        <tr>
+          <td style="padding-right: 8px;">E:</td>
+          <td><a href="mailto:${email}" style="color: #2B3A55; text-decoration: none;">${email}</a></td>
+        </tr>
+        <tr>
+          <td style="padding-right: 8px;">W:</td>
+          <td><a href="https://amjadhazli.com" style="color: #2B3A55; text-decoration: none;">amjadhazli.com</a></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
+    }
+
+    // Update preview
+    function updateSignature() {
+      const preview = document.getElementById('sig-preview');
+      preview.innerHTML = generateSignatureHTML();
+    }
+
+    // Copy signature HTML
+    function copySignature() {
+      const html = generateSignatureHTML();
+      navigator.clipboard.writeText(html).then(() => {
+        showToast('Signature HTML copied!');
+      }).catch(() => {
+        showToast('Failed to copy');
+      });
+    }
+
+    // Copy signature as plain text
+    function copySignatureText() {
+      const name = document.getElementById('sig-name').value || 'Your Name';
+      const title = document.getElementById('sig-title').value || 'Job Title';
+      const credentials = document.getElementById('sig-credentials').value;
+      const phone = document.getElementById('sig-phone').value || '+60 12-345 6789';
+      const email = document.getElementById('sig-email').value || 'name@amjadhazli.com';
+
+      let text = `${name}\n${title}`;
+      if (credentials) text += `\n${credentials}`;
+      text += `\n${phone} | ${email}`;
+      if (currentStyle === 'full') {
+        text += '\nwww.amjadhazli.com';
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Plain text copied!');
+      }).catch(() => {
+        showToast('Failed to copy');
+      });
+    }
+
+    // Initialize signature preview on load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSignature();
+
+      // Add keyboard support for preset and style buttons
+      document.querySelectorAll('.preset-btn, .style-btn').forEach(btn => {
+        btn.setAttribute('tabindex', '0');
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            btn.click();
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>

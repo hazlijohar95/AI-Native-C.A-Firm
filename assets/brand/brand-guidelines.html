@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brand Guidelines | Amjad & Hazli</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy: #2B3A55;
+      --navy-dark: #1E2A3F;
+      --gold: #B8986B;
+      --gold-light: #C9A87C;
+      --gold-dark: #A6875A;
+      --cream: #FAF8F5;
+      --white: #FFFFFF;
+      --ink: #1A1A1A;
+      --ink-light: #4A4A4A;
+      --ink-muted: #8A8A8A;
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 11pt;
+      line-height: 1.6;
+      color: var(--ink);
+      background: white;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 20mm;
+      margin: 0 auto;
+      background: white;
+      page-break-after: always;
+      position: relative;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    /* Cover Page */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: var(--navy);
+      color: white;
+      padding: 30mm;
+    }
+
+    .cover-monogram {
+      width: 100px;
+      margin-bottom: 40px;
+    }
+
+    .cover-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 42pt;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .cover-amp {
+      color: var(--gold);
+      font-size: 32pt;
+    }
+
+    .cover-subtitle {
+      font-size: 14pt;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 60px;
+    }
+
+    .cover-doc-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 18pt;
+      font-weight: 400;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+
+    .cover-year {
+      font-size: 12pt;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .cover-footer {
+      position: absolute;
+      bottom: 20mm;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+
+    .cover-footer-line {
+      width: 60px;
+      height: 2px;
+      background: var(--gold);
+      margin: 0 auto 16px;
+    }
+
+    .cover-footer-text {
+      font-size: 9pt;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.1em;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--gold);
+      margin-bottom: 24px;
+    }
+
+    .page-header-logo {
+      height: 24px;
+    }
+
+    .page-header-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 9pt;
+      color: var(--ink-muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* Section Titles */
+    .section-number {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 48pt;
+      font-weight: 400;
+      color: var(--gold);
+      opacity: 0.3;
+      line-height: 1;
+      margin-bottom: -20px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24pt;
+      font-weight: 400;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      font-size: 11pt;
+      color: var(--ink-muted);
+      margin-bottom: 24px;
+    }
+
+    /* Content */
+    h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 14pt;
+      font-weight: 500;
+      color: var(--navy);
+      margin: 24px 0 12px;
+    }
+
+    p {
+      margin-bottom: 12px;
+    }
+
+    /* Logo Grid */
+    .logo-showcase {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .logo-box {
+      padding: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+    }
+
+    .logo-box.light {
+      background: var(--cream);
+      border: 1px solid #e0e0e0;
+    }
+
+    .logo-box.dark {
+      background: var(--navy);
+    }
+
+    .logo-box img {
+      max-width: 80%;
+      max-height: 60px;
+    }
+
+    .logo-label {
+      text-align: center;
+      font-size: 9pt;
+      color: var(--ink-muted);
+      margin-top: 8px;
+    }
+
+    /* Color Swatches */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .color-swatch {
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .color-swatch-block {
+      height: 80px;
+    }
+
+    .color-swatch-info {
+      padding: 12px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-top: none;
+    }
+
+    .color-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 500;
+      font-size: 11pt;
+      margin-bottom: 4px;
+    }
+
+    .color-values {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 8pt;
+      color: var(--ink-muted);
+      line-height: 1.8;
+    }
+
+    /* Typography Specimen */
+    .type-specimen {
+      margin: 24px 0;
+      padding: 24px;
+      background: var(--cream);
+      border-radius: 4px;
+    }
+
+    .type-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 10pt;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .type-sample-display {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 32pt;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .type-sample-body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 14pt;
+      color: var(--ink-light);
+    }
+
+    /* Do's and Don'ts */
+    .guidelines-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 24px 0;
+    }
+
+    .guideline-box {
+      padding: 20px;
+      border-radius: 4px;
+      border-left: 3px solid;
+    }
+
+    .guideline-box.do {
+      background: #f0f9f4;
+      border-color: #4CAF50;
+    }
+
+    .guideline-box.dont {
+      background: #fef5f5;
+      border-color: #C45D5D;
+    }
+
+    .guideline-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 12pt;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .guideline-box.do .guideline-title {
+      color: #2E7D32;
+    }
+
+    .guideline-box.dont .guideline-title {
+      color: #C45D5D;
+    }
+
+    .guideline-list {
+      list-style: none;
+      font-size: 10pt;
+    }
+
+    .guideline-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .guideline-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* Clear Space Diagram */
+    .clearspace-diagram {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      background: var(--cream);
+      border-radius: 4px;
+      margin: 24px 0;
+    }
+
+    .clearspace-logo {
+      position: relative;
+      padding: 40px;
+      border: 2px dashed var(--gold);
+    }
+
+    .clearspace-logo img {
+      width: 120px;
+    }
+
+    .clearspace-label {
+      position: absolute;
+      font-size: 8pt;
+      color: var(--gold);
+    }
+
+    /* Footer */
+    .page-footer {
+      position: absolute;
+      bottom: 20mm;
+      left: 20mm;
+      right: 20mm;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      color: var(--ink-muted);
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .page {
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .no-print {
+        display: none;
+      }
+    }
+
+    /* Screen Styles */
+    @media screen {
+      body {
+        background: #e0e0e0;
+        padding: 20px;
+      }
+
+      .page {
+        box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        margin-bottom: 20px;
+      }
+
+      .print-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        background: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 14px;
+        cursor: pointer;
+        z-index: 100;
+      }
+
+      .print-btn:hover {
+        background: var(--gold);
+        color: var(--navy);
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">Save as PDF</button>
+
+  <!-- Page 1: Cover -->
+  <div class="page cover">
+    <svg class="cover-monogram" viewBox="0 0 120 140" fill="none">
+      <defs>
+        <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#C9A86C"/>
+          <stop offset="50%" stop-color="#B8986B"/>
+          <stop offset="100%" stop-color="#A6875A"/>
+        </linearGradient>
+      </defs>
+      <g fill="url(#gold)">
+        <path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/>
+        <path d="M16 24h8v92h-8z"/>
+        <path d="M10 24h20v5H10zM10 111h20v5H10z"/>
+        <path d="M96 24h8v92h-8z"/>
+        <path d="M90 24h20v5H90zM90 111h20v5H90z"/>
+        <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
+        <path d="M24 24Q60 0 96 24" stroke="url(#gold)" stroke-width="4" fill="none"/>
+        <path d="M24 116Q60 140 96 116" stroke="url(#gold)" stroke-width="4" fill="none"/>
+        <path d="M30 40Q60 20 90 40" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+        <path d="M30 100Q60 120 90 100" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+      </g>
+    </svg>
+
+    <h1 class="cover-title">AMJAD <span class="cover-amp">&</span> HAZLI</h1>
+    <p class="cover-subtitle">CHARTERED ACCOUNTANTS</p>
+
+    <p class="cover-doc-title">BRAND GUIDELINES</p>
+    <p class="cover-year">2026</p>
+
+    <div class="cover-footer">
+      <div class="cover-footer-line"></div>
+      <p class="cover-footer-text">CONFIDENTIAL</p>
+    </div>
+  </div>
+
+  <!-- Page 2: Brand Story -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">01</p>
+    <h2 class="section-title">Brand Story</h2>
+    <p class="section-subtitle">Our heritage, mission, and values</p>
+
+    <h3>Our Heritage</h3>
+    <p>Founded in 2026, Amjad & Hazli represents a new generation of chartered accountants who blend traditional expertise with modern innovation. Our firm was established on the principle that financial guidance should be both accessible and sophisticated.</p>
+
+    <h3>Mission</h3>
+    <p>To provide exceptional financial services that empower businesses and individuals to achieve their financial goals with confidence and clarity. We believe in building lasting relationships based on trust, integrity, and excellence.</p>
+
+    <h3>Vision</h3>
+    <p>To be the most trusted financial advisory partner in Malaysia, known for our unwavering commitment to client success and our innovative approach to traditional accounting services.</p>
+
+    <h3>Core Values</h3>
+    <p><strong>Integrity</strong> — We uphold the highest ethical standards in all our dealings.</p>
+    <p><strong>Excellence</strong> — We strive for perfection in every engagement.</p>
+    <p><strong>Innovation</strong> — We embrace modern solutions while respecting tradition.</p>
+    <p><strong>Partnership</strong> — We view our clients as partners in their financial journey.</p>
+
+    <h3>Brand Positioning</h3>
+    <p>Amjad & Hazli occupies a unique position in the Malaysian accounting landscape—bridging the gap between boutique personal service and comprehensive professional expertise. We are the choice for discerning clients who value both competence and character.</p>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 2</span>
+    </div>
+  </div>
+
+  <!-- Page 3: Logo Overview -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">02</p>
+    <h2 class="section-title">Logo System</h2>
+    <p class="section-subtitle">Our visual identity and its applications</p>
+
+    <h3>The Monogram</h3>
+    <p>The interlocking A&H monogram is the cornerstone of our visual identity. It represents the partnership between our founders and symbolizes the interweaving of expertise, tradition, and modern professionalism.</p>
+
+    <div class="logo-showcase">
+      <div>
+        <div class="logo-box dark">
+          <img src="logo-monogram.svg" alt="Monogram">
+        </div>
+        <p class="logo-label">Primary Monogram</p>
+      </div>
+      <div>
+        <div class="logo-box dark">
+          <img src="logo-stacked-white.svg" alt="Stacked Logo">
+        </div>
+        <p class="logo-label">Stacked (Dark BG)</p>
+      </div>
+      <div>
+        <div class="logo-box light">
+          <img src="logo-stacked.svg" alt="Stacked Logo Dark">
+        </div>
+        <p class="logo-label">Stacked (Light BG)</p>
+      </div>
+    </div>
+
+    <h3>Logo Variants</h3>
+    <p>Our logo system includes several variants to ensure proper representation across all applications:</p>
+
+    <div class="logo-showcase">
+      <div>
+        <div class="logo-box light">
+          <img src="logo-primary.svg" alt="Horizontal">
+        </div>
+        <p class="logo-label">Horizontal</p>
+      </div>
+      <div>
+        <div class="logo-box dark">
+          <img src="logo-wordmark-white.svg" alt="Wordmark">
+        </div>
+        <p class="logo-label">Wordmark</p>
+      </div>
+      <div>
+        <div class="logo-box dark">
+          <img src="favicon-32.svg" alt="Favicon" style="max-width: 32px;">
+        </div>
+        <p class="logo-label">Favicon</p>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 3</span>
+    </div>
+  </div>
+
+  <!-- Page 4: Clear Space & Sizing -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">03</p>
+    <h2 class="section-title">Clear Space & Sizing</h2>
+    <p class="section-subtitle">Maintaining logo integrity</p>
+
+    <h3>Clear Space</h3>
+    <p>Always maintain adequate clear space around the logo to ensure visibility and impact. The minimum clear space is equal to the height of the "A" in the monogram on all sides.</p>
+
+    <div class="clearspace-diagram">
+      <div class="clearspace-logo">
+        <img src="logo-monogram.svg" alt="Logo with clear space">
+      </div>
+    </div>
+
+    <h3>Minimum Sizes</h3>
+    <p>To maintain legibility and visual integrity, observe these minimum size requirements:</p>
+
+    <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 12px 0; font-weight: 500;">Application</td>
+        <td style="padding: 12px 0;">Minimum Width</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 12px 0;">Digital (screen)</td>
+        <td style="padding: 12px 0;">48px</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 12px 0;">Print (small)</td>
+        <td style="padding: 12px 0;">15mm</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0;">Print (standard)</td>
+        <td style="padding: 12px 0;">25mm</td>
+      </tr>
+    </table>
+
+    <h3>Favicon Usage</h3>
+    <p>For very small applications (favicons, app icons), use the simplified monogram variant. This ensures the logo remains recognizable at small sizes.</p>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 4</span>
+    </div>
+  </div>
+
+  <!-- Page 5: Color Palette -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">04</p>
+    <h2 class="section-title">Color Palette</h2>
+    <p class="section-subtitle">Our brand colors and their specifications</p>
+
+    <h3>Primary Colors</h3>
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="color-swatch-block" style="background: #2B3A55;"></div>
+        <div class="color-swatch-info">
+          <p class="color-name">Navy</p>
+          <p class="color-values">
+            HEX: #2B3A55<br>
+            RGB: 43, 58, 85<br>
+            CMYK: 85, 68, 37, 21<br>
+            Pantone: 289 C
+          </p>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="color-swatch-block" style="background: linear-gradient(145deg, #C9A87C, #B8986B, #A6875A);"></div>
+        <div class="color-swatch-info">
+          <p class="color-name">Gold</p>
+          <p class="color-values">
+            HEX: #B8986B<br>
+            RGB: 184, 152, 107<br>
+            CMYK: 22, 35, 57, 4<br>
+            Pantone: 7562 C
+          </p>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="color-swatch-block" style="background: #FAF8F5;"></div>
+        <div class="color-swatch-info">
+          <p class="color-name">Cream</p>
+          <p class="color-values">
+            HEX: #FAF8F5<br>
+            RGB: 250, 248, 245<br>
+            CMYK: 1, 1, 2, 0<br>
+            Pantone: 7527 C
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Secondary Colors</h3>
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="color-swatch-block" style="background: #1E2A3F;"></div>
+        <div class="color-swatch-info">
+          <p class="color-name">Navy Dark</p>
+          <p class="color-values">
+            HEX: #1E2A3F<br>
+            RGB: 30, 42, 63
+          </p>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="color-swatch-block" style="background: #FFFFFF; border: 1px solid #e0e0e0;"></div>
+        <div class="color-swatch-info">
+          <p class="color-name">White</p>
+          <p class="color-values">
+            HEX: #FFFFFF<br>
+            RGB: 255, 255, 255
+          </p>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="color-swatch-block" style="background: #1A1A1A;"></div>
+        <div class="color-swatch-info">
+          <p class="color-name">Ink</p>
+          <p class="color-values">
+            HEX: #1A1A1A<br>
+            RGB: 26, 26, 26
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Color Usage</h3>
+    <p>Navy serves as our primary brand color, used for backgrounds and key elements. Gold is used for accents, highlights, and the ampersand. Cream provides a warm, sophisticated background alternative to pure white.</p>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 5</span>
+    </div>
+  </div>
+
+  <!-- Page 6: Typography -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">05</p>
+    <h2 class="section-title">Typography</h2>
+    <p class="section-subtitle">Our brand typefaces and their usage</p>
+
+    <h3>Display Typeface</h3>
+    <div class="type-specimen">
+      <p class="type-name">PLAYFAIR DISPLAY</p>
+      <p class="type-sample-display">AMJAD & HAZLI</p>
+      <p style="font-family: 'Playfair Display'; font-size: 11pt; margin-top: 8px;">
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+        abcdefghijklmnopqrstuvwxyz<br>
+        1234567890
+      </p>
+    </div>
+    <p>Playfair Display is used for headlines, titles, the wordmark, and any display-sized text. It conveys elegance and timeless sophistication.</p>
+
+    <h3>Body Typeface</h3>
+    <div class="type-specimen">
+      <p class="type-name">CORMORANT GARAMOND</p>
+      <p class="type-sample-body">The quick brown fox jumps over the lazy dog.</p>
+      <p style="font-family: 'Cormorant Garamond'; font-size: 11pt; margin-top: 8px;">
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+        abcdefghijklmnopqrstuvwxyz<br>
+        1234567890
+      </p>
+    </div>
+    <p>Cormorant Garamond is used for body text, captions, and supporting copy. Its refined serifs complement Playfair Display perfectly.</p>
+
+    <h3>Type Hierarchy</h3>
+    <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 12px 0; font-weight: 500;">Element</td>
+        <td style="padding: 12px 0;">Typeface</td>
+        <td style="padding: 12px 0;">Weight</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 12px 0;">Headlines</td>
+        <td style="padding: 12px 0;">Playfair Display</td>
+        <td style="padding: 12px 0;">400-500</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 12px 0;">Subheadings</td>
+        <td style="padding: 12px 0;">Playfair Display</td>
+        <td style="padding: 12px 0;">400</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 12px 0;">Body Text</td>
+        <td style="padding: 12px 0;">Cormorant Garamond</td>
+        <td style="padding: 12px 0;">400</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0;">Captions</td>
+        <td style="padding: 12px 0;">Cormorant Garamond</td>
+        <td style="padding: 12px 0;">300</td>
+      </tr>
+    </table>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 6</span>
+    </div>
+  </div>
+
+  <!-- Page 7: Do's and Don'ts -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">06</p>
+    <h2 class="section-title">Do's & Don'ts</h2>
+    <p class="section-subtitle">Maintaining brand consistency</p>
+
+    <div class="guidelines-row">
+      <div class="guideline-box do">
+        <h4 class="guideline-title">Do</h4>
+        <ul class="guideline-list">
+          <li>Use the gold monogram on navy backgrounds</li>
+          <li>Maintain minimum clear space around logo</li>
+          <li>Use white logo variants on dark backgrounds</li>
+          <li>Keep minimum size of 48px for digital</li>
+          <li>Download assets from official sources</li>
+          <li>Use approved color combinations</li>
+          <li>Maintain aspect ratio when scaling</li>
+        </ul>
+      </div>
+      <div class="guideline-box dont">
+        <h4 class="guideline-title">Don't</h4>
+        <ul class="guideline-list">
+          <li>Rotate or skew the logo</li>
+          <li>Change the gold or navy colors</li>
+          <li>Add effects like shadows or outlines</li>
+          <li>Place on busy or low-contrast backgrounds</li>
+          <li>Recreate or modify the monogram</li>
+          <li>Stretch or distort the logo</li>
+          <li>Use unapproved color combinations</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Incorrect Usage Examples</h3>
+    <p>The following are examples of how NOT to use the brand identity:</p>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px;">
+      <div style="padding: 16px; background: #f5f5f5; text-align: center; border-radius: 4px;">
+        <div style="transform: rotate(15deg); opacity: 0.5;">
+          <svg width="40" height="46" viewBox="0 0 120 140"><g fill="#B8986B"><path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/></g></svg>
+        </div>
+        <p style="font-size: 8pt; color: #C45D5D; margin-top: 8px;">No rotation</p>
+      </div>
+      <div style="padding: 16px; background: #f5f5f5; text-align: center; border-radius: 4px;">
+        <div style="transform: scaleX(1.5); opacity: 0.5;">
+          <svg width="40" height="46" viewBox="0 0 120 140"><g fill="#B8986B"><path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/></g></svg>
+        </div>
+        <p style="font-size: 8pt; color: #C45D5D; margin-top: 8px;">No stretching</p>
+      </div>
+      <div style="padding: 16px; background: #f5f5f5; text-align: center; border-radius: 4px;">
+        <svg width="40" height="46" viewBox="0 0 120 140"><g fill="#FF6B6B"><path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/></g></svg>
+        <p style="font-size: 8pt; color: #C45D5D; margin-top: 8px;">No color changes</p>
+      </div>
+      <div style="padding: 16px; background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e0e0e0 10px, #e0e0e0 20px); text-align: center; border-radius: 4px;">
+        <svg width="40" height="46" viewBox="0 0 120 140" style="opacity: 0.5;"><g fill="#B8986B"><path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/></g></svg>
+        <p style="font-size: 8pt; color: #C45D5D; margin-top: 8px;">No busy backgrounds</p>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 7</span>
+    </div>
+  </div>
+
+  <!-- Page 8: Applications -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">07</p>
+    <h2 class="section-title">Applications</h2>
+    <p class="section-subtitle">Brand identity in use</p>
+
+    <h3>Business Cards</h3>
+    <p>Business cards feature the monogram on navy on the front, with contact details on a cream background on the reverse.</p>
+
+    <div style="display: flex; gap: 16px; margin: 16px 0;">
+      <div style="flex: 1; height: 100px; background: #2B3A55; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+        <svg width="40" height="46" viewBox="0 0 120 140">
+          <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#C9A86C"/><stop offset="50%" stop-color="#B8986B"/><stop offset="100%" stop-color="#A6875A"/></linearGradient></defs>
+          <g fill="url(#g1)"><path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/><path d="M16 24h8v92h-8z"/><path d="M96 24h8v92h-8z"/><path d="M24 64h20v7H24zM76 64h20v7H76z"/></g>
+        </svg>
+      </div>
+      <div style="flex: 1; height: 100px; background: #FAF8F5; border-radius: 4px; border: 1px solid #e0e0e0; padding: 12px;">
+        <p style="font-family: 'Playfair Display'; font-size: 10pt; font-weight: 500; color: #1a1a1a;">Hazli Johar</p>
+        <p style="font-size: 8pt; color: #2B3A55;">Senior Partner</p>
+        <p style="font-size: 7pt; color: #8a8a8a; margin-top: 8px;">+60 12-345 6789<br>hazli@amjadhazli.com</p>
+      </div>
+    </div>
+
+    <h3>Letterhead</h3>
+    <p>Letterhead uses a navy header bar with the monogram and wordmark, complemented by a navy footer with contact details.</p>
+
+    <h3>Email Signatures</h3>
+    <p>Email signatures should include the monogram, name, title, credentials (if applicable), and contact information. Use the signature generator on our brand assets page for consistency.</p>
+
+    <h3>Social Media</h3>
+    <p>Profile pictures use the monogram centered on a navy circle. Cover images feature the monogram on the left with the wordmark and tagline.</p>
+
+    <h3>Digital Applications</h3>
+    <p>For websites and digital platforms, ensure the logo meets minimum size requirements and maintains proper contrast against backgrounds.</p>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 8</span>
+    </div>
+  </div>
+
+  <!-- Page 9: Contact -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">BRAND GUIDELINES</span>
+      <span class="page-header-title">AMJAD & HAZLI</span>
+    </div>
+
+    <p class="section-number">08</p>
+    <h2 class="section-title">Contact</h2>
+    <p class="section-subtitle">Questions and asset requests</p>
+
+    <h3>Brand Assets</h3>
+    <p>All official brand assets are available for download at:</p>
+    <p style="font-family: 'SF Mono', Monaco, monospace; color: var(--navy); margin: 8px 0 24px;">amjadhazli.com/logo.html</p>
+
+    <h3>Questions</h3>
+    <p>For questions about brand usage, co-branding opportunities, or special requests, please contact:</p>
+
+    <div style="background: var(--cream); padding: 24px; border-radius: 4px; margin: 16px 0;">
+      <p style="font-family: 'Playfair Display'; font-weight: 500; margin-bottom: 8px;">Brand & Marketing</p>
+      <p style="color: var(--ink-light);">
+        Email: hello@amjadhazli.com<br>
+        Phone: +60 3-7890 1234
+      </p>
+    </div>
+
+    <h3>Address</h3>
+    <p>
+      Amjad & Hazli Chartered Accountants<br>
+      Level 8, Tower A, Plaza 33<br>
+      No. 1, Jalan Kemajuan<br>
+      Petaling Jaya 46150<br>
+      Selangor, Malaysia
+    </p>
+
+    <div style="text-align: center; margin-top: 60px;">
+      <svg width="60" height="70" viewBox="0 0 120 140">
+        <defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#C9A86C"/><stop offset="50%" stop-color="#B8986B"/><stop offset="100%" stop-color="#A6875A"/></linearGradient></defs>
+        <g fill="url(#g2)">
+          <path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/>
+          <path d="M16 24h8v92h-8z"/>
+          <path d="M10 24h20v5H10zM10 111h20v5H10z"/>
+          <path d="M96 24h8v92h-8z"/>
+          <path d="M90 24h20v5H90zM90 111h20v5H90z"/>
+          <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
+          <path d="M24 24Q60 0 96 24" stroke="url(#g2)" stroke-width="4" fill="none"/>
+          <path d="M24 116Q60 140 96 116" stroke="url(#g2)" stroke-width="4" fill="none"/>
+        </g>
+      </svg>
+      <p style="font-family: 'Playfair Display'; font-size: 14pt; letter-spacing: 0.1em; color: var(--navy); margin-top: 16px;">AMJAD <span style="color: var(--gold);">&</span> HAZLI</p>
+      <p style="font-size: 9pt; letter-spacing: 0.2em; color: var(--ink-muted);">CHARTERED ACCOUNTANTS</p>
+    </div>
+
+    <div class="page-footer">
+      <span>Brand Guidelines 2026</span>
+      <span>Page 9</span>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1584 396" fill="none">
+  <!-- LinkedIn Cover Image - 1584x396 -->
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A86C"/>
+      <stop offset="50%" stop-color="#B8986B"/>
+      <stop offset="100%" stop-color="#A6875A"/>
+    </linearGradient>
+    <linearGradient id="navyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E2A3F"/>
+      <stop offset="100%" stop-color="#2B3A55"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Navy gradient background -->
+  <rect width="1584" height="396" fill="url(#navyGradient)"/>
+
+  <!-- Subtle pattern overlay -->
+  <rect width="1584" height="396" fill="url(#gold)" opacity="0.02"/>
+
+  <!-- Left side - Monogram -->
+  <g fill="url(#gold)" transform="translate(120, 128) scale(1)">
+    <!-- Central A -->
+    <path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/>
+    <!-- Left H pillar -->
+    <path d="M16 24h8v92h-8z"/>
+    <path d="M10 24h20v5H10zM10 111h20v5H10z"/>
+    <!-- Right H pillar -->
+    <path d="M96 24h8v92h-8z"/>
+    <path d="M90 24h20v5H90zM90 111h20v5H90z"/>
+    <!-- H crossbar -->
+    <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
+    <!-- Decorative arch -->
+    <path d="M24 24Q60 0 96 24" stroke="url(#gold)" stroke-width="4" fill="none"/>
+    <path d="M24 116Q60 140 96 116" stroke="url(#gold)" stroke-width="4" fill="none"/>
+    <!-- Inner curves -->
+    <path d="M30 40Q60 20 90 40" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+    <path d="M30 100Q60 120 90 100" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+  </g>
+
+  <!-- Vertical gold accent line -->
+  <rect x="280" y="128" width="2" height="140" fill="url(#gold)" opacity="0.4"/>
+
+  <!-- Center-right - Wordmark -->
+  <g transform="translate(320, 158)">
+    <text font-family="'Playfair Display', Georgia, serif" font-size="48" font-weight="400" letter-spacing="0.12em" fill="white">
+      <tspan>AMJAD</tspan>
+      <tspan dx="14" font-size="36" fill="#B8986B">&amp;</tspan>
+      <tspan dx="14">HAZLI</tspan>
+    </text>
+    <text y="50" font-family="'Cormorant Garamond', Georgia, serif" font-size="18" letter-spacing="0.25em" fill="rgba(255,255,255,0.6)">
+      CHARTERED ACCOUNTANTS
+    </text>
+  </g>
+
+  <!-- Decorative gold line at bottom -->
+  <rect x="0" y="390" width="1584" height="6" fill="url(#gold)" opacity="0.3"/>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <!-- LinkedIn Profile Picture - 400x400 -->
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A86C"/>
+      <stop offset="50%" stop-color="#B8986B"/>
+      <stop offset="100%" stop-color="#A6875A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Navy circle background -->
+  <circle cx="200" cy="200" r="200" fill="#2B3A55"/>
+
+  <!-- Subtle radial glow -->
+  <circle cx="200" cy="200" r="120" fill="url(#gold)" opacity="0.05"/>
+
+  <!-- Monogram scaled and centered -->
+  <g fill="url(#gold)" transform="translate(140, 130) scale(1)">
+    <!-- Central A -->
+    <path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/>
+    <!-- Left H pillar -->
+    <path d="M16 24h8v92h-8z"/>
+    <path d="M10 24h20v5H10zM10 111h20v5H10z"/>
+    <!-- Right H pillar -->
+    <path d="M96 24h8v92h-8z"/>
+    <path d="M90 24h20v5H90zM90 111h20v5H90z"/>
+    <!-- H crossbar -->
+    <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
+    <!-- Decorative arch -->
+    <path d="M24 24Q60 0 96 24" stroke="url(#gold)" stroke-width="4" fill="none"/>
+    <path d="M24 116Q60 140 96 116" stroke="url(#gold)" stroke-width="4" fill="none"/>
+    <!-- Inner curves -->
+    <path d="M30 40Q60 20 90 40" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+    <path d="M30 100Q60 120 90 100" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.6"/>
+  </g>
+</svg>

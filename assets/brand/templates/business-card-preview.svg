@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400" fill="none">
+  <!-- Business Card Preview - Front & Back Side by Side -->
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A86C"/>
+      <stop offset="50%" stop-color="#B8986B"/>
+      <stop offset="100%" stop-color="#A6875A"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#1A2536" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Card Front (Left) -->
+  <g filter="url(#shadow)">
+    <rect x="20" y="50" width="315" height="180" rx="4" fill="#2B3A55"/>
+
+    <!-- Gold accent line at top -->
+    <rect x="20" y="50" width="315" height="3" rx="1" fill="url(#gold)"/>
+
+    <!-- Monogram centered -->
+    <g fill="url(#gold)" transform="translate(117.5, 75) scale(0.65)">
+      <!-- Central A -->
+      <path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/>
+      <!-- Left H pillar -->
+      <path d="M16 24h8v92h-8z"/>
+      <path d="M10 24h20v5H10zM10 111h20v5H10z"/>
+      <!-- Right H pillar -->
+      <path d="M96 24h8v92h-8z"/>
+      <path d="M90 24h20v5H90zM90 111h20v5H90z"/>
+      <!-- H crossbar -->
+      <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
+      <!-- Decorative arch -->
+      <path d="M24 24Q60 0 96 24" stroke="url(#gold)" stroke-width="4" fill="none"/>
+      <path d="M24 116Q60 140 96 116" stroke="url(#gold)" stroke-width="4" fill="none"/>
+    </g>
+
+    <!-- Company name below monogram -->
+    <text x="177.5" y="195" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="12" font-weight="400" letter-spacing="0.1em" fill="white">
+      <tspan>AMJAD</tspan>
+      <tspan dx="4" font-size="10" fill="#B8986B">&amp;</tspan>
+      <tspan dx="4">HAZLI</tspan>
+    </text>
+    <text x="177.5" y="212" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="8" letter-spacing="0.2em" fill="rgba(255,255,255,0.5)">
+      CHARTERED ACCOUNTANTS
+    </text>
+  </g>
+
+  <!-- Card Back (Right) -->
+  <g filter="url(#shadow)">
+    <rect x="365" y="50" width="315" height="180" rx="4" fill="#FAF8F5"/>
+
+    <!-- Gold accent line at top -->
+    <rect x="365" y="50" width="315" height="3" rx="1" fill="url(#gold)"/>
+
+    <!-- Person name -->
+    <text x="385" y="90" font-family="'Playfair Display', Georgia, serif" font-size="16" font-weight="500" fill="#1A1A1A">
+      Hazli Johar
+    </text>
+    <text x="385" y="108" font-family="'Cormorant Garamond', Georgia, serif" font-size="11" fill="#2B3A55">
+      Senior Partner
+    </text>
+    <text x="385" y="124" font-family="'Cormorant Garamond', Georgia, serif" font-size="10" font-style="italic" fill="#B8986B">
+      C.A.(M), CPA (Aust.)
+    </text>
+
+    <!-- Divider -->
+    <rect x="385" y="140" width="60" height="1" fill="url(#gold)" opacity="0.5"/>
+
+    <!-- Contact info -->
+    <text x="385" y="162" font-family="'Cormorant Garamond', Georgia, serif" font-size="10" fill="#4A4A4A">
+      <tspan>+60 12-345 6789</tspan>
+      <tspan x="385" dy="14">hazli@amjadhazli.com</tspan>
+      <tspan x="385" dy="14">www.amjadhazli.com</tspan>
+    </text>
+
+    <!-- Small monogram in corner -->
+    <g fill="url(#gold)" transform="translate(610, 170) scale(0.25)" opacity="0.3">
+      <path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/>
+      <path d="M16 24h8v92h-8z"/>
+      <path d="M96 24h8v92h-8z"/>
+      <path d="M24 64h20v7H24zM76 64h20v7H76z"/>
+    </g>
+  </g>
+
+  <!-- Labels -->
+  <text x="177.5" y="260" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="11" fill="#8A8A8A" font-style="italic">
+    Front
+  </text>
+  <text x="522.5" y="260" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="11" fill="#8A8A8A" font-style="italic">
+    Back
+  </text>
+</svg>
