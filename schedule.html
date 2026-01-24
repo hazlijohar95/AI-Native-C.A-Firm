@@ -147,6 +147,7 @@
 
     /* Mobile Menu */
     .mobile-menu-btn {
+      position: relative;
       display: none;
       flex-direction: column;
       justify-content: center;
@@ -378,7 +379,8 @@
 
     /* Responsive */
     @media (max-width: 1024px) {
-      .mobile-menu-btn { 
+      .mobile-menu-btn {
+      position: relative; 
         display: flex;
         min-width: 44px;
         min-height: 44px;
@@ -394,7 +396,7 @@
         padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
         flex-direction: column;
         gap: var(--space-1);
-        z-index: 99;
+        z-index: 10000;
         transform: translateX(100%);
         opacity: 0;
         visibility: hidden;
@@ -428,6 +430,12 @@
         overflow: hidden;
         position: fixed;
         width: 100%;
+      }
+      body.menu-open .nav {
+        z-index: 10001;
+      }
+      body.menu-open .mobile-menu-btn {
+        z-index: 10002;
       }
     }
 
