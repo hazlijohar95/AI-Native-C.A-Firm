@@ -1,240 +1,365 @@
 <div align="center">
 
+<img src="portal/public/favicon.svg" width="80" height="80" alt="Amjad & Hazli Logo" />
+
 # Amjad & Hazli
 
 ### AI-Native Chartered Accounting Firm
 
-[![Website](https://img.shields.io/badge/Website-amjadhazli.com-2B3A55?style=for-the-badge&logo=google-chrome&logoColor=white)](https://amjadhazli.com)
-[![Portal](https://img.shields.io/badge/Portal-portal.amjadhazli.com-0f0f12?style=for-the-badge&logo=shield&logoColor=white)](https://portal.amjadhazli.com)
-[![License](https://img.shields.io/badge/License-Proprietary-gray?style=for-the-badge)](LICENSE)
+[![Website](https://img.shields.io/badge/Website-amjadhazli.com-2B3A55?style=for-the-badge&logo=safari&logoColor=white)](https://amjadhazli.com)
+[![Portal](https://img.shields.io/badge/Portal-portal.amjadhazli.com-B8986B?style=for-the-badge&logo=shield&logoColor=white)](https://portal.amjadhazli.com)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![Convex](https://img.shields.io/badge/Convex-Realtime-F97316?style=for-the-badge&logo=convex&logoColor=white)](https://convex.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
 
 ---
 
-**Modern accounting services powered by AI and automation.**
+**Modern accounting services powered by AI and automation**
 
-*Bookkeeping • Tax Advisory • Virtual CFO • Technology Solutions*
+*Bookkeeping • Tax Advisory • Virtual CFO • Technology Solutions • Company Incorporation*
+
+[View Website](https://amjadhazli.com) · [Access Portal](https://portal.amjadhazli.com) · [Documentation](docs/portal/PORTAL_ROADMAP.md)
 
 </div>
 
 ---
 
-## Overview
+## 🏗️ Architecture Overview
 
-This monorepo contains two main projects:
-
-| Project | Description | Tech Stack |
-|---------|-------------|------------|
-| **Main Website** | Marketing site & service pages | HTML, CSS, JavaScript |
-| **Client Portal** | Secure client dashboard | React, Convex, WorkOS |
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              AMJAD & HAZLI                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────────┐              ┌─────────────────────┐              │
+│   │   LANDING WEBSITE   │              │    CLIENT PORTAL    │              │
+│   │   amjadhazli.com    │              │ portal.amjadhazli.com│              │
+│   ├─────────────────────┤              ├─────────────────────┤              │
+│   │ • HTML/CSS/JS       │              │ • React 19 + Vite 7 │              │
+│   │ • Responsive Design │              │ • Tailwind CSS v4   │              │
+│   │ • Cal.com Booking   │              │ • shadcn/ui + Radix │              │
+│   │ • Blog & Resources  │              │ • TypeScript 5      │              │
+│   └─────────────────────┘              └──────────┬──────────┘              │
+│                                                   │                         │
+│                                        ┌──────────▼──────────┐              │
+│                                        │       CONVEX        │              │
+│                                        │   Real-time Backend │              │
+│                                        ├─────────────────────┤              │
+│                                        │ • Serverless        │              │
+│                                        │ • TypeScript-native │              │
+│                                        │ • Auto-scaling      │              │
+│                                        │ • Real-time sync    │              │
+│                                        └──────────┬──────────┘              │
+│                                                   │                         │
+│   ┌──────────────┬──────────────┬────────────────┼────────────────┐         │
+│   │              │              │                │                │         │
+│   ▼              ▼              ▼                ▼                ▼         │
+│ WorkOS        Resend        Stripe          Cloudflare       Convex        │
+│  Auth         Email        Payments           R2             Storage       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Client Portal
+## 📁 Monorepo Structure
 
-A full-featured client portal for document management, task tracking, invoicing, and e-signatures.
+```
+amjad&hazli/
+├── 🌐 Landing Website (Root)
+│   ├── index.html              # Homepage
+│   ├── about.html              # Team & Credentials
+│   ├── blog.html               # Blog Listing
+│   ├── schedule.html           # Booking Page
+│   ├── resources.html          # Tools & Guides
+│   ├── privacy.html            # Privacy Policy
+│   ├── terms.html              # Terms of Service
+│   └── services/
+│       ├── bookkeeping.html
+│       ├── tax.html
+│       ├── cfo.html
+│       ├── technology.html
+│       └── incorporation.html
+│
+├── 🔐 portal/                  # Client Portal
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── admin/          # Admin-specific components
+│   │   │   ├── brand/          # Logo, branding assets
+│   │   │   ├── common/         # EmptyState, LoadingState, SearchInput
+│   │   │   ├── documents/      # Document management components
+│   │   │   ├── layout/         # Header, Sidebar
+│   │   │   ├── notifications/  # NotificationBell
+│   │   │   ├── signatures/     # Multi-party signature components
+│   │   │   ├── skeletons/      # Loading skeletons
+│   │   │   └── ui/             # shadcn/ui components
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── lib/                # Utilities, icons, constants
+│   │   └── pages/
+│   │       ├── admin/          # Admin panel pages
+│   │       └── *.tsx           # Client pages
+│   └── convex/                 # Backend functions
+│       ├── schema.ts           # Database schema
+│       ├── lib/                # Auth, helpers
+│       └── *.ts                # API endpoints
+│
+└── 📚 docs/
+    └── portal/
+        └── PORTAL_ROADMAP.md   # Feature roadmap & changelog
+```
 
-### Features
+---
+
+## ✨ Portal Features
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
-**For Clients**
-- Secure document upload & download
-- Task tracking with comments
-- Invoice viewing & payment
-- Electronic signature requests
-- Real-time notifications
-- Email notification preferences
+### 👤 For Clients
+
+| Feature | Description |
+|---------|-------------|
+| 📁 **Documents** | Upload, download, organize by service |
+| 📂 **Folders** | Hierarchical organization with breadcrumbs |
+| ✅ **Tasks** | Track assigned work with comments |
+| 💳 **Invoices** | View, download PDF, pay online |
+| ✍️ **Signatures** | Draw, type, or upload signatures |
+| 🔔 **Notifications** | Real-time alerts & email preferences |
+| 📢 **Announcements** | Firm updates & tax deadlines |
+| ⚙️ **Settings** | Profile & notification preferences |
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
-**For Admins**
-- Client organization management
-- Document request workflow
-- Task assignment & tracking
-- Invoice creation & management
-- Signature request management
-- Activity audit logs
+### 👔 For Admins
+
+| Feature | Description |
+|---------|-------------|
+| 📊 **Dashboard** | Overview with metrics & analytics |
+| 🏢 **Organizations** | Client management & subscriptions |
+| 👥 **Users** | Role assignment & bulk actions |
+| 📄 **Doc Requests** | Request specific documents |
+| 💰 **Invoices** | Create, edit, bulk operations |
+| ✍️ **Signatures** | Multi-party signature workflows |
+| 📢 **Announcements** | Targeted announcements |
+| 📈 **Activity** | Audit logs with analytics |
+| 🏷️ **Services** | Manage service types |
+| 📋 **Task Templates** | Recurring task automation |
 
 </td>
 </tr>
 </table>
 
-### Tech Stack
+---
+
+## 🛠️ Tech Stack
+
+<table>
+<tr>
+<td align="center" width="96">
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="48" height="48" alt="React" />
+<br>React 19
+</td>
+<td align="center" width="96">
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="48" height="48" alt="TypeScript" />
+<br>TypeScript
+</td>
+<td align="center" width="96">
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tailwindcss/tailwindcss-original.svg" width="48" height="48" alt="Tailwind" />
+<br>Tailwind v4
+</td>
+<td align="center" width="96">
+<img src="https://vitejs.dev/logo.svg" width="48" height="48" alt="Vite" />
+<br>Vite 7
+</td>
+<td align="center" width="96">
+<img src="https://avatars.githubusercontent.com/u/108468352" width="48" height="48" alt="Convex" />
+<br>Convex
+</td>
+</tr>
+</table>
+
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **Frontend** | React 19 + Vite 7 + TypeScript | Fast SPA with type safety |
+| **Styling** | Tailwind CSS v4 + shadcn/ui | Utility-first design system |
+| **Backend** | Convex | Real-time serverless database |
+| **Auth** | WorkOS AuthKit | Google OAuth + enterprise SSO |
+| **Email** | Resend | Transactional emails |
+| **Payments** | Stripe | Online payment processing |
+| **Storage** | Convex Storage (R2 ready) | Document storage |
+| **Hosting** | Cloudflare Pages | Edge deployment |
+
+---
+
+## 🎨 Design System
+
+<table>
+<tr>
+<td valign="top" width="50%">
+
+### Brand Colors
+
+| Color | Hex | Usage |
+|-------|-----|-------|
+| 🔵 **Navy** | `#2B3A55` | Primary, headings |
+| 🟡 **Gold** | `#B8986B` | Accent, CTAs |
+| 🟤 **Gold Hover** | `#A6875A` | Hover states |
+| 🔲 **Ink** | `#090516` | Body text |
+| ⬜ **Cream** | `#FAF8F5` | Background |
+
+</td>
+<td valign="top" width="50%">
+
+### Typography
+
+| Use | Font | Weight |
+|-----|------|--------|
+| **Display** | Playfair Display | 400, 500 |
+| **Body** | Manrope | 400, 500, 600 |
+| **Mono** | DM Mono | 400, 500 |
+
+</td>
+</tr>
+</table>
+
+### Responsive Breakpoints
 
 ```
-Frontend        React 19 + Vite + TypeScript + Tailwind CSS
-Components      shadcn/ui + Radix Primitives
-Backend         Convex (real-time, serverless)
-Auth            WorkOS AuthKit (Google OAuth, SSO-ready)
-Email           Resend (transactional emails)
-Payments        Stripe (scaffolded)
-Hosting         Cloudflare Pages
+Mobile-First Design
+├── 320px   Extra small phones (iPhone SE)
+├── 375px   Small phones (iPhone 12/13/14)
+├── 480px   Large phones
+├── 640px   Small tablets
+├── 768px   Tablets (iPad Mini)
+├── 1024px  Large tablets / Small desktops
+└── 1440px+ Desktop
 ```
 
-### Quick Start
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or pnpm
+- Convex account
+
+### Installation
 
 ```bash
-# Install dependencies
+# Clone the repository
+git clone https://github.com/amjadhazli/zed.git
+cd zed
+
+# Install portal dependencies
 cd portal && npm install
 
 # Start development servers
-npm run dev              # Frontend (Vite) → localhost:5173
-npx convex dev           # Backend (Convex)
+npm run dev              # Frontend → localhost:5173
+npx convex dev           # Backend (in another terminal)
 ```
 
 ### Environment Variables
 
 ```bash
-# Convex (portal/convex/.env.local)
-WORKOS_CLIENT_ID=client_xxx
-WORKOS_API_KEY=sk_xxx
-RESEND_API_KEY=re_xxx
-
-# Set via Convex dashboard or CLI
+# Convex Environment (set via CLI or dashboard)
 npx convex env set WORKOS_CLIENT_ID client_xxx
-```
-
-### Project Structure
-
-```
-portal/
-├── src/
-│   ├── components/     # Reusable UI components
-│   │   ├── common/     # EmptyState, LoadingState, SearchInput
-│   │   ├── layout/     # Header, Sidebar
-│   │   └── ui/         # shadcn components
-│   ├── hooks/          # Custom React hooks
-│   ├── lib/            # Utilities, icons
-│   ├── pages/          # Route pages
-│   │   ├── admin/      # Admin-only pages
-│   │   └── ...         # Client pages
-│   └── types/          # TypeScript types
-├── convex/             # Backend functions
-│   ├── schema.ts       # Database schema
-│   ├── documents.ts    # Document CRUD + requests
-│   ├── tasks.ts        # Tasks + comments
-│   ├── invoices.ts     # Invoice management
-│   ├── signatures.ts   # E-signature workflow
-│   ├── emails.ts       # Email notifications
-│   └── lib/            # Auth, helpers
-└── public/             # Static assets
+npx convex env set WORKOS_API_KEY sk_xxx
+npx convex env set RESEND_API_KEY re_xxx
+npx convex env set STRIPE_SECRET_KEY sk_xxx
+npx convex env set STRIPE_WEBHOOK_SECRET whsec_xxx
+npx convex env set PORTAL_URL https://portal.amjadhazli.com
 ```
 
 ---
 
-## Main Website
+## 📦 Deployment
 
-Static marketing website with service pages and blog.
-
-### Structure
-
-```
-├── index.html              # Landing page
-├── about.html              # Team & credentials
-├── blog.html               # Blog listing
-├── resources.html          # Tools & guides
-├── services/
-│   ├── bookkeeping.html
-│   ├── tax.html
-│   ├── cfo.html
-│   ├── technology.html
-│   └── incorporation.html
-└── blog/                   # Article pages
-```
-
-### Local Development
+| Project | Platform | Branch | URL |
+|---------|----------|--------|-----|
+| Website | Netlify | `master` | amjadhazli.com |
+| Portal | Cloudflare Pages | `master` | portal.amjadhazli.com |
+| Backend | Convex Cloud | Auto-deploy | — |
 
 ```bash
-python3 -m http.server 3000
-# Open http://localhost:3000
-```
-
----
-
-## Design System
-
-<table>
-<tr>
-<td>
-
-**Colors**
-| Token | Value |
-|-------|-------|
-| Navy | `#2B3A55` |
-| Gold | `#B8986B` |
-| Cream | `#FAF8F5` |
-| Ink | `#1A1A1A` |
-
-</td>
-<td>
-
-**Typography**
-| Use | Font |
-|-----|------|
-| Headings | Playfair Display |
-| Body | Manrope |
-| Mono | DM Mono |
-
-</td>
-</tr>
-</table>
-
-**Spacing Scale:** 4, 8, 12, 16, 24, 32, 48, 64, 80px
-
-**Breakpoints:** Mobile (375px) → Tablet (768px) → Desktop (1024px+)
-
----
-
-## Deployment
-
-| Project | Platform | Branch |
-|---------|----------|--------|
-| Website | Netlify | `master` |
-| Portal | Cloudflare Pages | `master` |
-| Backend | Convex Cloud | Auto-deploy |
-
-```bash
-# Deploy portal
+# Deploy Portal
 cd portal
 npm run build
 npx wrangler pages deploy dist
 
-# Deploy Convex
+# Deploy Convex Backend
 npx convex deploy
 ```
 
 ---
 
-## Documentation
+## 📋 Development Phases
 
-Detailed documentation is available in the `docs/` directory:
+### ✅ Completed
 
-- [`docs/portal/PORTAL_ROADMAP.md`](docs/portal/PORTAL_ROADMAP.md) — Portal feature roadmap & changelog
+| Phase | Features |
+|-------|----------|
+| **1-6** | Core portal: Auth, Documents, Tasks, Invoices, Signatures, Admin |
+| **Enhancement 1** | Doc requests, task comments, email notifications, signature preview |
+| **Enhancement 2** | Service-based docs, folders, versioning, code refactoring |
+| **Enhancement 3** | IP capture, hash verification, Stripe, PDF invoices, reminders |
+| **Enhancement 4** | Multi-party signatures, task templates, recurring tasks, financial dashboard |
+| **Enhancement 5** | Pagination, bulk operations, activity analytics with Recharts |
+| **Mobile Responsive** | Fluid design tokens, touch targets, responsive dialogs & filters |
+
+### 🔮 Planned
+
+- [ ] Recurring invoices (auto-generate on schedule)
+- [ ] Dark mode support
+- [ ] Two-factor authentication (TOTP)
+- [ ] Mobile app (React Native)
+- [ ] Signature certificates
 
 ---
 
-## Development Phases
+## 📄 Documentation
 
-### Completed
+- [**Portal Roadmap**](docs/portal/PORTAL_ROADMAP.md) — Complete feature list, changelog, and technical details
+- [**Claude Instructions**](.claude/CLAUDE.md) — AI development guidelines
 
-- [x] **Phase 1-6:** Core portal functionality
-- [x] **Enhancement Phase 1:** Document requests, task comments, email notifications, signature preview
+---
 
-### Planned
+## 🔒 Security Features
 
-- [ ] **Enhancement Phase 2:** Folders, reminders, Stripe payments, search
-- [ ] **Enhancement Phase 3:** Task templates, recurring tasks, multi-party signatures
-- [ ] **Enhancement Phase 4:** Bulk operations, onboarding templates, analytics
+| Feature | Description |
+|---------|-------------|
+| **WorkOS Auth** | Enterprise-grade authentication with SSO support |
+| **Document Hash** | SHA-256 integrity verification for signatures |
+| **IP Capture** | Audit trail with IP and user agent |
+| **Rate Limiting** | Protection on sensitive mutations |
+| **Stripe Webhooks** | HMAC-SHA256 signature verification |
+| **User Deactivation** | Soft delete preserving referential integrity |
+
+---
+
+## 📱 Mobile Responsiveness
+
+The portal is fully responsive with:
+
+- **Fluid typography** using CSS `clamp()` for smooth scaling
+- **Touch-friendly** targets (minimum 44×44px)
+- **Collision-aware** dropdowns and dialogs
+- **Mobile card views** for tables on small screens
+- **Safe area** support for notched devices
 
 ---
 
 <div align="center">
 
-**Built with precision for Malaysian businesses**
+### Built with precision for Malaysian businesses
 
-© 2026 Amjad & Hazli. All rights reserved.
+**© 2026 Amjad & Hazli. All rights reserved.**
+
+---
+
+<sub>Powered by React, Convex, and modern web technologies</sub>
 
 </div>

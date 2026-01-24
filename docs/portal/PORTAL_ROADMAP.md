@@ -1,9 +1,9 @@
 # Client Portal Roadmap
 ## Amjad & Hazli - AI-Native Chartered Accounting Firm
 
-> **Status:** Enhancement Phase 3 Complete
-> **Last Updated:** 2026-01-24
-> **Current Phase:** Production with Enhancements
+> **Status:** Mobile Responsive Implementation Complete
+> **Last Updated:** 2026-01-25
+> **Current Phase:** Production with Full Mobile Support
 
 ---
 
@@ -359,19 +359,153 @@ PORTAL_URL=https://portal.amjadhazli.com
 
 ## Future Enhancements
 
-### Enhancement Phase 4 (Planned)
-- [ ] Task templates for common workflows
-- [ ] Recurring tasks (weekly, monthly, quarterly)
-- [ ] Client financial summary dashboard
-- [ ] Multi-party signatures
-- [ ] Document search (full-text on name/description)
+### Enhancement Phase 4: Multi-Party Signatures & Task Enhancements
+**Status:** Complete
 
-### Enhancement Phase 5 (Planned)
-- [ ] Advanced bulk operations (assign, update, status change)
-- [ ] Client onboarding templates
-- [ ] Activity analytics and reporting
-- [ ] Signature preview before final submit
-- [ ] Admin invoice table pagination
+- [x] **Task Templates** - Common workflow templates
+  - Create templates for recurring task types
+  - Admin UI for template management
+  - Apply templates when creating new tasks
+
+- [x] **Recurring Tasks** - Automated task scheduling
+  - Weekly, monthly, quarterly recurrence options
+  - Automatic task creation via cron jobs
+  - Next occurrence tracking
+
+- [x] **Client Financial Summary Dashboard** - Financial overview
+  - Revenue and outstanding amounts per client
+  - Invoice and payment history charts
+  - Subscription service breakdown
+
+- [x] **Multi-Party Signatures** - Multiple signers workflow
+  - Create requests with 2-10 signers
+  - Drag-and-drop signer ordering
+  - Internal user search combobox
+  - External signer email input
+  - Sequential signing option
+  - Require all signatures option
+  - Signer progress tracking in details view
+  - Admin dropdown: Single Signer / Multi-Party
+
+**Key Files Added:**
+- `src/components/signatures/CreateMultiPartyDialog.tsx` - Multi-step wizard
+- `src/components/signatures/SignerList.tsx` - Drag-and-drop sortable list
+- `src/components/signatures/AddSignerForm.tsx` - Internal/external signer form
+- `src/components/signatures/SignerProgressList.tsx` - Signer status tracking
+- `src/components/ui/combobox.tsx` - User search combobox
+
+**Dependencies Added:**
+- `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` - Drag-and-drop
+
+---
+
+### Enhancement Phase 5: Search, Bulk Operations & Analytics
+**Status:** Complete
+
+Scalability and usability improvements across the admin panel.
+
+- [x] **Admin Invoice Pagination** - Cursor-based pagination for invoices
+  - Page size selector (20/50/100)
+  - Total count and range display
+  - Filter + pagination integration
+
+- [x] **Invoice Bulk Operations** - Multi-select actions
+  - Checkbox selection with select all
+  - Bulk publish draft invoices
+  - Bulk mark as paid
+  - Bulk cancel
+  - Export selected to CSV
+
+- [x] **Announcement Bulk Operations** - Multi-select actions
+  - Bulk pin/unpin
+  - Bulk delete
+  - Export selected to CSV
+
+- [x] **Activity Analytics Dashboard** - Visual analytics
+  - Summary stats (total activities, active users, avg/day)
+  - Time range selector (7-90 days)
+  - Daily activity trend line chart
+  - Resource type bar chart
+  - Action type pie chart
+  - Top active users leaderboard
+  - Activity heatmap by day/hour
+
+- [x] **Document Search Enhancement** - Improved client-side search
+  - Real-time filtering
+  - Search across name/description/tags
+
+**Key Files Added:**
+- `src/components/admin/ActivityAnalytics.tsx` - Analytics dashboard with Recharts
+- `convex/admin.ts` - `listInvoicesPaginated` query
+- `convex/invoices.ts` - `bulkPublish`, `bulkMarkPaid`, `bulkCancel` mutations
+- `convex/announcements.ts` - `bulkTogglePin`, `bulkDelete` mutations
+- `convex/activity.ts` - `getAnalytics` query
+
+**Dependencies Added:**
+- `recharts` - Charting library for analytics
+
+---
+
+### Mobile Responsiveness Implementation
+**Status:** Complete
+
+Pixel-perfect mobile experience from 320px to 1440px+ viewports.
+
+#### Landing Page CSS Foundation
+- [x] **Fluid Design Tokens** - CSS `clamp()` for smooth scaling
+  - `--space-section: clamp(48px, 8vw, 96px)`
+  - `--text-hero: clamp(28px, 6vw, 48px)`
+  - `--text-section: clamp(24px, 4.5vw, 40px)`
+- [x] **Extra-Small Breakpoint** - 479px for iPhone SE and small phones
+- [x] **Grid Gap Optimization** - Fluid gaps for testimonials, features, team, services grids
+- [x] **CTA Section** - Stack buttons vertically on mobile
+- [x] **Footer Links** - 44px touch targets on mobile
+- [x] **Service Hero Icons** - Responsive sizing with `clamp(64px, 15vw, 96px)`
+- [x] **Calendar Modal** - Responsive min-height for booking widget
+
+#### Portal UI Components
+- [x] **Dialog Component** - `w-[calc(100%-2rem)]` on mobile, `max-h-[90vh]` with overflow scroll
+- [x] **Select Component** - Collision avoidance, `collisionPadding={16}`
+- [x] **Dropdown Menu** - `max-w-[calc(100vw-2rem)]` prevents off-screen
+- [x] **Button Component** - `min-h-[44px]` touch targets for sm/icon sizes
+
+#### Portal Layout
+- [x] **Header** - 44px menu button, min-height on user dropdown
+- [x] **Sidebar** - 44px close button with larger icon
+
+#### Portal Pages
+- [x] **Settings** - Flex-col on mobile for toggle rows, full-width inputs
+- [x] **Invoices** - Full-width filters, mobile card view for line items
+- [x] **Tasks** - Full-width filter selects
+- [x] **Documents** - Full-width category filter
+
+#### Admin Pages
+- [x] **AdminInvoices** - Full-width filters, responsive pagination buttons
+- [x] **AdminActivity** - Full-width filter select
+- [x] **AdminAnnouncements** - Full-width type and status filters
+- [x] **AdminServices** - Full-width org filter
+- [x] **AdminSignatures** - Full-width org and status filters
+
+#### Global CSS Utilities
+- [x] **Utility Classes** - `.form-control-responsive`, `.filter-select-responsive`, `.touch-target-min`
+- [x] **Safe Area Support** - CSS variables for notched devices
+
+**Files Modified:**
+- Landing pages: `index.html`, `schedule.html`, `services/*.html`
+- UI Components: `dialog.tsx`, `select.tsx`, `dropdown-menu.tsx`, `button.tsx`
+- Layout: `Header.tsx`, `Sidebar.tsx`
+- Pages: `Settings.tsx`, `Invoices.tsx`, `Tasks.tsx`, `Documents.tsx`
+- Admin: `AdminInvoices.tsx`, `AdminActivity.tsx`, `AdminAnnouncements.tsx`, `AdminServices.tsx`, `AdminSignatures.tsx`
+- CSS: `portal/src/index.css`
+
+---
+
+### Enhancement Phase 6 (Planned)
+- [ ] Client onboarding templates (pre-configured service packages)
+- [ ] Recurring invoices (auto-generate on schedule)
+- [ ] Dark mode support
+- [ ] Two-factor authentication (TOTP)
+- [ ] Signature certificate/receipt generation
 
 ### Other Future Items
 - [ ] R2 direct upload with presigned URLs (when bucket configured)
@@ -387,6 +521,27 @@ PORTAL_URL=https://portal.amjadhazli.com
 
 | Date | Phase | Changes |
 |------|-------|---------|
+| 2026-01-25 | Mobile | Complete mobile responsiveness implementation (320px-1440px+) |
+| 2026-01-25 | Mobile | Added fluid design tokens with CSS clamp() for typography and spacing |
+| 2026-01-25 | Mobile | Added 479px breakpoint for extra-small phones |
+| 2026-01-25 | Mobile | Fixed dialog, select, dropdown collision and sizing on mobile |
+| 2026-01-25 | Mobile | Added 44px minimum touch targets to buttons and interactive elements |
+| 2026-01-25 | Mobile | Made all filter selects full-width on mobile |
+| 2026-01-25 | Mobile | Added mobile card view for invoice line items |
+| 2026-01-25 | Mobile | Added responsive utility classes to portal CSS |
+| 2026-01-25 | Enhancement 5 | Added admin invoice pagination with cursor-based navigation |
+| 2026-01-25 | Enhancement 5 | Added invoice bulk operations (publish, mark paid, cancel, export) |
+| 2026-01-25 | Enhancement 5 | Added announcement bulk operations (pin/unpin, delete, export) |
+| 2026-01-25 | Enhancement 5 | Added activity analytics dashboard with Recharts |
+| 2026-01-25 | Enhancement 5 | Added analytics query with heatmap, trends, and top users |
+| 2026-01-24 | Enhancement 4 | Added multi-party signature admin UI with drag-and-drop signer ordering |
+| 2026-01-24 | Enhancement 4 | Added CreateMultiPartyDialog 3-step wizard (configure → signers → review) |
+| 2026-01-24 | Enhancement 4 | Added SignerList with @dnd-kit for drag-and-drop reordering |
+| 2026-01-24 | Enhancement 4 | Added AddSignerForm with internal user combobox and external email input |
+| 2026-01-24 | Enhancement 4 | Added SignerProgressList for viewing signer status on existing requests |
+| 2026-01-24 | Enhancement 4 | Added task templates for common workflows |
+| 2026-01-24 | Enhancement 4 | Added recurring tasks (weekly/monthly/quarterly) |
+| 2026-01-24 | Enhancement 4 | Added client financial summary dashboard |
 | 2026-01-24 | Enhancement 3 | Added IP address capture for signature audit trail |
 | 2026-01-24 | Enhancement 3 | Added document hash verification (SHA-256) for signature integrity |
 | 2026-01-24 | Enhancement 3 | Added upload signature option (third method alongside draw/type) |
