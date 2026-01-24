@@ -15,6 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
   History,
   Search,
   User,
@@ -26,8 +32,10 @@ import {
   Building2,
   ExternalLink,
   ChevronDown,
+  BarChart3,
 } from "@/lib/icons";
 import { formatDistanceToNow } from "@/lib/utils";
+import { ActivityAnalytics } from "@/components/admin/ActivityAnalytics";
 import type { Id } from "../../../convex/_generated/dataModel";
 
 const PAGE_SIZE = 20;
@@ -48,9 +56,49 @@ interface ActivityItem {
 }
 
 export function AdminActivity() {
+  const [activeTab, setActiveTab] = useState<"log" | "analytics">("log");
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          Activity
+        </h1>
+        <p className="mt-1 text-muted-foreground">
+          View all activity and analytics across the portal
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "log" | "analytics")}>
+        <TabsList>
+          <TabsTrigger value="log" className="gap-2">
+            <History className="h-4 w-4" />
+            Activity Log
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="log" className="mt-6">
+          <ActivityLog />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="mt-6">
+          <ActivityAnalytics />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function ActivityLog() {
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [loadedActivities, setLoadedActivities] = useState<ActivityItem[]>([]);
-  
+
   const activityResult = useQuery(api.activity.list, { limit: PAGE_SIZE, cursor });
   const organizations = useQuery(api.organizations.list);
   const navigate = useNavigate();
@@ -73,15 +121,15 @@ export function AdminActivity() {
   }, [cursor, activityResult?.activities, loadedActivities]);
 
   // Create org lookup map with memoization
-  const orgMap = useMemo(() => 
+  const orgMap = useMemo(() =>
     new Map(organizations?.map((org) => [org._id.toString(), org.name]) || []),
     [organizations]
   );
 
   // Filter activity with memoization
-  const filteredActivity = useMemo(() => 
+  const filteredActivity = useMemo(() =>
     activities.filter((item) => {
-      const matchesSearch = 
+      const matchesSearch =
         item.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.resourceName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.action.toLowerCase().includes(searchQuery.toLowerCase());
@@ -174,19 +222,9 @@ export function AdminActivity() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Activity Log
-        </h1>
-        <p className="mt-1 text-muted-foreground">
-          View all activity across the portal
-        </p>
-      </div>
-
       {/* Filters */}
       <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-1 sm:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search activity..."
@@ -196,7 +234,7 @@ export function AdminActivity() {
           />
         </div>
         <Select value={actionFilter} onValueChange={setActionFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by type" />
           </SelectTrigger>
           <SelectContent>
@@ -220,8 +258,8 @@ export function AdminActivity() {
             <History className="h-12 w-12 text-muted-foreground/50" />
             <p className="mt-4 font-medium">No activity found</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {searchQuery || actionFilter !== "all" 
-                ? "Try adjusting your filters" 
+              {searchQuery || actionFilter !== "all"
+                ? "Try adjusting your filters"
                 : "Activity will appear here as users interact with the portal"}
             </p>
           </CardContent>
@@ -235,8 +273,8 @@ export function AdminActivity() {
                   {/* User Avatar */}
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted overflow-hidden">
                     {item.userAvatar ? (
-                      <img 
-                        src={item.userAvatar} 
+                      <img
+                        src={item.userAvatar}
                         alt={item.userName}
                         className="h-10 w-10 object-cover"
                       />
@@ -264,7 +302,7 @@ export function AdminActivity() {
                         )
                       )}
                     </div>
-                    
+
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
                       {/* Organization */}
                       {item.organizationId && (
@@ -273,7 +311,7 @@ export function AdminActivity() {
                           {orgMap.get(item.organizationId.toString()) || "Unknown"}
                         </span>
                       )}
-                      
+
                       {/* Time */}
                       <span className="text-muted-foreground">
                         {formatDistanceToNow(item.createdAt)}
@@ -299,8 +337,8 @@ export function AdminActivity() {
       {activities.length > 0 && (
         <div className="flex flex-col items-center gap-4">
           {activityResult?.hasMore && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleLoadMore}
               disabled={isLoadingMore || activityResult === undefined}
               className="gap-2"

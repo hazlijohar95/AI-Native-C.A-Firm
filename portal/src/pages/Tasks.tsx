@@ -123,20 +123,11 @@ export function Tasks() {
   return (
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div
-        className="opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
+      <div className="motion-safe-slide-up">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
-              <span className="text-xs font-medium text-[#6b6b76]">Tasks</span>
-            </div>
-            <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
-              Your <span className="italic text-[#6b6b76]">Tasks</span>
+            <h1 className="font-serif text-3xl sm:text-4xl text-[#2B3A55] tracking-tight">
+              Your <span className="italic text-[#B8986B]">Tasks</span>
             </h1>
             <p className="mt-2 text-[#6b6b76]">
               View and manage your assigned tasks
@@ -144,7 +135,8 @@ export function Tasks() {
           </div>
           <Button
             onClick={() => setShowRequestDialog(true)}
-            className="h-10 bg-[#253FF6] hover:bg-[#1e35d4] text-white rounded-xl text-sm font-medium shadow-sm"
+            variant="gold"
+            className="h-10 rounded-xl text-sm font-medium"
           >
             <HelpCircle className="h-4 w-4 mr-2" />
             Request Help
@@ -154,15 +146,12 @@ export function Tasks() {
 
       {/* Filters */}
       <div
-        className="flex flex-wrap items-center gap-3 opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
-        }}
+        className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 motion-safe-slide-up motion-safe-slide-up-delay-2"
       >
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-[#9d9da6]" />
+          <Filter className="h-4 w-4 text-[#9d9da6] shrink-0" />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
+            <SelectTrigger className="w-full sm:w-[150px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -175,7 +164,7 @@ export function Tasks() {
           </Select>
         </div>
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger className="w-[150px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
+          <SelectTrigger className="w-full sm:w-[150px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>
@@ -198,10 +187,7 @@ export function Tasks() {
         </div>
       ) : tasks.length === 0 ? (
         <div
-          className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards",
-          }}
+          className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] motion-safe-slide-up motion-safe-slide-up-delay-3"
         >
           <div className="w-14 h-14 rounded-xl bg-[#22c55e]/10 flex items-center justify-center mb-4">
             <CheckSquare className="h-6 w-6 text-[#22c55e]" />
@@ -247,12 +233,6 @@ export function Tasks() {
         onClose={() => setShowRequestDialog(false)}
       />
 
-      <style>{`
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -306,14 +286,11 @@ function TaskCard({ task, index, onStatusChange, onSelect, onCancelRequest, isOv
   return (
     <div
       className={cn(
-        "group bg-white rounded-2xl border border-black/5 p-5 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] opacity-0",
+        "group bg-white rounded-xl border border-[rgba(184,152,107,0.1)] p-5 transition-all duration-200 hover:border-[rgba(184,152,107,0.25)] hover:shadow-[0_4px_16px_rgba(184,152,107,0.12)] motion-safe-slide-up motion-safe-slide-up-delay-3",
         task.status === "completed" && "opacity-60",
         isPendingRequest && "border-amber-200 bg-amber-50/30",
         isRejectedRequest && "border-red-200 bg-red-50/30 opacity-70"
       )}
-      style={{
-        animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${0.15 + index * 0.03}s forwards`,
-      }}
     >
       <div className="flex items-start gap-4">
         {/* Status Toggle - disabled for pending/rejected requests */}
@@ -329,7 +306,7 @@ function TaskCard({ task, index, onStatusChange, onSelect, onCancelRequest, isOv
           }}
           disabled={isPendingRequest || isRejectedRequest}
           className={cn(
-            "mt-0.5 flex-shrink-0 rounded-full transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#253FF6] focus-visible:ring-offset-2",
+            "mt-0.5 flex-shrink-0 rounded-full transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8986B] focus-visible:ring-offset-2",
             isPendingRequest || isRejectedRequest
               ? "cursor-not-allowed opacity-50"
               : "hover:scale-110"
@@ -348,7 +325,7 @@ function TaskCard({ task, index, onStatusChange, onSelect, onCancelRequest, isOv
           <div className="flex flex-wrap items-center gap-2">
             <h3
               className={cn(
-                "font-medium text-[#0f0f12] hover:text-[#253FF6] transition-colors",
+                "font-medium text-[#0f0f12] hover:text-[#B8986B] transition-colors",
                 task.status === "completed" && "line-through text-[#9d9da6]"
               )}
             >
@@ -561,7 +538,7 @@ function TaskDetailDialog({ task, onClose }: Omit<TaskDetailDialogProps, "onStat
                     <div className={cn(
                       "w-6 h-6 rounded-full flex items-center justify-center text-white text-xs",
                       comment.userRole === "admin" || comment.userRole === "staff"
-                        ? "bg-[#253FF6]"
+                        ? "bg-[#B8986B]"
                         : "bg-gray-400"
                     )}>
                       {comment.userRole === "admin" || comment.userRole === "staff"
@@ -591,7 +568,7 @@ function TaskDetailDialog({ task, onClose }: Omit<TaskDetailDialogProps, "onStat
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="flex-1 h-10 px-3 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#253FF6] focus:border-transparent"
+              className="flex-1 h-10 px-3 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#B8986B] focus:border-transparent"
               disabled={isSubmitting}
             />
             <button
@@ -657,7 +634,7 @@ function RequestHelpDialog({ open, onClose }: RequestHelpDialogProps) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="font-serif text-xl flex items-center gap-2">
-            <HelpCircle className="h-5 w-5 text-[#253FF6]" />
+            <HelpCircle className="h-5 w-5 text-[#B8986B]" />
             Request Help
           </DialogTitle>
           <DialogDescription className="text-[#6b6b76]">
@@ -676,7 +653,7 @@ function RequestHelpDialog({ open, onClose }: RequestHelpDialogProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Need help with tax documents"
-              className="w-full h-10 px-3 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#253FF6] focus:border-transparent"
+              className="w-full h-10 px-3 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#B8986B] focus:border-transparent"
               disabled={isSubmitting}
               required
             />
@@ -692,7 +669,7 @@ function RequestHelpDialog({ open, onClose }: RequestHelpDialogProps) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide any additional context that might help us assist you better..."
               rows={4}
-              className="w-full px-3 py-2 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#253FF6] focus:border-transparent resize-none"
+              className="w-full px-3 py-2 rounded-lg border border-[#EBEBEB] text-sm focus:outline-none focus:ring-2 focus:ring-[#B8986B] focus:border-transparent resize-none"
               disabled={isSubmitting}
             />
           </div>
@@ -710,7 +687,7 @@ function RequestHelpDialog({ open, onClose }: RequestHelpDialogProps) {
             <Button
               type="submit"
               disabled={!title.trim() || isSubmitting}
-              className="bg-[#253FF6] hover:bg-[#1e35d4] text-white rounded-lg"
+              className="bg-[#B8986B] hover:bg-[#A6875A] text-white rounded-lg"
             >
               {isSubmitting ? (
                 <>

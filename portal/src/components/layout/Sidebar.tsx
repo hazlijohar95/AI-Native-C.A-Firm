@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/brand";
 import {
   LayoutDashboard,
   FileText,
@@ -80,7 +81,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 transform bg-white border-r border-[#F1F1F1] motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-in-out lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 transform bg-gradient-to-b from-white to-[#FAF8F5] border-r border-[rgba(184,152,107,0.1)] motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-in-out lg:hidden",
           open ? "translate-x-0" : "-translate-x-full"
         )}
         aria-label="Mobile navigation"
@@ -94,7 +95,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         className="hidden lg:flex lg:w-64 lg:flex-col lg:shrink-0"
         aria-label="Main navigation"
       >
-        <div className="flex min-h-0 flex-1 flex-col border-r border-[#F1F1F1] bg-white">
+        <div className="flex min-h-0 flex-1 flex-col border-r border-[rgba(184,152,107,0.1)] bg-gradient-to-b from-white to-[#FAF8F5]">
           <SidebarContent />
         </div>
       </aside>
@@ -114,52 +115,56 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
   return (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-14 items-center justify-between border-b border-[#F1F1F1] px-4">
+      <div className="flex h-14 items-center justify-between border-b border-[rgba(184,152,107,0.1)] px-4">
         <a href="https://amjadhazli.com" className="flex items-center">
-          <span className="font-['Playfair_Display'] text-[#090516] text-base">Amjad & Hazli</span>
+          <Logo variant="full" size="xs" color="gold" />
         </a>
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded border border-[#EBEBEB] text-[#737373] hover:bg-[#F8F8F8] hover:text-[#090516] transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-[rgba(184,152,107,0.15)] text-[#737373] hover:bg-[#B8986B]/8 hover:text-[#2B3A55] transition-all duration-200"
             aria-label="Close navigation menu"
           >
-            <X className="h-4 w-4" aria-hidden="true" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         )}
       </div>
 
-      {/* Client Navigation */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto" aria-label="Portal navigation">
-        <div className="mb-2 px-3">
-          <span className="font-['DM_Mono'] text-[10px] text-[#737373] uppercase tracking-[0.02em]">
-            Portal
-          </span>
-        </div>
-        <div className="space-y-0.5">
-          {clientNavigation.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.href}
-              onClick={onClose}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-[#253FF6]/5 text-[#253FF6]"
-                    : "text-[#3A3A3A] hover:bg-[#F8F8F8] hover:text-[#090516]"
-                )
-              }
-            >
-              <item.icon className="h-4 w-4" aria-hidden="true" />
-              {item.name}
-            </NavLink>
-          ))}
-        </div>
+        {/* Client Navigation - Only show for clients */}
+        {!isAdmin && (
+          <>
+            <div className="mb-2 px-3">
+              <span className="font-['DM_Mono'] text-[10px] text-[#737373] uppercase tracking-[0.02em]">
+                Portal
+              </span>
+            </div>
+            <div className="space-y-0.5">
+              {clientNavigation.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.href}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 border-l-[3px]",
+                      isActive
+                        ? "bg-[#B8986B]/12 text-[#B8986B] border-l-[#B8986B]"
+                        : "text-[#3A3A3A] hover:bg-[#B8986B]/6 hover:text-[#2B3A55] border-l-transparent"
+                    )
+                  }
+                >
+                  <item.icon className="h-4 w-4" aria-hidden="true" />
+                  {item.name}
+                </NavLink>
+              ))}
+            </div>
+          </>
+        )}
 
-        {/* Admin Navigation */}
+        {/* Admin Navigation - Only show for admins/staff */}
         {isAdmin && (
-          <div className="mt-6">
+          <>
             <div className="mb-2 px-3">
               <span className="font-['DM_Mono'] text-[10px] text-[#737373] uppercase tracking-[0.02em]">
                 Admin
@@ -173,10 +178,10 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
                   onClick={onClose}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition-colors",
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 border-l-[3px]",
                       isActive
-                        ? "bg-[#253FF6]/5 text-[#253FF6]"
-                        : "text-[#3A3A3A] hover:bg-[#F8F8F8] hover:text-[#090516]"
+                        ? "bg-[#B8986B]/12 text-[#B8986B] border-l-[#B8986B]"
+                        : "text-[#3A3A3A] hover:bg-[#B8986B]/6 hover:text-[#2B3A55] border-l-transparent"
                     )
                   }
                 >
@@ -185,12 +190,12 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
                 </NavLink>
               ))}
             </div>
-          </div>
+          </>
         )}
       </nav>
 
       {/* Secondary Navigation */}
-      <div className="border-t border-[#F1F1F1] px-3 py-4">
+      <div className="border-t border-[rgba(184,152,107,0.1)] px-3 py-4">
         <div className="space-y-0.5">
           {secondaryNavigation.map((item) => (
             <NavLink
@@ -199,10 +204,10 @@ function SidebarContent({ onClose, showCloseButton }: SidebarContentProps) {
               onClick={onClose}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 border-l-[3px]",
                   isActive
-                    ? "bg-[#253FF6]/5 text-[#253FF6]"
-                    : "text-[#737373] hover:bg-[#F8F8F8] hover:text-[#090516]"
+                    ? "bg-[#B8986B]/12 text-[#B8986B] border-l-[#B8986B]"
+                    : "text-[#737373] hover:bg-[#B8986B]/6 hover:text-[#2B3A55] border-l-transparent"
                 )
               }
             >

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -44,6 +44,8 @@ import {
   CreditCard,
   Edit,
   Download,
+  ChevronLeft,
+  ChevronRight,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { formatDate, formatCurrency } from "@/lib/utils";
@@ -51,32 +53,106 @@ import { exportToCSV, formatDateForExport, formatCurrencyForExport } from "@/lib
 import { InvoiceStatusBadge, PaymentStatusBadge, type InvoiceStatus } from "@/components/status-badges";
 import type { Id } from "../../../convex/_generated/dataModel";
 
+const PAGE_SIZES = [20, 50, 100];
+
 export function AdminInvoices() {
-  const invoices = useQuery(api.admin.listAllInvoices);
   const organizations = useQuery(api.organizations.list);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [pageSize, setPageSize] = useState(20);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const [cursorHistory, setCursorHistory] = useState<(string | undefined)[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<(typeof invoices extends (infer T)[] | undefined ? T : never) | null>(null);
-  const [editingInvoice, setEditingInvoice] = useState<(typeof invoices extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceType | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<InvoiceType | null>(null);
 
-  // Filter invoices with memoization
-  const filteredInvoices = useMemo(() => 
-    invoices?.filter((invoice) => {
-      const matchesSearch = 
-        invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        invoice.organizationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        invoice.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "all" || invoice.displayStatus === statusFilter;
-      return matchesSearch && matchesStatus;
-    }),
-    [invoices, searchQuery, statusFilter]
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Use paginated query
+  const invoiceResult = useQuery(api.admin.listInvoicesPaginated, {
+    status: statusFilter === "all" ? undefined : statusFilter,
+    searchQuery: searchQuery || undefined,
+    limit: pageSize,
+    cursor,
+  });
+
+  // Reset cursor when filters change
+  useEffect(() => {
+    setCursor(undefined);
+    setCursorHistory([]);
+    setSelectedIds(new Set());
+  }, [searchQuery, statusFilter, pageSize]);
+
+  // Type for invoice
+  type InvoiceType = NonNullable<typeof invoiceResult>["invoices"][number];
+
+  const invoices = invoiceResult?.invoices || [];
+  const hasMore = invoiceResult?.hasMore || false;
+  const totalCount = invoiceResult?.totalCount || 0;
+
+  // Bulk selection handlers
+  const toggleSelection = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleAll = useCallback(() => {
+    if (selectedIds.size === invoices.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(invoices.map((inv) => inv._id)));
+    }
+  }, [invoices, selectedIds.size]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  const allSelected = invoices.length > 0 && selectedIds.size === invoices.length;
+  const someSelected = selectedIds.size > 0 && !allSelected;
+
+  // Get selected invoices for bulk operations
+  const selectedInvoices = useMemo(() =>
+    invoices.filter((inv) => selectedIds.has(inv._id)),
+    [invoices, selectedIds]
   );
 
+  // Pagination handlers
+  const handleNextPage = useCallback(() => {
+    if (hasMore && invoiceResult?.nextCursor) {
+      setCursorHistory((prev) => [...prev, cursor]);
+      setCursor(invoiceResult.nextCursor);
+      setSelectedIds(new Set());
+    }
+  }, [hasMore, invoiceResult?.nextCursor, cursor]);
+
+  const handlePrevPage = useCallback(() => {
+    if (cursorHistory.length > 0) {
+      const newHistory = [...cursorHistory];
+      const prevCursor = newHistory.pop();
+      setCursorHistory(newHistory);
+      setCursor(prevCursor);
+      setSelectedIds(new Set());
+    }
+  }, [cursorHistory]);
+
+  const currentPage = cursorHistory.length + 1;
+  const startItem = (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalCount);
+
   const handleExportInvoices = () => {
-    if (!filteredInvoices) return;
-    
-    exportToCSV(filteredInvoices, "invoices-export", [
+    const dataToExport = selectedIds.size > 0 ? selectedInvoices : invoices;
+    if (!dataToExport.length) return;
+
+    exportToCSV(dataToExport, "invoices-export", [
       { key: "invoiceNumber", header: "Invoice Number" },
       { key: "organizationName", header: "Client" },
       { key: "description", header: "Description" },
@@ -87,7 +163,7 @@ export function AdminInvoices() {
       { key: "paidAt", header: "Paid Date", formatter: formatDateForExport as (val: unknown) => string },
     ]);
 
-    toast.success(`Exported ${filteredInvoices.length} invoices`);
+    toast.success(`Exported ${dataToExport.length} invoices`);
   };
 
   return (
@@ -109,17 +185,17 @@ export function AdminInvoices() {
               Create Invoice
             </Button>
           </DialogTrigger>
-          <CreateInvoiceDialog 
+          <CreateInvoiceDialog
             organizations={organizations || []}
-            onClose={() => setIsCreateOpen(false)} 
+            onClose={() => setIsCreateOpen(false)}
           />
         </Dialog>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:flex-1">
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search invoices..."
@@ -129,7 +205,7 @@ export function AdminInvoices() {
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -142,91 +218,163 @@ export function AdminInvoices() {
             </SelectContent>
           </Select>
         </div>
-        <Button variant="outline" onClick={handleExportInvoices} className="gap-2">
+        <Button variant="outline" onClick={handleExportInvoices} className="gap-2 w-full sm:w-auto">
           <Download className="h-4 w-4" />
-          Export CSV
+          Export{selectedIds.size > 0 ? ` (${selectedIds.size})` : " CSV"}
         </Button>
       </div>
 
+      {/* Bulk Actions Bar */}
+      {selectedIds.size > 0 && (
+        <BulkActionsBar
+          selectedIds={selectedIds}
+          selectedInvoices={selectedInvoices}
+          onClearSelection={clearSelection}
+          onExport={handleExportInvoices}
+        />
+      )}
+
       {/* Invoices List */}
-      {invoices === undefined ? (
+      {invoiceResult === undefined ? (
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
-      ) : filteredInvoices?.length === 0 ? (
+      ) : invoices.length === 0 ? (
         <Card>
           <CardContent className="flex h-48 flex-col items-center justify-center text-center">
             <Receipt className="h-12 w-12 text-muted-foreground/50" />
             <p className="mt-4 font-medium">No invoices found</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {searchQuery || statusFilter !== "all" 
-                ? "Try adjusting your filters" 
+              {searchQuery || statusFilter !== "all"
+                ? "Try adjusting your filters"
                 : "Create your first invoice to get started"}
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-md border">
-          <div className="overflow-x-auto">
-            <table className="w-full" aria-label="Invoices list">
-              <caption className="sr-only">
-                List of invoices with client, amount, due date, and status information
-              </caption>
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Invoice</th>
-                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Client</th>
-                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Amount</th>
-                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Due Date</th>
-                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
-                  <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredInvoices?.map((invoice) => (
-                  <tr key={invoice._id} className="border-b last:border-0 hover:bg-muted/30">
-                    <td className="px-4 py-3">
-                      <div>
-                        <p className="font-medium">{invoice.invoiceNumber}</p>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {invoice.description}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Building2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                        {invoice.organizationName}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="font-medium">{formatCurrency(invoice.amount)}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm">{formatDate(invoice.dueDate)}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <InvoiceStatusBadge status={invoice.displayStatus as InvoiceStatus} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <InvoiceActions 
-                        invoice={invoice}
-                        onViewDetails={() => setSelectedInvoice(invoice)}
-                        onEdit={() => setEditingInvoice(invoice)}
+        <>
+          <div className="rounded-md border">
+            <div className="overflow-x-auto">
+              <table className="w-full" aria-label="Invoices list">
+                <caption className="sr-only">
+                  List of invoices with client, amount, due date, and status information
+                </caption>
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th scope="col" className="px-4 py-3 text-left">
+                      <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={toggleAll}
+                        aria-label="Select all invoices"
+                        className={someSelected ? "data-[state=checked]:bg-primary/50" : ""}
                       />
-                    </td>
+                    </th>
+                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Invoice</th>
+                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Client</th>
+                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Amount</th>
+                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Due Date</th>
+                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
+                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {invoices.map((invoice) => (
+                    <tr key={invoice._id} className="border-b last:border-0 hover:bg-muted/30">
+                      <td className="px-4 py-3">
+                        <Checkbox
+                          checked={selectedIds.has(invoice._id)}
+                          onCheckedChange={() => toggleSelection(invoice._id)}
+                          aria-label={`Select invoice ${invoice.invoiceNumber}`}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="font-medium">{invoice.invoiceNumber}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-1">
+                            {invoice.description}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Building2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                          {invoice.organizationName}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-medium">{formatCurrency(invoice.amount)}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm">{formatDate(invoice.dueDate)}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <InvoiceStatusBadge status={invoice.displayStatus as InvoiceStatus} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <InvoiceActions
+                          invoice={invoice}
+                          onViewDetails={() => setSelectedInvoice(invoice)}
+                          onEdit={() => setEditingInvoice(invoice)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+
+          {/* Pagination Controls */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Showing {startItem}-{endItem} of {totalCount}</span>
+              <Select value={pageSize.toString()} onValueChange={(v) => setPageSize(Number(v))}>
+                <SelectTrigger className="w-[80px] h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAGE_SIZES.map((size) => (
+                    <SelectItem key={size} value={size.toString()}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <span>per page</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevPage}
+                disabled={cursorHistory.length === 0}
+                className="min-h-[44px] sm:min-h-0"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Previous</span>
+              </Button>
+              <span className="text-sm text-muted-foreground px-2">
+                Page {currentPage}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNextPage}
+                disabled={!hasMore}
+                className="min-h-[44px] sm:min-h-0"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Invoice Details Dialog */}
       <Dialog open={!!selectedInvoice} onOpenChange={() => setSelectedInvoice(null)}>
         {selectedInvoice && (
-          <InvoiceDetailsDialog 
+          <InvoiceDetailsDialog
             invoice={selectedInvoice}
             onClose={() => setSelectedInvoice(null)}
           />
@@ -236,12 +384,164 @@ export function AdminInvoices() {
       {/* Edit Invoice Dialog (drafts only) */}
       <Dialog open={!!editingInvoice} onOpenChange={() => setEditingInvoice(null)}>
         {editingInvoice && (
-          <EditInvoiceDialog 
+          <EditInvoiceDialog
             invoice={editingInvoice}
             onClose={() => setEditingInvoice(null)}
           />
         )}
       </Dialog>
+    </div>
+  );
+}
+
+interface BulkActionsBarProps {
+  selectedIds: Set<string>;
+  selectedInvoices: Array<{
+    _id: string;
+    status: string;
+    displayStatus: string;
+  }>;
+  onClearSelection: () => void;
+  onExport: () => void;
+}
+
+function BulkActionsBar({ selectedIds, selectedInvoices, onClearSelection, onExport }: BulkActionsBarProps) {
+  const bulkPublish = useMutation(api.invoices.bulkPublish);
+  const bulkMarkPaid = useMutation(api.invoices.bulkMarkPaid);
+  const bulkCancel = useMutation(api.invoices.bulkCancel);
+
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isMarkingPaid, setIsMarkingPaid] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  // Determine which actions are available
+  const draftInvoices = selectedInvoices.filter((inv) => inv.status === "draft");
+  const payableInvoices = selectedInvoices.filter(
+    (inv) => inv.displayStatus === "pending" || inv.displayStatus === "overdue"
+  );
+  const cancellableInvoices = selectedInvoices.filter(
+    (inv) => inv.status !== "paid" && inv.status !== "cancelled"
+  );
+
+  const handleBulkPublish = async () => {
+    if (draftInvoices.length === 0) return;
+
+    setIsPublishing(true);
+    try {
+      const result = await bulkPublish({
+        ids: draftInvoices.map((inv) => inv._id as Id<"invoices">),
+      });
+      toast.success(`Published ${result.published} invoices${result.skipped > 0 ? ` (${result.skipped} skipped)` : ""}`);
+      onClearSelection();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to publish invoices");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handleBulkMarkPaid = async () => {
+    if (payableInvoices.length === 0) return;
+
+    setIsMarkingPaid(true);
+    try {
+      const result = await bulkMarkPaid({
+        ids: payableInvoices.map((inv) => inv._id as Id<"invoices">),
+        method: "bank_transfer",
+      });
+      toast.success(`Marked ${result.paid} invoices as paid${result.skipped > 0 ? ` (${result.skipped} skipped)` : ""}`);
+      onClearSelection();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to mark invoices as paid");
+    } finally {
+      setIsMarkingPaid(false);
+    }
+  };
+
+  const handleBulkCancel = async () => {
+    if (cancellableInvoices.length === 0) return;
+
+    setIsCancelling(true);
+    try {
+      const result = await bulkCancel({
+        ids: cancellableInvoices.map((inv) => inv._id as Id<"invoices">),
+      });
+      toast.success(`Cancelled ${result.cancelled} invoices${result.skipped > 0 ? ` (${result.skipped} skipped)` : ""}`);
+      onClearSelection();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to cancel invoices");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg border">
+      <span className="text-sm font-medium">
+        {selectedIds.size} selected
+      </span>
+      <div className="flex items-center gap-2">
+        {draftInvoices.length > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleBulkPublish}
+            disabled={isPublishing}
+            className="gap-1"
+          >
+            {isPublishing ? <Spinner size="sm" /> : <Send className="h-3 w-3" />}
+            Publish ({draftInvoices.length})
+          </Button>
+        )}
+        {payableInvoices.length > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleBulkMarkPaid}
+            disabled={isMarkingPaid}
+            className="gap-1"
+          >
+            {isMarkingPaid ? <Spinner size="sm" /> : <CreditCard className="h-3 w-3" />}
+            Mark Paid ({payableInvoices.length})
+          </Button>
+        )}
+        {cancellableInvoices.length > 0 && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isCancelling}
+                className="gap-1 text-destructive hover:text-destructive"
+              >
+                {isCancelling ? <Spinner size="sm" /> : <X className="h-3 w-3" />}
+                Cancel ({cancellableInvoices.length})
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel {cancellableInvoices.length} Invoices?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. The selected invoices will be marked as cancelled.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep Invoices</AlertDialogCancel>
+                <AlertDialogAction onClick={handleBulkCancel} className="bg-destructive text-destructive-foreground">
+                  Cancel Invoices
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        <Button size="sm" variant="outline" onClick={onExport} className="gap-1">
+          <Download className="h-3 w-3" />
+          Export
+        </Button>
+      </div>
+      <Button size="sm" variant="ghost" onClick={onClearSelection} className="ml-auto">
+        Clear
+      </Button>
     </div>
   );
 }
@@ -314,7 +614,7 @@ function InvoiceActions({ invoice, onViewDetails, onEdit }: InvoiceActionsProps)
               Payment
             </Button>
           </DialogTrigger>
-          <RecordPaymentDialog 
+          <RecordPaymentDialog
             invoiceId={invoice._id}
             onClose={() => setIsRecordPaymentOpen(false)}
           />
@@ -355,7 +655,7 @@ interface CreateInvoiceDialogProps {
 
 function CreateInvoiceDialog({ organizations, onClose }: CreateInvoiceDialogProps) {
   const createInvoice = useMutation(api.invoices.create);
-  
+
   const [organizationId, setOrganizationId] = useState<string>("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -366,7 +666,7 @@ function CreateInvoiceDialog({ organizations, onClose }: CreateInvoiceDialogProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!organizationId || !description.trim() || !amount || !dueDate) {
       toast.error("Please fill in all required fields");
       return;
@@ -511,7 +811,7 @@ interface RecordPaymentDialogProps {
 function RecordPaymentDialog({ invoiceId, onClose }: RecordPaymentDialogProps) {
   const invoice = useQuery(api.invoices.get, { id: invoiceId });
   const recordPayment = useMutation(api.invoices.recordPayment);
-  
+
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<"bank_transfer" | "cash" | "other">("bank_transfer");
   const [reference, setReference] = useState("");
@@ -527,7 +827,7 @@ function RecordPaymentDialog({ invoiceId, onClose }: RecordPaymentDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const amountInCents = Math.round(parseFloat(amount) * 100);
     if (isNaN(amountInCents) || amountInCents <= 0) {
       toast.error("Please enter a valid amount");
@@ -784,7 +1084,7 @@ interface EditInvoiceDialogProps {
 
 function EditInvoiceDialog({ invoice, onClose }: EditInvoiceDialogProps) {
   const updateInvoice = useMutation(api.invoices.update);
-  
+
   const [description, setDescription] = useState(invoice.description);
   const [amount, setAmount] = useState((invoice.amount / 100).toFixed(2));
   const [dueDate, setDueDate] = useState(new Date(invoice.dueDate).toISOString().split("T")[0]);
@@ -793,7 +1093,7 @@ function EditInvoiceDialog({ invoice, onClose }: EditInvoiceDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!description.trim()) {
       toast.error("Description is required");
       return;

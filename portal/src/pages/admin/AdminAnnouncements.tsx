@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,9 +50,12 @@ import {
   Scale,
   Lightbulb,
   Settings,
+  Download,
+  PinOff,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
+import { exportToCSV, formatDateForExport } from "@/lib/bulk-actions";
 import type { Id } from "../../../convex/_generated/dataModel";
 
 type AnnouncementType = "general" | "tax_deadline" | "regulatory" | "firm_news" | "maintenance" | "tip";
@@ -74,17 +77,61 @@ export function AdminAnnouncements() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingAnnouncement, setEditingAnnouncement] = useState<(typeof announcements extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [editingAnnouncement, setEditingAnnouncement] = useState<AnnouncementItemType | null>(null);
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Type for announcement
+  type AnnouncementItemType = NonNullable<typeof announcements>[number];
 
   // Filter announcements
-  const filteredAnnouncements = announcements?.filter((announcement) => {
-    const matchesSearch = 
-      announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      announcement.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = typeFilter === "all" || announcement.type === typeFilter;
-    const matchesStatus = statusFilter === "all" || announcement.adminStatus === statusFilter;
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  const filteredAnnouncements = useMemo(() =>
+    announcements?.filter((announcement) => {
+      const matchesSearch =
+        announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        announcement.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = typeFilter === "all" || announcement.type === typeFilter;
+      const matchesStatus = statusFilter === "all" || announcement.adminStatus === statusFilter;
+      return matchesSearch && matchesType && matchesStatus;
+    }),
+    [announcements, searchQuery, typeFilter, statusFilter]
+  );
+
+  // Bulk selection handlers
+  const toggleSelection = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleAll = useCallback(() => {
+    if (!filteredAnnouncements) return;
+    if (selectedIds.size === filteredAnnouncements.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredAnnouncements.map((a) => a._id)));
+    }
+  }, [filteredAnnouncements, selectedIds.size]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  const allSelected = (filteredAnnouncements?.length || 0) > 0 && selectedIds.size === filteredAnnouncements?.length;
+  const someSelected = selectedIds.size > 0 && !allSelected;
+
+  // Get selected announcements for bulk operations
+  const selectedAnnouncements = useMemo(() =>
+    filteredAnnouncements?.filter((a) => selectedIds.has(a._id)) || [],
+    [filteredAnnouncements, selectedIds]
+  );
 
   const getTypeBadge = (type: AnnouncementType) => {
     const config = announcementTypeConfig[type] || announcementTypeConfig.general;
@@ -110,6 +157,23 @@ export function AdminAnnouncements() {
     }
   };
 
+  const handleExport = () => {
+    const dataToExport = selectedIds.size > 0 ? selectedAnnouncements : (filteredAnnouncements || []);
+    if (!dataToExport.length) return;
+
+    exportToCSV(dataToExport, "announcements-export", [
+      { key: "title", header: "Title" },
+      { key: "content", header: "Content" },
+      { key: "type", header: "Type" },
+      { key: "adminStatus", header: "Status" },
+      { key: "isPinned", header: "Pinned", formatter: (v) => v ? "Yes" : "No" },
+      { key: "publishedAt", header: "Published Date", formatter: formatDateForExport as (val: unknown) => string },
+      { key: "expiresAt", header: "Expires Date", formatter: formatDateForExport as (val: unknown) => string },
+    ]);
+
+    toast.success(`Exported ${dataToExport.length} announcements`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -122,23 +186,29 @@ export function AdminAnnouncements() {
             Create and manage client announcements
           </p>
         </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Announcement
-            </Button>
-          </DialogTrigger>
-          <AnnouncementDialog 
-            organizations={organizations || []}
-            onClose={() => setIsCreateOpen(false)} 
-          />
-        </Dialog>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleExport} className="gap-2">
+            <Download className="h-4 w-4" />
+            Export{selectedIds.size > 0 ? ` (${selectedIds.size})` : ""}
+          </Button>
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Announcement
+              </Button>
+            </DialogTrigger>
+            <AnnouncementDialog
+              organizations={organizations || []}
+              onClose={() => setIsCreateOpen(false)}
+            />
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+        <div className="relative flex-1 sm:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search announcements..."
@@ -148,7 +218,7 @@ export function AdminAnnouncements() {
           />
         </div>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by type" />
           </SelectTrigger>
           <SelectContent>
@@ -162,7 +232,7 @@ export function AdminAnnouncements() {
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -173,6 +243,16 @@ export function AdminAnnouncements() {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedIds.size > 0 && (
+        <BulkActionsBar
+          selectedIds={selectedIds}
+          selectedAnnouncements={selectedAnnouncements}
+          onClearSelection={clearSelection}
+          onExport={handleExport}
+        />
+      )}
 
       {/* Announcements List */}
       {announcements === undefined ? (
@@ -185,87 +265,259 @@ export function AdminAnnouncements() {
             <Megaphone className="h-12 w-12 text-muted-foreground/50" />
             <p className="mt-4 font-medium">No announcements found</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {searchQuery || typeFilter !== "all" 
-                ? "Try adjusting your filters" 
+              {searchQuery || typeFilter !== "all"
+                ? "Try adjusting your filters"
                 : "Create your first announcement to get started"}
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {filteredAnnouncements?.map((announcement) => (
-            <Card key={announcement._id} className={announcement.isPinned ? "border-primary/50" : ""}>
-              <CardContent className="p-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      {announcement.isPinned && (
-                        <Pin className="h-4 w-4 text-primary" />
-                      )}
-                      {getTypeBadge(announcement.type as AnnouncementType)}
-                      {getStatusBadge(announcement.adminStatus)}
-                      {announcement.targetOrganizations && announcement.targetOrganizations.length > 0 ? (
-                        <Badge variant="outline" className="gap-1">
-                          <Building2 className="h-3 w-3" />
-                          {announcement.targetOrganizations.length} org{announcement.targetOrganizations.length !== 1 ? "s" : ""}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="gap-1">
-                          <Globe className="h-3 w-3" />
-                          All clients
-                        </Badge>
-                      )}
+        <>
+          {/* Select All Header */}
+          <div className="flex items-center gap-3 px-1">
+            <Checkbox
+              checked={allSelected}
+              onCheckedChange={toggleAll}
+              aria-label="Select all announcements"
+              className={someSelected ? "data-[state=checked]:bg-primary/50" : ""}
+            />
+            <span className="text-sm text-muted-foreground">
+              {selectedIds.size > 0
+                ? `${selectedIds.size} of ${filteredAnnouncements?.length} selected`
+                : `${filteredAnnouncements?.length} announcements`}
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {filteredAnnouncements?.map((announcement) => (
+              <Card key={announcement._id} className={announcement.isPinned ? "border-primary/50" : ""}>
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    {/* Checkbox */}
+                    <Checkbox
+                      checked={selectedIds.has(announcement._id)}
+                      onCheckedChange={() => toggleSelection(announcement._id)}
+                      aria-label={`Select ${announcement.title}`}
+                      className="mt-1"
+                    />
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        {announcement.isPinned && (
+                          <Pin className="h-4 w-4 text-primary" />
+                        )}
+                        {getTypeBadge(announcement.type as AnnouncementType)}
+                        {getStatusBadge(announcement.adminStatus)}
+                        {announcement.targetOrganizations && announcement.targetOrganizations.length > 0 ? (
+                          <Badge variant="outline" className="gap-1">
+                            <Building2 className="h-3 w-3" />
+                            {announcement.targetOrganizations.length} org{announcement.targetOrganizations.length !== 1 ? "s" : ""}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="gap-1">
+                            <Globe className="h-3 w-3" />
+                            All clients
+                          </Badge>
+                        )}
+                      </div>
+                      <h3 className="font-semibold">{announcement.title}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                        {announcement.content}
+                      </p>
+                      <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
+                        {announcement.adminStatus === "scheduled" ? (
+                          <span className="flex items-center gap-1 text-amber-600">
+                            <Clock className="h-3 w-3" />
+                            Scheduled for {formatDate(announcement.publishedAt)}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            Published {formatDate(announcement.publishedAt)}
+                          </span>
+                        )}
+                        {announcement.expiresAt && (
+                          <span>Expires {formatDate(announcement.expiresAt)}</span>
+                        )}
+                      </div>
                     </div>
-                    <h3 className="font-semibold">{announcement.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                      {announcement.content}
-                    </p>
-                    <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-                      {announcement.adminStatus === "scheduled" && announcement.scheduledFor ? (
-                        <span className="flex items-center gap-1 text-amber-600">
-                          <Clock className="h-3 w-3" />
-                          Scheduled for {formatDate(announcement.scheduledFor)}
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          Published {formatDate(announcement.publishedAt)}
-                        </span>
-                      )}
-                      {announcement.expiresAt && (
-                        <span>Expires {formatDate(announcement.expiresAt)}</span>
-                      )}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <Dialog
+                        open={editingAnnouncement?._id === announcement._id}
+                        onOpenChange={(open) => !open && setEditingAnnouncement(null)}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditingAnnouncement(announcement)}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <AnnouncementDialog
+                          announcement={announcement}
+                          organizations={organizations || []}
+                          onClose={() => setEditingAnnouncement(null)}
+                        />
+                      </Dialog>
+                      <DeleteAnnouncementButton id={announcement._id} />
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Dialog 
-                      open={editingAnnouncement?._id === announcement._id} 
-                      onOpenChange={(open) => !open && setEditingAnnouncement(null)}
-                    >
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => setEditingAnnouncement(announcement)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <AnnouncementDialog 
-                        announcement={announcement}
-                        organizations={organizations || []}
-                        onClose={() => setEditingAnnouncement(null)} 
-                      />
-                    </Dialog>
-                    <DeleteAnnouncementButton id={announcement._id} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
+    </div>
+  );
+}
+
+interface BulkActionsBarProps {
+  selectedIds: Set<string>;
+  selectedAnnouncements: Array<{
+    _id: string;
+    isPinned: boolean;
+  }>;
+  onClearSelection: () => void;
+  onExport: () => void;
+}
+
+function BulkActionsBar({ selectedIds, selectedAnnouncements, onClearSelection, onExport }: BulkActionsBarProps) {
+  const bulkTogglePin = useMutation(api.announcements.bulkTogglePin);
+  const bulkDelete = useMutation(api.announcements.bulkDelete);
+
+  const [isPinning, setIsPinning] = useState(false);
+  const [isUnpinning, setIsUnpinning] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Count pinned/unpinned
+  const pinnedCount = selectedAnnouncements.filter((a) => a.isPinned).length;
+  const unpinnedCount = selectedAnnouncements.filter((a) => !a.isPinned).length;
+
+  const handleBulkPin = async () => {
+    if (unpinnedCount === 0) return;
+
+    const unpinnedIds = selectedAnnouncements
+      .filter((a) => !a.isPinned)
+      .map((a) => a._id as Id<"announcements">);
+
+    setIsPinning(true);
+    try {
+      const result = await bulkTogglePin({ ids: unpinnedIds, isPinned: true });
+      toast.success(`Pinned ${result.updated} announcements`);
+      onClearSelection();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to pin announcements");
+    } finally {
+      setIsPinning(false);
+    }
+  };
+
+  const handleBulkUnpin = async () => {
+    if (pinnedCount === 0) return;
+
+    const pinnedIds = selectedAnnouncements
+      .filter((a) => a.isPinned)
+      .map((a) => a._id as Id<"announcements">);
+
+    setIsUnpinning(true);
+    try {
+      const result = await bulkTogglePin({ ids: pinnedIds, isPinned: false });
+      toast.success(`Unpinned ${result.updated} announcements`);
+      onClearSelection();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to unpin announcements");
+    } finally {
+      setIsUnpinning(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await bulkDelete({
+        ids: selectedAnnouncements.map((a) => a._id as Id<"announcements">),
+      });
+      toast.success(`Deleted ${result.deleted} announcements`);
+      onClearSelection();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete announcements");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg border">
+      <span className="text-sm font-medium">
+        {selectedIds.size} selected
+      </span>
+      <div className="flex items-center gap-2">
+        {unpinnedCount > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleBulkPin}
+            disabled={isPinning}
+            className="gap-1"
+          >
+            {isPinning ? <Spinner size="sm" /> : <Pin className="h-3 w-3" />}
+            Pin ({unpinnedCount})
+          </Button>
+        )}
+        {pinnedCount > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleBulkUnpin}
+            disabled={isUnpinning}
+            className="gap-1"
+          >
+            {isUnpinning ? <Spinner size="sm" /> : <PinOff className="h-3 w-3" />}
+            Unpin ({pinnedCount})
+          </Button>
+        )}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={isDeleting}
+              className="gap-1 text-destructive hover:text-destructive"
+            >
+              {isDeleting ? <Spinner size="sm" /> : <Trash className="h-3 w-3" />}
+              Delete ({selectedIds.size})
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete {selectedIds.size} Announcements?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. The selected announcements will be permanently deleted.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive text-destructive-foreground">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <Button size="sm" variant="outline" onClick={onExport} className="gap-1">
+          <Download className="h-3 w-3" />
+          Export
+        </Button>
+      </div>
+      <Button size="sm" variant="ghost" onClick={onClearSelection} className="ml-auto">
+        Clear
+      </Button>
     </div>
   );
 }
@@ -316,7 +568,7 @@ interface AnnouncementDialogProps {
     targetOrganizations?: Id<"organizations">[];
     isPinned: boolean;
     expiresAt?: number;
-    scheduledFor?: number;
+    publishedAt: number;
     adminStatus?: string;
   };
   organizations: Array<{ _id: Id<"organizations">; name: string }>;
@@ -340,24 +592,24 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
       ? new Date(announcement.expiresAt).toISOString().split("T")[0]
       : ""
   );
-  // Scheduling state
+  // Scheduling state - use publishedAt for scheduled announcements (future publishedAt = scheduled)
+  const isScheduledAnnouncement = announcement?.adminStatus === "scheduled";
   const [publishOption, setPublishOption] = useState<"now" | "schedule">(
-    announcement?.adminStatus === "scheduled" ? "schedule" : "now"
+    isScheduledAnnouncement ? "schedule" : "now"
   );
   const [scheduledDate, setScheduledDate] = useState(
-    announcement?.scheduledFor
-      ? new Date(announcement.scheduledFor).toISOString().split("T")[0]
+    isScheduledAnnouncement && announcement?.publishedAt
+      ? new Date(announcement.publishedAt).toISOString().split("T")[0]
       : ""
   );
   const [scheduledTime, setScheduledTime] = useState(
-    announcement?.scheduledFor
-      ? new Date(announcement.scheduledFor).toTimeString().slice(0, 5)
+    isScheduledAnnouncement && announcement?.publishedAt
+      ? new Date(announcement.publishedAt).toTimeString().slice(0, 5)
       : "09:00"
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!announcement;
-  const isScheduled = announcement?.adminStatus === "scheduled";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -399,7 +651,7 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
           targetOrganizations,
           isPinned,
           expiresAt: expiresAt ? new Date(expiresAt).getTime() : undefined,
-          scheduledFor,
+          publishedAt: scheduledFor, // Pass scheduled time as publishedAt
         });
         toast.success(scheduledFor ? "Announcement scheduled" : "Announcement updated");
       } else {
@@ -410,7 +662,7 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
           targetOrganizations,
           isPinned,
           expiresAt: expiresAt ? new Date(expiresAt).getTime() : undefined,
-          scheduledFor,
+          publishedAt: scheduledFor, // Pass scheduled time as publishedAt
         });
         toast.success(scheduledFor ? "Announcement scheduled" : "Announcement published");
       }
@@ -423,8 +675,8 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
   };
 
   const toggleOrg = (orgId: string) => {
-    setSelectedOrgs(prev => 
-      prev.includes(orgId) 
+    setSelectedOrgs(prev =>
+      prev.includes(orgId)
         ? prev.filter(id => id !== orgId)
         : [...prev, orgId]
     );
@@ -507,8 +759,8 @@ function AnnouncementDialog({ announcement, organizations, onClose }: Announceme
                   <p className="text-sm text-muted-foreground">No organizations available</p>
                 ) : (
                   organizations.map((org) => (
-                    <label 
-                      key={org._id} 
+                    <label
+                      key={org._id}
                       className="flex items-center gap-2 p-1 hover:bg-muted/50 rounded cursor-pointer"
                     >
                       <Checkbox

@@ -119,19 +119,10 @@ export function AdminServices() {
   return (
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div
-        className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between motion-safe-slide-up">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
-            <Settings className="w-3.5 h-3.5 text-[#6b6b76]" />
-            <span className="text-xs font-medium text-[#6b6b76]">Admin</span>
-          </div>
-          <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
-            Service <span className="italic text-[#6b6b76]">Management</span>
+          <h1 className="font-serif text-3xl sm:text-4xl text-[#2B3A55] tracking-tight">
+            Service <span className="italic text-[#B8986B]">Management</span>
           </h1>
           <p className="mt-2 text-[#6b6b76]">
             Manage service types and client subscriptions
@@ -153,12 +144,7 @@ export function AdminServices() {
       </div>
 
       {/* Service Types Grid */}
-      <div
-        className="opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
-        }}
-      >
+      <div className="motion-safe-slide-up motion-safe-slide-up-delay-2">
         <h2 className="font-serif text-xl text-[#0f0f12] mb-4">Service Types</h2>
 
         {isLoading ? (
@@ -195,19 +181,14 @@ export function AdminServices() {
       </div>
 
       {/* Organization Subscriptions */}
-      <div
-        className="opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
-        }}
-      >
-        <div className="flex items-center justify-between mb-4">
+      <div className="motion-safe-slide-up motion-safe-slide-up-delay-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h2 className="font-serif text-xl text-[#0f0f12]">Client Subscriptions</h2>
           <Select
             value={selectedOrgId as string}
             onValueChange={(v) => setSelectedOrgId(v as Id<"organizations"> | "all")}
           >
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="Filter by client" />
             </SelectTrigger>
             <SelectContent>
@@ -282,12 +263,6 @@ export function AdminServices() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <style>{`
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -308,12 +283,9 @@ function ServiceTypeCard({ service, onEdit, onDelete, onToggleActive, delay }: S
   return (
     <div
       className={cn(
-        "bg-white rounded-2xl border p-5 transition-all duration-200 opacity-0",
+        "bg-white rounded-2xl border p-5 transition-all duration-200 motion-safe-slide-up motion-safe-slide-up-delay-2",
         service.isActive ? "border-black/5" : "border-red-200 bg-red-50/30"
       )}
-      style={{
-        animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s forwards`,
-      }}
     >
       <div className="flex items-start justify-between mb-4">
         <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", colorClass)}>

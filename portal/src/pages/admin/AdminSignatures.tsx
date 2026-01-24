@@ -56,7 +56,11 @@ import {
   Download,
   FileText,
   User,
+  Users2,
+  ChevronDown,
 } from "@/lib/icons";
+import { CreateMultiPartyDialog } from "@/components/signatures/CreateMultiPartyDialog";
+import { SignerProgressList } from "@/components/signatures/SignerProgressList";
 import { toast } from "sonner";
 import { formatDate, formatDistanceToNow, cn } from "@/lib/utils";
 import { exportToCSV, formatDateForExport } from "@/lib/bulk-actions";
@@ -80,6 +84,10 @@ type SignatureRequestType = {
   expiresAt?: number;
   signedAt?: number;
   signedBy?: Id<"users">;
+  signerCount?: number;
+  completedCount?: number;
+  requireAll?: boolean;
+  requireSequential?: boolean;
 };
 
 const statusOptions = [
@@ -128,6 +136,7 @@ export function AdminSignatures() {
 
   // Dialog state using useDialog hook for consistency
   const createDialog = useDialog();
+  const multiPartyDialog = useDialog();
   const viewDialog = useDialog<SignatureRequestType>();
   const cancelDialog = useDialog<SignatureRequestType>();
 
@@ -197,17 +206,41 @@ export function AdminSignatures() {
             Manage document signature requests
           </p>
         </div>
-        <Dialog open={createDialog.isOpen} onOpenChange={createDialog.setIsOpen}>
-          <DialogTrigger asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
               Request Signature
+              <ChevronDown className="h-4 w-4 ml-1" />
             </Button>
-          </DialogTrigger>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => createDialog.open()}>
+              <User className="h-4 w-4 mr-2" />
+              Single Signer
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => multiPartyDialog.open()}>
+              <Users2 className="h-4 w-4 mr-2" />
+              Multi-Party (2-10 signers)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Single Signer Dialog */}
+        <Dialog open={createDialog.isOpen} onOpenChange={createDialog.setIsOpen}>
           <CreateSignatureRequestDialog
             organizations={organizations || []}
             documents={documents || []}
             onClose={createDialog.close}
+          />
+        </Dialog>
+
+        {/* Multi-Party Dialog */}
+        <Dialog open={multiPartyDialog.isOpen} onOpenChange={multiPartyDialog.setIsOpen}>
+          <CreateMultiPartyDialog
+            organizations={organizations || []}
+            documents={documents || []}
+            onClose={multiPartyDialog.close}
           />
         </Dialog>
       </div>
@@ -223,7 +256,7 @@ export function AdminSignatures() {
             maxWidth="full"
           />
           <Select value={orgFilter} onValueChange={setOrgFilter}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="Organization" />
             </SelectTrigger>
             <SelectContent>
@@ -236,7 +269,7 @@ export function AdminSignatures() {
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]">
+            <SelectTrigger className="w-full sm:w-[150px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -267,10 +300,25 @@ export function AdminSignatures() {
               : "Create your first signature request to get started"
           }
           action={
-            <Button onClick={() => createDialog.open()} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Request Signature
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Request Signature
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center">
+                <DropdownMenuItem onClick={() => createDialog.open()}>
+                  <User className="h-4 w-4 mr-2" />
+                  Single Signer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => multiPartyDialog.open()}>
+                  <Users2 className="h-4 w-4 mr-2" />
+                  Multi-Party (2-10 signers)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           }
         />
       ) : (
@@ -306,7 +354,15 @@ export function AdminSignatures() {
                     >
                       <td className="px-4 py-3">
                         <div>
-                          <p className="font-medium">{req.title}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{req.title}</p>
+                            {req.signerCount && req.signerCount > 1 && (
+                              <Badge variant="secondary" className="gap-1 text-xs">
+                                <Users2 className="h-3 w-3" />
+                                {req.completedCount || 0}/{req.signerCount}
+                              </Badge>
+                            )}
+                          </div>
                           {req.description && (
                             <p className="text-sm text-muted-foreground line-clamp-1">
                               {req.description}
@@ -672,6 +728,20 @@ function SignatureDetailsDialog({ request, orgName, onClose }: SignatureDetailsD
             </div>
           )}
         </div>
+
+        {/* Multi-Party Signer Progress */}
+        {request.signerCount && request.signerCount > 1 && (
+          <div className="border-t pt-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Users2 className="h-4 w-4 text-muted-foreground" />
+              <p className="text-sm font-medium">Signers</p>
+            </div>
+            <SignerProgressList
+              requestId={request._id}
+              requireSequential={request.requireSequential}
+            />
+          </div>
+        )}
 
         {/* Signature Details */}
         {signatureDetails?.signature && (

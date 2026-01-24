@@ -1,4 +1,4 @@
-@import "tailwindcss" theme(static);
+@import "tailwindcss";
 
 /* Google Fonts - Cynco Design System (matches landing page) */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&family=Inter:wght@400;500&display=swap');
@@ -10,17 +10,19 @@
   --font-serif: "Playfair Display", Georgia, serif;
   --font-mono: "DM Mono", "SF Mono", monospace;
 
-  /* Border Radius - Sharp (matches landing page) */
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 4px;
-  --radius-xl: 4px;
-  --radius-2xl: 4px;
+  /* Border Radius - Premium Softness */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
 
-  /* Custom shadows */
-  --shadow-soft: 0 2px 8px -2px rgba(0, 0, 0, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
-  --shadow-medium: 0 4px 16px -4px rgba(0, 0, 0, 0.12), 0 8px 32px -8px rgba(0, 0, 0, 0.08);
-  --shadow-elevated: 0 8px 32px -8px rgba(0, 0, 0, 0.16), 0 16px 48px -16px rgba(0, 0, 0, 0.12);
+  /* Custom shadows - Navy-tinted depth */
+  --shadow-soft: 0 2px 8px rgba(43, 58, 85, 0.04), 0 4px 16px rgba(43, 58, 85, 0.02);
+  --shadow-medium: 0 4px 12px rgba(43, 58, 85, 0.06), 0 8px 24px rgba(43, 58, 85, 0.04);
+  --shadow-elevated: 0 8px 24px rgba(43, 58, 85, 0.08), 0 16px 48px rgba(43, 58, 85, 0.06);
+  --shadow-gold: 0 4px 16px rgba(184, 152, 107, 0.25);
+  --shadow-gold-lg: 0 8px 24px rgba(184, 152, 107, 0.3);
 
   /* Animations */
   --animate-fade-in: fade-in 0.5s ease-out forwards;
@@ -60,6 +62,15 @@
     to { background-position: 200% 0; }
   }
 
+  @keyframes draw-curve {
+    0% { stroke-dashoffset: 60; opacity: 0.4; }
+    40% { stroke-dashoffset: 0; opacity: 1; }
+    60% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 60; opacity: 0.4; }
+  }
+
+  --animate-draw-curve: draw-curve 2.5s ease-in-out infinite;
+
   @keyframes accordion-down {
     from { height: 0; }
     to { height: var(--radix-accordion-content-height); }
@@ -74,10 +85,25 @@
   --animate-accordion-up: accordion-up 0.2s ease-out;
 }
 
-/* CSS Variables for theming - Cynco Design System */
+/* CSS Variables for theming - Amjad & Hazli Brand System */
 @layer base {
   :root {
-    /* Core palette - matches landing page */
+    /* Brand Colors - Navy & Gold */
+    --color-brand-navy: #2B3A55;
+    --color-brand-navy-dark: #1E2A3F;
+    --color-brand-navy-light: #3D4F6F;
+    --color-brand-gold: #B8986B;
+    --color-brand-gold-hover: #A6875A;
+    --color-brand-gold-light: #C9A86C;
+    --color-brand-cream: #FAF8F5;
+
+    /* Gold Accent Spectrum */
+    --color-gold-50: rgba(184, 152, 107, 0.04);
+    --color-gold-100: rgba(184, 152, 107, 0.08);
+    --color-gold-200: rgba(184, 152, 107, 0.15);
+    --color-gold-300: rgba(184, 152, 107, 0.25);
+
+    /* Core palette */
     --color-ink: #090516;
     --color-ink-secondary: #3A3A3A;
     --color-ink-muted: #737373;
@@ -88,27 +114,28 @@
     --color-surface-sunken: #F0F0F0;
     --color-surface-overlay: rgba(255, 255, 255, 0.9);
 
-    --color-accent: #253FF6;
-    --color-accent-hover: #293ED5;
-    --color-accent-muted: rgba(37, 63, 246, 0.08);
-    --color-accent-subtle: rgba(37, 63, 246, 0.01);
+    /* Accent - Now Gold */
+    --color-accent: #B8986B;
+    --color-accent-hover: #A6875A;
+    --color-accent-muted: rgba(184, 152, 107, 0.10);
+    --color-accent-subtle: rgba(184, 152, 107, 0.04);
 
     --color-border: #EBEBEB;
     --color-border-subtle: #F1F1F1;
-    --color-border-focus: #253FF6;
+    --color-border-focus: #B8986B;
 
     --color-success: #22c55e;
     --color-warning: #d97706;
     --color-error: #ef4444;
 
-    /* shadcn variables */
-    --background: 0 0% 100%;
+    /* shadcn variables - updated for gold accent */
+    --background: 40 33% 97%;  /* Warm cream: #FAF8F5 */
     --foreground: 240 6% 7%;
     --card: 0 0% 100%;
     --card-foreground: 240 6% 7%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 6% 7%;
-    --primary: 221 83% 53%;
+    --primary: 37 30% 55%;
     --primary-foreground: 0 0% 100%;
     --secondary: 240 5% 96%;
     --secondary-foreground: 240 6% 10%;
@@ -120,11 +147,17 @@
     --destructive-foreground: 0 0% 100%;
     --border: 240 6% 90%;
     --input: 240 6% 90%;
-    --ring: 221 83% 53%;
+    --ring: 37 30% 55%;
     --radius: 0.5rem;
   }
 
   .dark {
+    /* Brand colors adapt for dark mode */
+    --color-brand-navy: #3D4F6F;
+    --color-brand-navy-dark: #2B3A55;
+    --color-brand-gold: #C9A86C;
+    --color-brand-gold-hover: #B8986B;
+
     --color-ink: #f5f5f7;
     --color-ink-secondary: #c4c4cc;
     --color-ink-muted: #8e8e99;
@@ -135,8 +168,13 @@
     --color-surface-sunken: #0a0a0c;
     --color-surface-overlay: rgba(15, 15, 18, 0.95);
 
+    --color-accent: #C9A86C;
+    --color-accent-hover: #B8986B;
+    --color-accent-muted: rgba(201, 168, 108, 0.15);
+
     --color-border: #27272a;
     --color-border-subtle: #1f1f23;
+    --color-border-focus: #C9A86C;
 
     --background: 240 6% 7%;
     --foreground: 0 0% 96%;
@@ -144,7 +182,7 @@
     --card-foreground: 0 0% 96%;
     --popover: 240 6% 9%;
     --popover-foreground: 0 0% 96%;
-    --primary: 221 83% 53%;
+    --primary: 37 35% 58%;
     --primary-foreground: 0 0% 100%;
     --secondary: 240 5% 17%;
     --secondary-foreground: 0 0% 96%;
@@ -156,7 +194,7 @@
     --destructive-foreground: 0 0% 96%;
     --border: 240 5% 17%;
     --input: 240 5% 17%;
-    --ring: 221 83% 53%;
+    --ring: 37 35% 58%;
   }
 }
 
@@ -219,6 +257,16 @@
     background-clip: text;
   }
 
+  /* Gold Gradient for Premium CTAs */
+  .bg-gradient-gold {
+    background: linear-gradient(135deg, #C9A86C 0%, #B8986B 50%, #A6875A 100%);
+  }
+
+  /* Navy Gradient for Hero Sections */
+  .bg-gradient-navy {
+    background: linear-gradient(135deg, #2B3A55 0%, #1E2A3F 100%);
+  }
+
   .glass {
     background: var(--color-surface-overlay);
     backdrop-filter: blur(12px) saturate(180%);
@@ -243,4 +291,77 @@
   .animate-stagger-3 { animation-delay: 0.3s; }
   .animate-stagger-4 { animation-delay: 0.4s; }
   .animate-stagger-5 { animation-delay: 0.5s; }
+
+  /* Motion-safe slide-up animation utility */
+  .motion-safe-slide-up {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-safe-slide-up {
+      animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .motion-safe-slide-up-delay-1 { animation-delay: 0.05s; }
+    .motion-safe-slide-up-delay-2 { animation-delay: 0.1s; }
+    .motion-safe-slide-up-delay-3 { animation-delay: 0.15s; }
+    .motion-safe-slide-up-delay-4 { animation-delay: 0.2s; }
+    .motion-safe-slide-up-delay-5 { animation-delay: 0.25s; }
+    .motion-safe-slide-up-delay-6 { animation-delay: 0.3s; }
+    .motion-safe-slide-up-delay-7 { animation-delay: 0.35s; }
+    .motion-safe-slide-up-delay-8 { animation-delay: 0.4s; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-safe-slide-up {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  /* Mobile-responsive form controls */
+  .form-control-responsive {
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .form-control-responsive {
+      width: 16rem; /* w-64 */
+    }
+  }
+
+  /* Responsive filter select */
+  .filter-select-responsive {
+    width: 100%;
+    min-width: 120px;
+  }
+
+  @media (min-width: 640px) {
+    .filter-select-responsive {
+      width: 150px;
+    }
+  }
+
+  /* Touch target minimum size (44x44px for accessibility) */
+  .touch-target-min {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  @media (min-width: 640px) {
+    .touch-target-min {
+      min-height: unset;
+      min-width: unset;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    /* Safe area insets for mobile devices with notches */
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  }
 }

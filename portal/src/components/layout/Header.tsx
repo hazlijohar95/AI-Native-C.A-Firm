@@ -23,20 +23,20 @@ export function Header({ onMenuClick }: HeaderProps) {
     : user?.firstName?.[0]?.toUpperCase() || "U";
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-[#F1F1F1] bg-white px-4 md:px-6">
+    <header className="flex h-14 items-center justify-between border-b border-[rgba(184,152,107,0.1)] bg-white px-4 md:px-6">
       {/* Left side - Menu button (mobile) */}
       <div className="flex items-center gap-3">
         <button
-          className="flex h-9 w-9 items-center justify-center rounded border border-[#EBEBEB] text-[#737373] hover:bg-[#F8F8F8] hover:text-[#090516] transition-colors lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-[rgba(184,152,107,0.15)] text-[#737373] hover:bg-[#B8986B]/8 hover:text-[#2B3A55] transition-all duration-200 lg:hidden"
           onClick={onMenuClick}
           aria-label="Open navigation menu"
         >
-          <Menu className="h-4 w-4" aria-hidden="true" />
+          <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
 
         {/* Page context - can be dynamic */}
         <div className="hidden md:block">
-          <span className="font-['DM_Mono'] text-[11px] text-[#737373] uppercase tracking-[0.02em]">
+          <span className="font-['DM_Mono'] text-[11px] text-[#B8986B] uppercase tracking-[0.02em]">
             Client Portal
           </span>
         </div>
@@ -50,13 +50,15 @@ export function Header({ onMenuClick }: HeaderProps) {
         {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded border border-[#EBEBEB] py-1.5 pl-1.5 pr-2.5 hover:bg-[#F8F8F8] transition-colors focus:outline-none focus:ring-2 focus:ring-[#253FF6]/20 focus:border-[#253FF6]">
+            <button className="flex items-center gap-2 rounded-lg border border-[rgba(184,152,107,0.15)] py-1.5 pl-1.5 pr-2.5 min-h-[44px] hover:bg-[#B8986B]/8 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#B8986B]/20 focus:border-[#B8986B]">
               {/* Avatar */}
-              <div className="flex h-7 w-7 items-center justify-center rounded bg-[#090516] text-white">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#2B3A55] to-[#1E2A3F] text-white">
                 {user?.profilePictureUrl ? (
                   <img
                     src={user.profilePictureUrl}
                     alt={user.firstName || "User"}
+                    width={28}
+                    height={28}
                     className="h-7 w-7 rounded object-cover"
                   />
                 ) : (
@@ -70,7 +72,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               <ChevronDown className="h-3.5 w-3.5 text-[#737373]" aria-hidden="true" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-white border border-[#EBEBEB] rounded shadow-[0_4px_12px_rgba(0,0,0,0.08)] p-1">
+          <DropdownMenuContent align="end" className="w-56 bg-white border border-[rgba(184,152,107,0.15)] rounded-xl shadow-[0_4px_16px_rgba(43,58,85,0.1)] p-1">
             <DropdownMenuLabel className="px-3 py-2">
               <div className="flex flex-col">
                 <span className="text-sm font-medium text-[#090516]">

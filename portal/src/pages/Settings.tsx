@@ -35,7 +35,7 @@ interface EmailToggleProps {
 
 function EmailToggle({ icon, label, description, checked, onChange, disabled }: EmailToggleProps) {
   return (
-    <div className="px-6 py-4 flex items-center justify-between">
+    <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 bg-[#F8F8F8] rounded flex items-center justify-center">
           {icon}
@@ -52,8 +52,8 @@ function EmailToggle({ icon, label, description, checked, onChange, disabled }: 
         onClick={() => onChange(!checked)}
         disabled={disabled}
         className={cn(
-          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#253FF6] focus-visible:ring-offset-2",
-          checked ? "bg-[#253FF6]" : "bg-[#e5e5e7]",
+          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8986B] focus-visible:ring-offset-2",
+          checked ? "bg-[#B8986B]" : "bg-[#e5e5e7]",
           disabled && "opacity-50 cursor-not-allowed"
         )}
       >
@@ -141,18 +141,15 @@ export function Settings() {
     <div className="max-w-3xl mx-auto space-y-8">
       {/* Page Header */}
       <div>
-        <span className="inline-block font-['DM_Mono'] text-[11px] text-[#737373] uppercase tracking-[0.02em] mb-2">
-          Account
-        </span>
-        <h1 className="font-['Playfair_Display'] text-3xl text-[#090516]">Settings</h1>
-        <p className="text-[#737373] mt-1">Manage your account preferences</p>
+        <h1 className="font-serif text-3xl text-[#2B3A55]">Account <span className="italic text-[#B8986B]">Settings</span></h1>
+        <p className="text-[#737373] mt-2">Manage your profile and preferences</p>
       </div>
 
       {/* Profile Section */}
-      <section className="bg-white border border-[#EBEBEB] rounded overflow-hidden">
-        <div className="px-6 py-5 border-b border-[#F1F1F1] flex items-center justify-between">
+      <section className="bg-white border border-[rgba(184,152,107,0.15)] rounded-xl shadow-soft overflow-hidden">
+        <div className="px-6 py-5 border-b border-[rgba(184,152,107,0.1)] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#253FF6] rounded flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#B8986B] rounded flex items-center justify-center">
               <User className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -163,7 +160,7 @@ export function Settings() {
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="h-9 px-4 text-sm font-medium text-[#253FF6] hover:bg-[#253FF6]/5 rounded transition-colors"
+              className="h-9 px-4 text-sm font-medium text-[#B8986B] hover:bg-[#B8986B]/5 rounded transition-colors"
             >
               Edit
             </button>
@@ -178,7 +175,7 @@ export function Settings() {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="h-9 px-4 text-sm font-medium text-white bg-[#253FF6] hover:bg-[#293ED5] disabled:bg-[#EBEBEB] disabled:text-[#737373] rounded transition-colors flex items-center gap-2"
+                className="h-9 px-4 text-sm font-medium text-white bg-[#B8986B] hover:bg-[#A6875A] disabled:bg-[#EBEBEB] disabled:text-[#737373] rounded transition-colors flex items-center gap-2"
               >
                 {isSaving ? (
                   <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -195,7 +192,7 @@ export function Settings() {
 
         <div className="divide-y divide-[#F1F1F1]">
           {/* Name */}
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
             <div className="flex items-center gap-3">
               <User className="w-4 h-4 text-[#737373]" />
               <span className="text-sm text-[#737373]">Full Name</span>
@@ -205,7 +202,8 @@ export function Settings() {
                 type="text"
                 value={profileData.name}
                 onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                className="w-64 h-9 px-3 bg-[#F8F8F8] border border-[#EBEBEB] rounded text-sm text-[#090516] focus:outline-none focus:border-[#253FF6] focus:ring-1 focus:ring-[#253FF6]/20"
+                autoComplete="name"
+                className="w-full sm:w-64 h-10 sm:h-9 px-3 bg-[#F8F8F8] border border-[#EBEBEB] rounded text-sm text-[#090516] focus:outline-none focus:border-[#B8986B] focus:ring-1 focus:ring-[#B8986B]/20"
                 placeholder="Enter your name"
               />
             ) : (
@@ -216,7 +214,7 @@ export function Settings() {
           </div>
 
           {/* Email */}
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
             <div className="flex items-center gap-3">
               <Mail className="w-4 h-4 text-[#737373]" />
               <span className="text-sm text-[#737373]">Email</span>
@@ -232,7 +230,7 @@ export function Settings() {
           </div>
 
           {/* Phone */}
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
             <div className="flex items-center gap-3">
               <Phone className="w-4 h-4 text-[#737373]" />
               <span className="text-sm text-[#737373]">Phone</span>
@@ -242,7 +240,8 @@ export function Settings() {
                 type="tel"
                 value={profileData.phone}
                 onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                className="w-64 h-9 px-3 bg-[#F8F8F8] border border-[#EBEBEB] rounded text-sm text-[#090516] focus:outline-none focus:border-[#253FF6] focus:ring-1 focus:ring-[#253FF6]/20"
+                autoComplete="tel"
+                className="w-full sm:w-64 h-10 sm:h-9 px-3 bg-[#F8F8F8] border border-[#EBEBEB] rounded text-sm text-[#090516] focus:outline-none focus:border-[#B8986B] focus:ring-1 focus:ring-[#B8986B]/20"
                 placeholder="+60 12-345 6789"
               />
             ) : (
@@ -270,19 +269,19 @@ export function Settings() {
 
         {organization ? (
           <div className="divide-y divide-[#F1F1F1]">
-            <div className="px-6 py-4 flex items-center justify-between">
+            <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
               <span className="text-sm text-[#737373]">Company Name</span>
               <span className="text-sm font-medium text-[#090516]">{organization.name}</span>
             </div>
             {organization.registrationNumber && (
-              <div className="px-6 py-4 flex items-center justify-between">
+              <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
                 <span className="text-sm text-[#737373]">Registration No.</span>
                 <span className="font-['DM_Mono'] text-sm text-[#090516]">
                   {organization.registrationNumber}
                 </span>
               </div>
             )}
-            <div className="px-6 py-4 flex items-center justify-between">
+            <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
               <span className="text-sm text-[#737373]">Contact Email</span>
               <span className="text-sm font-medium text-[#090516]">{organization.email}</span>
             </div>
@@ -294,7 +293,7 @@ export function Settings() {
             </div>
             <p className="text-sm text-[#737373]">
               No organization linked yet.{" "}
-              <a href="mailto:hello@amjadhazli.com" className="text-[#253FF6] hover:underline">
+              <a href="mailto:hello@amjadhazli.com" className="text-[#B8986B] hover:underline">
                 Contact us
               </a>{" "}
               to set this up.
@@ -318,7 +317,7 @@ export function Settings() {
         </div>
 
         <div className="divide-y divide-[#F1F1F1]">
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
             <div>
               <p className="text-sm font-medium text-[#090516]">Authentication</p>
               <p className="text-xs text-[#737373] mt-0.5">Managed via WorkOS</p>
@@ -329,7 +328,7 @@ export function Settings() {
               </span>
             </div>
           </div>
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
             <div>
               <p className="text-sm font-medium text-[#090516]">Two-Factor Authentication</p>
               <p className="text-xs text-[#737373] mt-0.5">Extra security for your account</p>
@@ -338,7 +337,7 @@ export function Settings() {
               href="https://auth.amjadhazli.com/settings"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-[#253FF6] hover:underline"
+              className="flex items-center gap-1 text-sm text-[#B8986B] hover:underline"
             >
               <span>Manage</span>
               <ExternalLink className="w-3 h-3" />
@@ -436,7 +435,7 @@ export function Settings() {
       <div className="text-center pb-8">
         <p className="text-xs text-[#737373]">
           Need help?{" "}
-          <a href="mailto:hello@amjadhazli.com" className="text-[#253FF6] hover:underline">
+          <a href="mailto:hello@amjadhazli.com" className="text-[#B8986B] hover:underline">
             Contact support
           </a>
         </p>

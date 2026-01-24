@@ -156,12 +156,8 @@ export function Invoices() {
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
       <div className="motion-safe-slide-up">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
-          <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
-          <span className="text-xs font-medium text-[#6b6b76]">Billing</span>
-        </div>
-        <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
-          Your <span className="italic text-[#6b6b76]">Invoices</span>
+        <h1 className="font-serif text-3xl sm:text-4xl text-[#2B3A55] tracking-tight">
+          Your <span className="italic text-[#B8986B]">Invoices</span>
         </h1>
         <p className="mt-2 text-[#6b6b76]">
           View and pay your invoices
@@ -207,12 +203,12 @@ export function Invoices() {
       )}
 
       {/* Filters */}
-      <div className="flex items-center gap-3 motion-safe-slide-up motion-safe-slide-up-delay-3">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-[#9d9da6]" aria-hidden="true" />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 motion-safe-slide-up motion-safe-slide-up-delay-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Filter className="h-4 w-4 text-[#9d9da6] shrink-0" aria-hidden="true" />
           <label htmlFor="status-filter" className="sr-only">Filter by status</label>
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
-            <SelectTrigger id="status-filter" className="w-[150px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
+            <SelectTrigger id="status-filter" className="w-full min-w-[120px] sm:w-[150px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -382,7 +378,26 @@ export function Invoices() {
               {/* Line Items */}
               <div>
                 <h4 className="text-sm font-medium text-[#0f0f12] mb-3">Line Items</h4>
-                <div className="rounded-xl border border-[#EBEBEB] overflow-x-auto">
+
+                {/* Mobile Card View */}
+                <div className="block sm:hidden space-y-3">
+                  {selectedInvoiceData.lineItems.map((item: LineItem, index: number) => (
+                    <div key={index} className="bg-[#f8f8f8] rounded-lg p-4 space-y-2">
+                      <p className="font-medium text-[#0f0f12]">{item.description}</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[#6b6b76]">Qty: {item.quantity}</span>
+                        <span className="font-['DM_Mono'] text-[#0f0f12]">{formatCurrency(item.amount, selectedInvoiceData.currency)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="bg-[#0f0f12] rounded-lg p-4 flex justify-between items-center">
+                    <span className="text-white font-medium">Total</span>
+                    <span className="font-serif text-lg text-white">{formatCurrency(selectedInvoiceData.amount, selectedInvoiceData.currency)}</span>
+                  </div>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block rounded-xl border border-[#EBEBEB] overflow-x-auto">
                   <table className="w-full text-sm min-w-[400px]">
                     <thead className="border-b border-[#EBEBEB] bg-[#f8f8f8]">
                       <tr>

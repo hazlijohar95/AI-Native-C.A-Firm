@@ -213,19 +213,10 @@ export function Documents() {
   return (
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div
-        className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between motion-safe-slide-up">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
-            <span className="text-xs font-medium text-[#6b6b76]">Documents</span>
-          </div>
-          <h1 className="font-serif text-3xl sm:text-4xl text-[#0f0f12] tracking-tight">
-            Your <span className="italic text-[#6b6b76]">Documents</span>
+          <h1 className="font-serif text-3xl sm:text-4xl text-[#2B3A55] tracking-tight">
+            Your <span className="italic text-[#B8986B]">Documents</span>
           </h1>
           <p className="mt-2 text-[#6b6b76]">
             {selectedServiceId === "all"
@@ -239,7 +230,7 @@ export function Documents() {
           if (!open) setFulfillRequestId(null);
         }}>
           <DialogTrigger asChild>
-            <button className="group inline-flex items-center gap-2 h-11 px-5 bg-[#0f0f12] hover:bg-[#1a1a1f] text-white rounded-xl font-medium text-sm transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.1),0_4px_12px_rgba(0,0,0,0.1)] hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_8px_24px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 self-start sm:self-auto">
+            <button className="group inline-flex items-center gap-2 h-11 px-5 bg-gradient-to-br from-[#C9A86C] via-[#B8986B] to-[#A6875A] text-white rounded-xl font-medium text-sm transition-all duration-200 shadow-[0_2px_8px_rgba(184,152,107,0.25)] hover:shadow-[0_4px_16px_rgba(184,152,107,0.35)] hover:-translate-y-0.5 self-start sm:self-auto">
               <Upload className="h-4 w-4" />
               <span>Upload Document</span>
             </button>
@@ -261,12 +252,7 @@ export function Documents() {
 
       {/* Service Tabs Navigation */}
       {!isLoading && subscribedServices.length > 0 && (
-        <div
-          className="opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards",
-          }}
-        >
+        <div className="motion-safe-slide-up motion-safe-slide-up-delay-1">
           <ServiceTabsNav
             services={servicesWithCounts}
             selectedServiceId={selectedServiceId}
@@ -279,12 +265,7 @@ export function Documents() {
 
       {/* Breadcrumb Navigation (when inside a service or folder) */}
       {!isLoading && (selectedServiceId !== "all" || currentFolderId) && (
-        <div
-          className="opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.07s forwards",
-          }}
-        >
+        <div className="motion-safe-slide-up motion-safe-slide-up-delay-1">
           <BreadcrumbNav
             items={breadcrumbItems}
             onNavigate={(item) => {
@@ -302,12 +283,7 @@ export function Documents() {
       )}
 
       {/* Search and Filters */}
-      <div
-        className="flex flex-col sm:flex-row items-start sm:items-center gap-3 opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
-        }}
-      >
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 motion-safe-slide-up motion-safe-slide-up-delay-2">
         {/* Search Input */}
         <div className="relative flex-1 w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9d9da6]" />
@@ -329,10 +305,10 @@ export function Documents() {
         </div>
 
         {/* Category Filter */}
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-[#9d9da6]" />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Filter className="h-4 w-4 text-[#9d9da6] shrink-0" />
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[180px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
+            <SelectTrigger className="w-full sm:w-[180px] h-10 bg-white border-[#EBEBEB] rounded-lg text-sm">
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
             <SelectContent>
@@ -388,12 +364,7 @@ export function Documents() {
 
       {/* Document Requests Section (for clients) */}
       {currentUser?.role === "client" && hasRequests && (
-        <div
-          className="opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards",
-          }}
-        >
+        <div className="motion-safe-slide-up motion-safe-slide-up-delay-2">
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-100 p-5 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
@@ -433,12 +404,7 @@ export function Documents() {
         </div>
       ) : showServiceOverview && serviceStats ? (
         // Service Overview Grid (when "All" is selected and no search)
-        <div
-          className="opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards",
-          }}
-        >
+        <div className="motion-safe-slide-up motion-safe-slide-up-delay-3">
           <h2 className="font-serif text-xl text-[#0f0f12] mb-4">Your Services</h2>
           <ServiceOverviewGrid
             stats={serviceStats.filter(s =>
@@ -449,12 +415,7 @@ export function Documents() {
         </div>
       ) : (
         // Service-specific view with folders and documents
-        <div
-          className="space-y-6 opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards",
-          }}
-        >
+        <div className="space-y-6 motion-safe-slide-up motion-safe-slide-up-delay-3">
           {/* Folders Section */}
           {showFolders && !isInFolder && currentUser?.organizationId && (
             <div>
@@ -616,12 +577,6 @@ export function Documents() {
         />
       )}
 
-      <style>{`
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

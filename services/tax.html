@@ -120,9 +120,9 @@
       --tap-target-min: 44px;
 
       /* Border Radius */
-      --radius-sm: 2px;
-      --radius-md: 4px;
-      --radius-lg: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
 
       /* Transitions */
       --transition-fast: 150ms ease;
@@ -176,7 +176,7 @@
       font-size: 16px;
       line-height: 1.6;
       color: var(--color-text-tertiary);
-      background: var(--color-white);
+      background: #FAF8F5;
       -webkit-font-smoothing: antialiased;
       overscroll-behavior-y: contain;
       padding-left: env(safe-area-inset-left);
@@ -356,7 +356,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: var(--color-white);
+        background: #FAF8F5;
         padding: calc(64px + env(safe-area-inset-top)) var(--space-4) var(--space-8);
         padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
         flex-direction: column;
@@ -472,7 +472,7 @@
     }
 
     .btn-secondary {
-      background: var(--color-white);
+      background: #FAF8F5;
       color: var(--color-text-primary);
       border: 1px solid var(--color-gray-400);
     }
@@ -530,8 +530,8 @@
     }
 
     .service-hero-icon {
-      width: 96px;
-      height: 96px;
+      width: clamp(64px, 15vw, 96px);
+      height: clamp(64px, 15vw, 96px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -542,7 +542,7 @@
     }
 
     .service-hero-icon i {
-      font-size: 48px;
+      font-size: clamp(32px, 8vw, 48px);
       color: var(--color-primary);
     }
 
@@ -697,7 +697,7 @@
       align-items: flex-start;
       text-align: left;
       padding: var(--space-8);
-      background: var(--color-white);
+      background: #FAF8F5;
       border: 1px solid var(--color-gray-100);
       border-radius: var(--radius-md);
       transition: all var(--transition-slow);
@@ -789,7 +789,7 @@
 
     .comparison-card {
       padding: var(--space-8);
-      background: var(--color-white);
+      background: #FAF8F5;
       border: 1px solid var(--color-gray-100);
       border-radius: var(--radius-md);
       transition: all var(--transition-slow);
@@ -884,7 +884,7 @@
 
     .use-case-card {
       padding: var(--space-8);
-      background: var(--color-white);
+      background: #FAF8F5;
       border: 1px solid var(--color-gray-100);
       border-radius: var(--radius-md);
       transition: all var(--transition-slow);
@@ -990,7 +990,7 @@
 
     .outcome-card {
       padding: var(--space-8);
-      background: var(--color-white);
+      background: #FAF8F5;
       border: 1px solid var(--color-gray-100);
       border-radius: var(--radius-md);
       text-align: center;
@@ -1054,7 +1054,7 @@
       align-items: flex-start;
       gap: var(--space-5);
       padding: var(--space-6);
-      background: var(--color-white);
+      background: #FAF8F5;
       border: 1px solid var(--color-gray-100);
       border-radius: var(--radius-md);
       transition: all var(--transition-slow);
@@ -1119,7 +1119,7 @@
 
     .pricing-card {
       padding: var(--space-8);
-      background: var(--color-white);
+      background: #FAF8F5;
       border: 1px solid var(--color-gray-200);
       border-radius: var(--radius-md);
       transition: all var(--transition-slow);
@@ -1326,7 +1326,7 @@
     .footer-nav-group a { font-size: 14px; color: var(--color-text-tertiary); text-decoration: none; transition: color 0.15s ease; }
     .footer-nav-group a:hover { color: var(--color-primary); }
     .footer-credentials { display: flex; align-items: center; justify-content: center; gap: var(--space-6); padding: var(--space-6) 0; border-bottom: 1px solid var(--color-gray-200); }
-    .credential-badge { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); background: var(--color-white); border: 1px solid var(--color-gray-200); border-radius: 6px; }
+    .credential-badge { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); background: #FAF8F5; border: 1px solid var(--color-gray-200); border-radius: 6px; }
     .credential-badge-icon { width: 40px; height: 40px; flex-shrink: 0; }
     .credential-badge-icon img { width: 100%; height: 100%; object-fit: contain; }
     .credential-badge-text { display: flex; flex-direction: column; gap: 1px; }
@@ -1335,7 +1335,7 @@
     .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-6); }
     .footer-copy { font-size: 13px; color: var(--color-text-tertiary); }
     .footer-social { display: flex; gap: var(--space-2); }
-    .footer-social a { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--color-white); border: 1px solid var(--color-gray-200); color: var(--color-text-tertiary); transition: all 0.15s ease; }
+    .footer-social a { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #FAF8F5; border: 1px solid var(--color-gray-200); color: var(--color-text-tertiary); transition: all 0.15s ease; }
     .footer-social a:hover { border-color: var(--color-primary); color: var(--color-primary); }
     .footer-social i { font-size: 15px; }
     @media (max-width: 768px) {
@@ -1389,7 +1389,7 @@
       width: 100%;
       max-width: 1000px;
       max-height: 90vh;
-      background: var(--color-white);
+      background: #FAF8F5;
       border-radius: var(--radius-md);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
       overflow: hidden;
