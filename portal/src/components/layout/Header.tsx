@@ -23,7 +23,7 @@ export function Header({ onMenuClick }: HeaderProps) {
     : user?.firstName?.[0]?.toUpperCase() || "U";
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-[rgba(184,152,107,0.1)] bg-white px-4 md:px-6">
+    <header className="relative z-10 flex h-14 items-center justify-between border-b border-[rgba(184,152,107,0.1)] bg-white px-4 md:px-6">
       {/* Left side - Menu button (mobile) */}
       <div className="flex items-center gap-3">
         <button

@@ -35,7 +35,7 @@ export function Shell({ children }: ShellProps) {
       />
 
       {/* Main content area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="relative z-0 flex flex-1 flex-col overflow-hidden">
         <Header onMenuClick={() => setSidebarOpen(true)} />
         
         <main 
