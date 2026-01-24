@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 50" fill="none">
+  <!-- AMJAD & HAZLI wordmark only -->
+  <text x="0" y="38" font-family="'Playfair Display', 'Times New Roman', serif" font-size="36" font-weight="400" letter-spacing="0.12em" fill="#1a1a1a">
+    <tspan>AMJAD</tspan>
+    <tspan dx="8" font-size="24" fill="#B8986B">&amp;</tspan>
+    <tspan dx="8">HAZLI</tspan>
+  </text>
+</svg>

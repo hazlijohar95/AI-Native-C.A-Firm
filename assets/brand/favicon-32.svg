@@ -1,9 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- Favicon - Navy background with gold monogram -->
   <rect width="32" height="32" rx="4" fill="#2B3A55"/>
-
   <g transform="translate(2, 1) scale(0.23)" fill="#B8986B">
-    <!-- Simplified A&H for small sizes -->
     <path d="M60 8L28 108h10l6-18h32l6 18h10L60 8zm0 18l12 36H48l12-36z"/>
     <path d="M16 24h8v92h-8z"/>
     <path d="M10 24h20v5H10zM10 111h20v5H10z"/>

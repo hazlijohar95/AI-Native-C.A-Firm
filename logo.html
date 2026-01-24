@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brand Assets | Amjad & Hazli</title>
+  <meta name="description" content="Official Amjad & Hazli brand assets, logos, and guidelines for press and partners.">
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       DESIGN TOKENS — Refined Luxury System
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+      /* Colors */
+      --navy-900: #1A2536;
+      --navy-800: #1E2A3F;
+      --navy-700: #2B3A55;
+      --navy-600: #3D4F6F;
+      --navy-500: #4A5D7A;
+
+      --gold-600: #A6875A;
+      --gold-500: #B8986B;
+      --gold-400: #C9A87C;
+      --gold-300: #D4BA94;
+
+      --cream-100: #FFFDFB;
+      --cream-200: #FAF8F5;
+      --cream-300: #F5F2ED;
+
+      --ink-900: #0D0D0D;
+      --ink-800: #1A1A1A;
+      --ink-600: #4A4A4A;
+      --ink-400: #8A8A8A;
+      --ink-200: #C4C4C4;
+
+      /* Typography */
+      --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+      --font-body: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+      --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+
+      /* Spacing (8px grid) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+      --space-20: 80px;
+      --space-24: 96px;
+      --space-32: 128px;
+
+      /* Transitions */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+      --duration-fast: 150ms;
+      --duration-normal: 280ms;
+      --duration-slow: 450ms;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(26, 37, 54, 0.04);
+      --shadow-md: 0 4px 16px rgba(26, 37, 54, 0.06);
+      --shadow-lg: 0 12px 40px rgba(26, 37, 54, 0.08);
+      --shadow-xl: 0 24px 64px rgba(26, 37, 54, 0.12);
+
+      /* Layout */
+      --max-width: 1200px;
+      --content-padding: var(--space-8);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       BASE RESET & FOUNDATIONS
+       ══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 1.125rem;
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--ink-800);
+      background: var(--cream-200);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Subtle grain texture overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.015;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      z-index: 9999;
+    }
+
+    ::selection {
+      background: var(--gold-400);
+      color: var(--navy-900);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       NAVIGATION — Refined Fixed Header
+       ══════════════════════════════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--navy-800);
+      border-bottom: 1px solid rgba(184, 152, 107, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--content-padding);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: white;
+      text-decoration: none;
+      letter-spacing: 0.18em;
+      transition: opacity var(--duration-normal) var(--ease-out-quart);
+    }
+
+    .nav-brand:hover {
+      opacity: 0.85;
+    }
+
+    .nav-back {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 400;
+      color: var(--gold-400);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: all var(--duration-normal) var(--ease-out-quart);
+    }
+
+    .nav-back i {
+      font-size: 1.125rem;
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .nav-back:hover {
+      color: var(--gold-300);
+    }
+
+    .nav-back:hover i {
+      transform: translateX(-3px);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       HERO — Elegant Brand Reveal
+       ══════════════════════════════════════════════════════════════ */
+    .hero {
+      background: linear-gradient(180deg, var(--navy-800) 0%, var(--navy-700) 100%);
+      padding: calc(72px + var(--space-24)) var(--content-padding) var(--space-24);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 560px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Subtle radial glow */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 800px;
+      height: 800px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse, rgba(184, 152, 107, 0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Decorative line accent */
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: var(--space-16);
+      background: linear-gradient(to bottom, var(--gold-500), transparent);
+      opacity: 0.4;
+    }
+
+    .hero-monogram {
+      width: 120px;
+      height: auto;
+      margin-bottom: var(--space-12);
+      animation: gentle-float 8s ease-in-out infinite;
+      filter: drop-shadow(0 8px 32px rgba(184, 152, 107, 0.15));
+    }
+
+    @keyframes gentle-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .hero-label {
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-weight: 400;
+      color: var(--gold-400);
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      margin-bottom: var(--space-4);
+      opacity: 0;
+      animation: fade-up 0.8s var(--ease-out-expo) 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 400;
+      color: white;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      margin-bottom: var(--space-5);
+      opacity: 0;
+      animation: fade-up 0.8s var(--ease-out-expo) 0.35s forwards;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-body);
+      font-size: 1.25rem;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.6);
+      max-width: 400px;
+      line-height: 1.6;
+      opacity: 0;
+      animation: fade-up 0.8s var(--ease-out-expo) 0.5s forwards;
+    }
+
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SECTIONS — Consistent Vertical Rhythm
+       ══════════════════════════════════════════════════════════════ */
+    .section {
+      padding: var(--space-24) var(--content-padding);
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .section-dark {
+      background: var(--navy-700);
+      max-width: 100%;
+      position: relative;
+    }
+
+    .section-dark::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-500), transparent);
+      opacity: 0.2;
+    }
+
+    .section-dark .section-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--space-24) var(--content-padding);
+    }
+
+    .section-header {
+      margin-bottom: var(--space-12);
+    }
+
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-weight: 400;
+      color: var(--gold-500);
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      margin-bottom: var(--space-3);
+      display: block;
+    }
+
+    .section-dark .section-label {
+      color: var(--gold-400);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 400;
+      color: var(--ink-800);
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+      margin-bottom: var(--space-3);
+    }
+
+    .section-dark .section-title {
+      color: white;
+    }
+
+    .section-desc {
+      font-family: var(--font-body);
+      font-size: 1.0625rem;
+      font-weight: 300;
+      color: var(--ink-400);
+      line-height: 1.6;
+    }
+
+    .section-dark .section-desc {
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       LOGO GRID — Premium Card Design
+       ══════════════════════════════════════════════════════════════ */
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+
+    @media (max-width: 900px) {
+      .logo-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .logo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .logo-card {
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      transition:
+        transform var(--duration-slow) var(--ease-out-expo),
+        box-shadow var(--duration-slow) var(--ease-out-expo);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logo-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .logo-preview {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-8);
+      background: var(--cream-200);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      border-radius: 6px 6px 0 0;
+      pointer-events: none;
+    }
+
+    .logo-preview.dark {
+      background: var(--navy-700);
+    }
+
+    .logo-preview.dark::after {
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .logo-preview img {
+      max-width: 75%;
+      max-height: 120px;
+      object-fit: contain;
+      transition: transform var(--duration-slow) var(--ease-out-expo);
+    }
+
+    .logo-card:hover .logo-preview img {
+      transform: scale(1.02);
+    }
+
+    .logo-info {
+      padding: var(--space-5) var(--space-6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--cream-300);
+    }
+
+    .logo-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .logo-name {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      color: var(--ink-800);
+      letter-spacing: 0.01em;
+    }
+
+    .logo-format {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--ink-400);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .logo-download {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--navy-700);
+      color: var(--gold-400);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .logo-download:hover {
+      background: var(--gold-500);
+      color: var(--navy-900);
+      transform: scale(1.08);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       COLOR PALETTE — Elegant Swatches
+       ══════════════════════════════════════════════════════════════ */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--space-4);
+    }
+
+    @media (max-width: 900px) {
+      .color-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      .color-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .color-card {
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      transition:
+        transform var(--duration-normal) var(--ease-out-expo),
+        box-shadow var(--duration-normal) var(--ease-out-expo);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .color-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .color-card:active {
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    .color-swatch {
+      height: 100px;
+      position: relative;
+    }
+
+    .color-swatch::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 6px 6px 0 0;
+    }
+
+    .color-info {
+      padding: var(--space-4) var(--space-4) var(--space-5);
+    }
+
+    .color-name {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--ink-800);
+      margin-bottom: 2px;
+    }
+
+    .color-hex {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--ink-400);
+      letter-spacing: 0.02em;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       TYPOGRAPHY SPECIMEN — Refined Display
+       ══════════════════════════════════════════════════════════════ */
+    .type-specimen {
+      background: white;
+      border-radius: 6px;
+      padding: var(--space-16) var(--space-12);
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+
+    .type-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--gold-500);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-4);
+    }
+
+    .type-display {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 400;
+      color: var(--ink-800);
+      letter-spacing: 0.08em;
+      line-height: 1.1;
+      margin-bottom: var(--space-6);
+    }
+
+    .type-divider {
+      width: 48px;
+      height: 1px;
+      background: var(--gold-500);
+      margin: 0 auto var(--space-6);
+      opacity: 0.5;
+    }
+
+    .type-sample {
+      font-family: var(--font-body);
+      font-size: 1.25rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink-400);
+      line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       GUIDELINES — Clean Card System
+       ══════════════════════════════════════════════════════════════ */
+    .guidelines-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+
+    @media (max-width: 700px) {
+      .guidelines-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .guideline-card {
+      background: white;
+      padding: var(--space-8);
+      border-radius: 6px;
+      box-shadow: var(--shadow-sm);
+      border-left: 3px solid transparent;
+      transition: box-shadow var(--duration-normal) var(--ease-out-quart);
+    }
+
+    .guideline-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .guideline-card.do {
+      border-left-color: var(--gold-500);
+    }
+
+    .guideline-card.dont {
+      border-left-color: #C45D5D;
+    }
+
+    .guideline-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
+
+    .guideline-header i {
+      font-size: 1.25rem;
+    }
+
+    .guideline-card.do .guideline-header {
+      color: var(--gold-600);
+    }
+
+    .guideline-card.dont .guideline-header {
+      color: #C45D5D;
+    }
+
+    .guideline-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .guideline-list {
+      list-style: none;
+    }
+
+    .guideline-list li {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 400;
+      color: var(--ink-600);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--cream-300);
+      line-height: 1.5;
+    }
+
+    .guideline-list li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DOWNLOAD SECTION — Premium Cards
+       ══════════════════════════════════════════════════════════════ */
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+
+    @media (max-width: 800px) {
+      .download-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .download-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(184, 152, 107, 0.15);
+      border-radius: 6px;
+      padding: var(--space-8);
+      transition: all var(--duration-slow) var(--ease-out-expo);
+    }
+
+    .download-card:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(184, 152, 107, 0.35);
+      transform: translateY(-4px);
+    }
+
+    .download-icon {
+      width: 52px;
+      height: 52px;
+      background: rgba(184, 152, 107, 0.12);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-5);
+      color: var(--gold-400);
+      font-size: 1.375rem;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .download-card:hover .download-icon {
+      background: rgba(184, 152, 107, 0.2);
+      transform: scale(1.05);
+    }
+
+    .download-title {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: white;
+      margin-bottom: var(--space-2);
+      letter-spacing: 0.01em;
+    }
+
+    .download-desc {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.5;
+      margin-bottom: var(--space-6);
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      background: var(--gold-500);
+      color: var(--navy-900);
+      text-decoration: none;
+      border-radius: 4px;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .download-btn:hover {
+      background: var(--gold-400);
+      transform: translateY(-1px);
+    }
+
+    .download-btn:active {
+      transform: translateY(0);
+    }
+
+    .download-btn i {
+      font-size: 1rem;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       FOOTER — Refined Minimal
+       ══════════════════════════════════════════════════════════════ */
+    .footer {
+      background: var(--navy-900);
+      padding: var(--space-12) var(--content-padding);
+      text-align: center;
+      position: relative;
+    }
+
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 1px;
+      background: var(--gold-500);
+      opacity: 0.3;
+    }
+
+    .footer-text {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .footer-link {
+      color: var(--gold-400);
+      text-decoration: none;
+      transition: color var(--duration-fast) var(--ease-out-quart);
+    }
+
+    .footer-link:hover {
+      color: var(--gold-300);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       TOAST NOTIFICATION — Elegant Feedback
+       ══════════════════════════════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: var(--space-8);
+      left: 50%;
+      transform: translateX(-50%) translateY(calc(100% + var(--space-8)));
+      background: var(--navy-800);
+      color: white;
+      padding: var(--space-4) var(--space-6);
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 400;
+      opacity: 0;
+      transition: all var(--duration-slow) var(--ease-out-expo);
+      z-index: 1000;
+      border: 1px solid rgba(184, 152, 107, 0.25);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCROLL REVEAL ANIMATIONS
+       ══════════════════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition:
+        opacity 0.7s var(--ease-out-expo),
+        transform 0.7s var(--ease-out-expo);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Stagger children */
+    .reveal-stagger > * {
+      opacity: 0;
+      transform: translateY(16px);
+      transition:
+        opacity 0.6s var(--ease-out-expo),
+        transform 0.6s var(--ease-out-expo);
+    }
+
+    .reveal-stagger.visible > *:nth-child(1) { transition-delay: 0s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.06s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.12s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.18s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.24s; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.30s; opacity: 1; transform: translateY(0); }
+
+    /* ══════════════════════════════════════════════════════════════
+       RESPONSIVE REFINEMENTS
+       ══════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      :root {
+        --content-padding: var(--space-6);
+      }
+
+      .hero {
+        min-height: 480px;
+        padding-top: calc(72px + var(--space-16));
+        padding-bottom: var(--space-16);
+      }
+
+      .hero-monogram {
+        width: 100px;
+      }
+
+      .section {
+        padding: var(--space-16) var(--content-padding);
+      }
+
+      .section-dark .section-inner {
+        padding: var(--space-16) var(--content-padding);
+      }
+
+      .type-specimen {
+        padding: var(--space-10) var(--space-6);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .reveal, .reveal-stagger > * {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">AMJAD & HAZLI</a>
+      <a href="index.html" class="nav-back">
+        <i class="ph ph-arrow-left"></i>
+        <span>Back to home</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <img src="assets/brand/logo-monogram.svg" alt="A&H Monogram" class="hero-monogram">
+    <p class="hero-label">Brand Guidelines</p>
+    <h1 class="hero-title">Brand Assets</h1>
+    <p class="hero-subtitle">Official logos, guidelines, and assets for press and partners.</p>
+  </section>
+
+  <!-- Logo Variants -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Logos</span>
+      <h2 class="section-title">Logo Variants</h2>
+      <p class="section-desc">Download the appropriate logo variant for your use case.</p>
+    </div>
+
+    <div class="logo-grid reveal-stagger">
+      <div class="logo-card">
+        <div class="logo-preview dark">
+          <img src="assets/brand/logo-stacked-white.svg" alt="Full Logo">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Full Logo (Stacked)</span>
+            <span class="logo-format">SVG</span>
+          </div>
+          <a href="assets/brand/logo-stacked-white.svg" download class="logo-download" aria-label="Download">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-preview">
+          <img src="assets/brand/logo-primary.svg" alt="Horizontal Logo">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Horizontal Logo</span>
+            <span class="logo-format">SVG</span>
+          </div>
+          <a href="assets/brand/logo-primary.svg" download class="logo-download" aria-label="Download">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-preview dark">
+          <img src="assets/brand/logo-monogram.svg" alt="Monogram" style="max-width: 88px;">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Monogram</span>
+            <span class="logo-format">SVG</span>
+          </div>
+          <a href="assets/brand/logo-monogram.svg" download class="logo-download" aria-label="Download">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-preview">
+          <img src="assets/brand/logo-wordmark.svg" alt="Wordmark">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Wordmark</span>
+            <span class="logo-format">SVG</span>
+          </div>
+          <a href="assets/brand/logo-wordmark.svg" download class="logo-download" aria-label="Download">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-preview dark">
+          <img src="assets/brand/logo-wordmark-white.svg" alt="Wordmark White">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Wordmark (White)</span>
+            <span class="logo-format">SVG</span>
+          </div>
+          <a href="assets/brand/logo-wordmark-white.svg" download class="logo-download" aria-label="Download">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-preview dark">
+          <img src="assets/brand/favicon-32.svg" alt="Favicon" style="max-width: 32px;">
+        </div>
+        <div class="logo-info">
+          <div class="logo-meta">
+            <span class="logo-name">Favicon</span>
+            <span class="logo-format">SVG</span>
+          </div>
+          <a href="assets/brand/favicon-32.svg" download class="logo-download" aria-label="Download">
+            <i class="ph ph-download-simple"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Color Palette -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Colors</span>
+      <h2 class="section-title">Color Palette</h2>
+      <p class="section-desc">Click any color to copy the hex code.</p>
+    </div>
+
+    <div class="color-grid reveal-stagger">
+      <div class="color-card" onclick="copyColor('#2B3A55')" role="button" tabindex="0">
+        <div class="color-swatch" style="background: #2B3A55;"></div>
+        <div class="color-info">
+          <div class="color-name">Navy</div>
+          <div class="color-hex">#2B3A55</div>
+        </div>
+      </div>
+
+      <div class="color-card" onclick="copyColor('#B8986B')" role="button" tabindex="0">
+        <div class="color-swatch" style="background: linear-gradient(145deg, #C9A87C 0%, #B8986B 50%, #A6875A 100%);"></div>
+        <div class="color-info">
+          <div class="color-name">Gold</div>
+          <div class="color-hex">#B8986B</div>
+        </div>
+      </div>
+
+      <div class="color-card" onclick="copyColor('#1E2A3F')" role="button" tabindex="0">
+        <div class="color-swatch" style="background: #1E2A3F;"></div>
+        <div class="color-info">
+          <div class="color-name">Navy Dark</div>
+          <div class="color-hex">#1E2A3F</div>
+        </div>
+      </div>
+
+      <div class="color-card" onclick="copyColor('#FAF8F5')" role="button" tabindex="0">
+        <div class="color-swatch" style="background: #FAF8F5;"></div>
+        <div class="color-info">
+          <div class="color-name">Cream</div>
+          <div class="color-hex">#FAF8F5</div>
+        </div>
+      </div>
+
+      <div class="color-card" onclick="copyColor('#FFFFFF')" role="button" tabindex="0">
+        <div class="color-swatch" style="background: #FFFFFF;"></div>
+        <div class="color-info">
+          <div class="color-name">White</div>
+          <div class="color-hex">#FFFFFF</div>
+        </div>
+      </div>
+
+      <div class="color-card" onclick="copyColor('#1A1A1A')" role="button" tabindex="0">
+        <div class="color-swatch" style="background: #1A1A1A;"></div>
+        <div class="color-info">
+          <div class="color-name">Ink</div>
+          <div class="color-hex">#1A1A1A</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Typography -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Typography</span>
+      <h2 class="section-title">Brand Typeface</h2>
+      <p class="section-desc">Playfair Display conveys elegance and timeless professionalism.</p>
+    </div>
+
+    <div class="type-specimen reveal">
+      <p class="type-label">Playfair Display</p>
+      <p class="type-display">AMJAD & HAZLI</p>
+      <div class="type-divider"></div>
+      <p class="type-sample">Chartered Accountants — Trusted expertise since establishment.</p>
+    </div>
+  </section>
+
+  <!-- Guidelines -->
+  <section class="section">
+    <div class="section-header reveal">
+      <span class="section-label">Guidelines</span>
+      <h2 class="section-title">Usage Guidelines</h2>
+      <p class="section-desc">Follow these rules to maintain brand consistency.</p>
+    </div>
+
+    <div class="guidelines-grid reveal-stagger">
+      <div class="guideline-card do">
+        <div class="guideline-header">
+          <i class="ph ph-check-circle"></i>
+          <span class="guideline-title">Do</span>
+        </div>
+        <ul class="guideline-list">
+          <li>Use the gold monogram on navy backgrounds</li>
+          <li>Maintain clear space around the logo</li>
+          <li>Use white wordmark on dark backgrounds</li>
+          <li>Keep minimum size of 48px for digital</li>
+          <li>Download assets from this official page</li>
+        </ul>
+      </div>
+
+      <div class="guideline-card dont">
+        <div class="guideline-header">
+          <i class="ph ph-x-circle"></i>
+          <span class="guideline-title">Don't</span>
+        </div>
+        <ul class="guideline-list">
+          <li>Rotate or skew the logo</li>
+          <li>Change the gold or navy colors</li>
+          <li>Add effects like shadows or outlines</li>
+          <li>Place on busy or low-contrast backgrounds</li>
+          <li>Recreate or modify the monogram</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Downloads -->
+  <section class="section-dark">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-label">Downloads</span>
+        <h2 class="section-title">Download Packs</h2>
+        <p class="section-desc">Get all brand assets in one convenient package.</p>
+      </div>
+
+      <div class="download-grid reveal-stagger">
+        <div class="download-card">
+          <div class="download-icon"><i class="ph ph-file-svg"></i></div>
+          <h3 class="download-title">SVG Pack</h3>
+          <p class="download-desc">All vector logos in SVG format. Perfect for web and print.</p>
+          <a href="assets/brand/logo-stacked-white.svg" download class="download-btn">
+            <i class="ph ph-download-simple"></i>
+            Download
+          </a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon"><i class="ph ph-shapes"></i></div>
+          <h3 class="download-title">Monogram</h3>
+          <p class="download-desc">The A&H monogram for icons and brand marks.</p>
+          <a href="assets/brand/logo-monogram.svg" download class="download-btn">
+            <i class="ph ph-download-simple"></i>
+            Download
+          </a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon"><i class="ph ph-app-window"></i></div>
+          <h3 class="download-title">Favicons</h3>
+          <p class="download-desc">Browser and app icons in multiple sizes.</p>
+          <a href="assets/brand/favicon-32.svg" download class="download-btn">
+            <i class="ph ph-download-simple"></i>
+            Download
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">
+      Questions about brand usage? <a href="mailto:hello@amjadhazli.com" class="footer-link">Contact us</a>
+    </p>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">Copied to clipboard</div>
+
+  <script>
+    // Intersection Observer for reveal animations
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: '0px 0px -40px 0px'
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
+      revealObserver.observe(el);
+    });
+
+    // Copy color to clipboard
+    function copyColor(hex) {
+      navigator.clipboard.writeText(hex).then(() => {
+        showToast('Copied ' + hex);
+      }).catch(() => {
+        showToast('Failed to copy');
+      });
+    }
+
+    // Handle keyboard interaction for color cards
+    document.querySelectorAll('.color-card').forEach(card => {
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    });
+
+    // Toast notification
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      clearTimeout(toastTimeout);
+      toast.textContent = message;
+      toast.classList.add('show');
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2200);
+    }
+  </script>
+</body>
+</html>
