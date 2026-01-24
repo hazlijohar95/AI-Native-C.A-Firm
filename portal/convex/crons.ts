@@ -24,4 +24,12 @@ crons.hourly(
   internal.announcements.publishScheduled
 );
 
+// Process invoice payment reminders daily at 10 AM Malaysia time (2 AM UTC)
+// Sends: due soon (3 days before), overdue (1 day after), and weekly overdue reminders
+crons.daily(
+  "process-invoice-reminders",
+  { hourUTC: 2, minuteUTC: 0 },
+  internal.invoices.processInvoiceReminders
+);
+
 export default crons;

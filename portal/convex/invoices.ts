@@ -499,10 +499,14 @@ export const recordPayment = mutation({
 // STRIPE ACTIONS
 // ============================================
 
-// Create checkout session (placeholder - requires Stripe API key)
+// Create checkout session for online payment
 export const createCheckoutSession = action({
   args: { invoiceId: v.id("invoices") },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{
+    success: boolean;
+    message?: string;
+    checkoutUrl: string | null;
+  }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Unauthorized");
@@ -517,13 +521,99 @@ export const createCheckoutSession = action({
       throw new Error("Invoice cannot be paid online");
     }
 
-    // TODO: Implement Stripe checkout when STRIPE_SECRET_KEY is configured
-    // For now, return a placeholder message
-    return {
-      success: false,
-      message: "Online payment is coming soon. Please use bank transfer for now.",
-      checkoutUrl: null,
-    };
+    // Check if Stripe is configured
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      return {
+        success: false,
+        message: "Online payment is coming soon. Please use bank transfer for now.",
+        checkoutUrl: null,
+      };
+    }
+
+    // Create Stripe checkout session
+    try {
+      const portalUrl = process.env.PORTAL_URL || "https://portal.amjadhazli.com";
+
+      // Build line items for Stripe
+      const lineItems = invoice.lineItems.map((item: {
+        description: string;
+        quantity: number;
+        unitPrice: number;
+        amount: number;
+      }) => ({
+        price_data: {
+          currency: invoice.currency.toLowerCase(),
+          product_data: {
+            name: item.description,
+          },
+          unit_amount: item.unitPrice, // Already in cents
+        },
+        quantity: item.quantity,
+      }));
+
+      // Create checkout session via Stripe API
+      const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${stripeSecretKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          "mode": "payment",
+          "success_url": `${portalUrl}/invoices?payment=success&invoice=${invoice.invoiceNumber}`,
+          "cancel_url": `${portalUrl}/invoices?payment=cancelled&invoice=${invoice.invoiceNumber}`,
+          "client_reference_id": args.invoiceId.toString(),
+          "customer_email": identity.email || "",
+          "metadata[invoice_id]": args.invoiceId.toString(),
+          "metadata[invoice_number]": invoice.invoiceNumber,
+          ...lineItems.reduce((acc: Record<string, string>, item: {
+            price_data: {
+              currency: string;
+              product_data: { name: string };
+              unit_amount: number;
+            };
+            quantity: number;
+          }, index: number) => {
+            acc[`line_items[${index}][price_data][currency]`] = item.price_data.currency;
+            acc[`line_items[${index}][price_data][product_data][name]`] = item.price_data.product_data.name;
+            acc[`line_items[${index}][price_data][unit_amount]`] = item.price_data.unit_amount.toString();
+            acc[`line_items[${index}][quantity]`] = item.quantity.toString();
+            return acc;
+          }, {} as Record<string, string>),
+        }).toString(),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Stripe API error:", errorText);
+        return {
+          success: false,
+          message: "Failed to create payment session. Please try again or use bank transfer.",
+          checkoutUrl: null,
+        };
+      }
+
+      const session = await response.json();
+
+      // Store the session ID on the invoice
+      await ctx.runMutation(internal.invoices.updateStripeSession, {
+        invoiceId: args.invoiceId,
+        sessionId: session.id,
+      });
+
+      return {
+        success: true,
+        checkoutUrl: session.url,
+      };
+    } catch (error) {
+      console.error("Stripe checkout error:", error);
+      return {
+        success: false,
+        message: "Failed to initiate payment. Please try again or use bank transfer.",
+        checkoutUrl: null,
+      };
+    }
   },
 });
 
@@ -621,5 +711,140 @@ export const recordStripePayment = internalMutation({
         createdAt: now,
       });
     }
+  },
+});
+
+// ============================================
+// INVOICE REMINDERS
+// ============================================
+
+// Helper to format currency for emails
+function formatCurrencyForEmail(amount: number, currency: string = "MYR"): string {
+  return new Intl.NumberFormat("en-MY", {
+    style: "currency",
+    currency,
+  }).format(amount / 100);
+}
+
+// Process invoice reminders (called by cron job)
+export const processInvoiceReminders = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const threeDaysMs = 3 * oneDayMs;
+    const sevenDaysMs = 7 * oneDayMs;
+
+    // Get all pending invoices (not paid, not cancelled, not draft)
+    const pendingInvoices = await ctx.db
+      .query("invoices")
+      .filter((q) =>
+        q.and(
+          q.neq(q.field("status"), "paid"),
+          q.neq(q.field("status"), "cancelled"),
+          q.neq(q.field("status"), "draft")
+        )
+      )
+      .collect();
+
+    let remindersSent = 0;
+
+    for (const invoice of pendingInvoices) {
+      const dueDate = invoice.dueDate;
+      const daysUntilDue = Math.floor((dueDate - now) / oneDayMs);
+      const daysOverdue = Math.floor((now - dueDate) / oneDayMs);
+
+      // Get organization users for notifications
+      const orgUsers = await ctx.db
+        .query("users")
+        .withIndex("by_organization", (q) => q.eq("organizationId", invoice.organizationId))
+        .collect();
+
+      // Initialize reminders tracking if needed
+      const remindersSentTracking = invoice.remindersSent || {
+        beforeDue: undefined,
+        oneDayOverdue: undefined,
+        weeklyOverdue: [],
+      };
+
+      let shouldUpdate = false;
+
+      // 1. Send "due soon" reminder 3 days before due date
+      if (daysUntilDue <= 3 && daysUntilDue > 0 && !remindersSentTracking.beforeDue) {
+        for (const user of orgUsers) {
+          await ctx.scheduler.runAfter(0, internal.emails.sendInvoiceDueSoonEmail, {
+            recipientId: user._id.toString(),
+            recipientEmail: user.email,
+            recipientName: user.name,
+            invoiceNumber: invoice.invoiceNumber,
+            amount: formatCurrencyForEmail(invoice.amount, invoice.currency),
+            dueDate: invoice.dueDate,
+          });
+        }
+        remindersSentTracking.beforeDue = now;
+        shouldUpdate = true;
+        remindersSent++;
+        console.log(`Sent due soon reminder for invoice ${invoice.invoiceNumber}`);
+      }
+
+      // 2. Send first overdue reminder 1 day after due date
+      if (daysOverdue >= 1 && !remindersSentTracking.oneDayOverdue) {
+        for (const user of orgUsers) {
+          await ctx.scheduler.runAfter(0, internal.emails.sendInvoiceOverdueEmail, {
+            recipientId: user._id.toString(),
+            recipientEmail: user.email,
+            recipientName: user.name,
+            invoiceNumber: invoice.invoiceNumber,
+            amount: formatCurrencyForEmail(invoice.amount, invoice.currency),
+            dueDate: invoice.dueDate,
+            daysOverdue: daysOverdue,
+          });
+        }
+        remindersSentTracking.oneDayOverdue = now;
+        shouldUpdate = true;
+        remindersSent++;
+        console.log(`Sent 1-day overdue reminder for invoice ${invoice.invoiceNumber}`);
+      }
+
+      // 3. Send weekly overdue reminders (after first overdue reminder)
+      if (daysOverdue >= 7 && remindersSentTracking.oneDayOverdue) {
+        const weeklyReminders = remindersSentTracking.weeklyOverdue || [];
+        const lastWeeklyReminder = weeklyReminders.length > 0
+          ? weeklyReminders[weeklyReminders.length - 1]
+          : remindersSentTracking.oneDayOverdue;
+
+        // Check if 7 days have passed since last weekly reminder
+        const daysSinceLastReminder = Math.floor((now - lastWeeklyReminder) / oneDayMs);
+
+        if (daysSinceLastReminder >= 7) {
+          for (const user of orgUsers) {
+            await ctx.scheduler.runAfter(0, internal.emails.sendInvoiceOverdueEmail, {
+              recipientId: user._id.toString(),
+              recipientEmail: user.email,
+              recipientName: user.name,
+              invoiceNumber: invoice.invoiceNumber,
+              amount: formatCurrencyForEmail(invoice.amount, invoice.currency),
+              dueDate: invoice.dueDate,
+              daysOverdue: daysOverdue,
+            });
+          }
+          weeklyReminders.push(now);
+          remindersSentTracking.weeklyOverdue = weeklyReminders;
+          shouldUpdate = true;
+          remindersSent++;
+          console.log(`Sent weekly overdue reminder for invoice ${invoice.invoiceNumber} (${daysOverdue} days overdue)`);
+        }
+      }
+
+      // Update invoice with reminder tracking
+      if (shouldUpdate) {
+        await ctx.db.patch(invoice._id, {
+          remindersSent: remindersSentTracking,
+        });
+      }
+    }
+
+    console.log(`Invoice reminder processing complete. Sent ${remindersSent} reminders.`);
+    return { processed: pendingInvoices.length, remindersSent };
   },
 });

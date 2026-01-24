@@ -44,6 +44,8 @@ import {
   Eye,
   Loader2,
   Download,
+  Upload,
+  ImageIcon,
 } from "@/lib/icons";
 import { cn, formatDistanceToNow } from "@/lib/utils";
 import type { Id } from "../../convex/_generated/dataModel";
@@ -392,9 +394,11 @@ export function Signatures() {
   const [signDialogOpen, setSignDialogOpen] = useState(false);
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<Id<"signatureRequests"> | null>(null);
-  const [signatureType, setSignatureType] = useState<"draw" | "type">("draw");
+  const [signatureType, setSignatureType] = useState<"draw" | "type" | "upload">("draw");
   const [typedSignature, setTypedSignature] = useState("");
   const [drawnSignature, setDrawnSignature] = useState<string | null>(null);
+  const [uploadedSignature, setUploadedSignature] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string>("");
   const [legalName, setLegalName] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
@@ -418,7 +422,7 @@ export function Signatures() {
     selectedRequest ? { id: selectedRequest } : "skip"
   );
 
-  const signMutation = useMutation(api.signatures.sign);
+  const signAction = useAction(api.signatures.sign);
   const declineMutation = useMutation(api.signatures.decline);
   const getDocumentPreview = useAction(api.signatures.getDocumentPreview);
   const recordPreview = useMutation(api.signatures.recordDocumentPreview);
@@ -430,6 +434,8 @@ export function Signatures() {
     setSignatureType("draw");
     setTypedSignature("");
     setDrawnSignature(null);
+    setUploadedSignature(null);
+    setUploadedFileName("");
     setLegalName("");
     setAgreedToTerms(false);
     // Reset preview state
@@ -473,10 +479,46 @@ export function Signatures() {
     setDeclineDialogOpen(true);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (max 500KB)
+    if (file.size > 500 * 1024) {
+      toast.error("Image too large (max 500KB)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setUploadedSignature(dataUrl);
+      setUploadedFileName(file.name);
+    };
+    reader.onerror = () => {
+      toast.error("Failed to read file");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSign = async () => {
     if (!selectedRequest) return;
 
-    const signatureData = signatureType === "draw" ? drawnSignature : typedSignature;
+    let signatureData: string | null = null;
+    if (signatureType === "draw") {
+      signatureData = drawnSignature;
+    } else if (signatureType === "type") {
+      signatureData = typedSignature;
+    } else if (signatureType === "upload") {
+      signatureData = uploadedSignature;
+    }
+
     if (!signatureData) {
       toast.error("Please provide a signature");
       return;
@@ -492,13 +534,27 @@ export function Signatures() {
 
     setIsSigning(true);
     try {
-      await signMutation({
+      // Fetch client IP address for audit trail
+      let ipAddress: string | undefined;
+      try {
+        const ipResponse = await fetch("https://api.ipify.org?format=json");
+        if (ipResponse.ok) {
+          const ipData = await ipResponse.json();
+          ipAddress = ipData.ip;
+        }
+      } catch {
+        // IP fetch is best-effort; continue without it
+        console.warn("Could not fetch IP address for signature audit trail");
+      }
+
+      await signAction({
         requestId: selectedRequest,
         signatureType,
         signatureData,
         legalName: legalName.trim(),
         agreedToTerms,
         userAgent: navigator.userAgent,
+        ipAddress,
       });
       toast.success("Document signed successfully");
       setSignDialogOpen(false);
@@ -530,12 +586,7 @@ export function Signatures() {
   return (
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div
-        className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between motion-safe-slide-up">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
@@ -557,12 +608,7 @@ export function Signatures() {
       </div>
 
       {/* Filters */}
-      <div
-        className="flex items-center gap-3 opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
-        }}
-      >
+      <div className="flex items-center gap-3 motion-safe-slide-up motion-safe-slide-up-delay-2">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-[#9d9da6]" aria-hidden="true" />
           <label htmlFor="signature-status-filter" className="sr-only">Filter by status</label>
@@ -590,12 +636,7 @@ export function Signatures() {
           </div>
         </div>
       ) : requests.length === 0 ? (
-        <div
-          className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards",
-          }}
-        >
+        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] motion-safe-slide-up motion-safe-slide-up-delay-3">
           <div className="w-14 h-14 rounded-xl bg-[#e5e5e7] flex items-center justify-center mb-4">
             <FileSignature className="h-6 w-6 text-[#6b6b76]" />
           </div>
@@ -616,12 +657,9 @@ export function Signatures() {
               <div
                 key={request._id}
                 className={cn(
-                  "group bg-white rounded-2xl border border-black/5 p-5 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] opacity-0",
+                  "group bg-white rounded-2xl border border-black/5 p-5 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] motion-safe-slide-up motion-safe-slide-up-delay-3",
                   displayStatus === "pending" && "border-l-4 border-l-amber-400"
                 )}
-                style={{
-                  animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${0.15 + index * 0.03}s forwards`,
-                }}
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   {/* Request Info */}
@@ -777,7 +815,7 @@ export function Signatures() {
 
               <div className="space-y-6">
                 {/* Signature Type Selector */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => setSignatureType("draw")}
                     className={cn(
@@ -802,10 +840,22 @@ export function Signatures() {
                     <Type className="h-3.5 w-3.5" />
                     Type
                   </button>
+                  <button
+                    onClick={() => setSignatureType("upload")}
+                    className={cn(
+                      "h-9 px-4 rounded-lg text-sm font-medium transition-colors flex items-center gap-2",
+                      signatureType === "upload"
+                        ? "bg-[#0f0f12] text-white"
+                        : "bg-white border border-[#EBEBEB] text-[#3A3A3A] hover:bg-[#f8f8f8]"
+                    )}
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    Upload
+                  </button>
                 </div>
 
                 {/* Signature Input */}
-                {signatureType === "draw" ? (
+                {signatureType === "draw" && (
                   <div>
                     <label className="block text-sm font-medium text-[#0f0f12] mb-2">Draw your signature</label>
                     <SignatureCanvas
@@ -816,7 +866,8 @@ export function Signatures() {
                       <p className="mt-2 text-xs text-emerald-600 font-medium">Signature captured</p>
                     )}
                   </div>
-                ) : (
+                )}
+                {signatureType === "type" && (
                   <div>
                     <label htmlFor="typedSignature" className="block text-sm font-medium text-[#0f0f12] mb-2">
                       Type your signature
@@ -829,6 +880,51 @@ export function Signatures() {
                       className="h-12 text-xl border-[#EBEBEB] rounded-lg"
                       style={{ fontFamily: "'Brush Script MT', cursive" }}
                     />
+                  </div>
+                )}
+                {signatureType === "upload" && (
+                  <div>
+                    <label className="block text-sm font-medium text-[#0f0f12] mb-2">Upload your signature</label>
+                    {uploadedSignature ? (
+                      <div className="space-y-3">
+                        <div className="rounded-lg border-2 border-dashed bg-white p-4">
+                          <img
+                            src={uploadedSignature}
+                            alt="Uploaded signature"
+                            className="max-h-32 mx-auto object-contain"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-emerald-600">
+                            <CheckCircle2 className="h-4 w-4" />
+                            <span className="font-medium">{uploadedFileName}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUploadedSignature(null);
+                              setUploadedFileName("");
+                            }}
+                            className="h-8 px-3 rounded-lg border border-[#EBEBEB] text-xs font-medium text-[#3A3A3A] bg-white hover:bg-[#f8f8f8] transition-colors flex items-center gap-1.5"
+                          >
+                            <Eraser className="h-3 w-3" />
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center h-40 rounded-lg border-2 border-dashed border-[#EBEBEB] bg-[#fafafa] cursor-pointer hover:bg-[#f5f5f5] transition-colors">
+                        <ImageIcon className="h-8 w-8 text-[#9d9da6] mb-2" />
+                        <span className="text-sm text-[#6b6b76]">Click to upload signature image</span>
+                        <span className="text-xs text-[#9d9da6] mt-1">PNG, JPG up to 500KB</span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
                   </div>
                 )}
 
@@ -924,12 +1020,6 @@ export function Signatures() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <style>{`
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

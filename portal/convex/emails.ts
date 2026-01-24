@@ -317,6 +317,82 @@ export const templates = {
       </p>
     `, "To manage your email preferences, visit Settings in your portal."),
   }),
+
+  // Invoice reminder - due soon (sent 3 days before due date)
+  invoiceDueSoon: (recipientName: string, invoiceNumber: string, amount: string, dueDate: number) => ({
+    subject: `⏰ Reminder: Invoice ${invoiceNumber} Due Soon`,
+    html: baseTemplate(`
+      <h1 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600; color: #090516;">
+        Invoice Due Soon
+      </h1>
+      <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #404040;">
+        Hi ${recipientName},
+      </p>
+      <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #404040;">
+        This is a friendly reminder that the following invoice is due soon:
+      </p>
+      <div style="background-color: #fef3c7; border-radius: 6px; padding: 16px; margin-bottom: 24px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #92400e;">Invoice Number</td>
+            <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #92400e; text-align: right;">${invoiceNumber}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #92400e;">Amount Due</td>
+            <td style="padding: 8px 0; font-size: 18px; font-weight: 600; color: #92400e; text-align: right;">${amount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #92400e;">Due Date</td>
+            <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #92400e; text-align: right;">${new Date(dueDate).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" })}</td>
+          </tr>
+        </table>
+      </div>
+      <p style="margin: 0 0 24px 0;">
+        ${emailButton("Pay Invoice", `${BRAND.website}/invoices`)}
+      </p>
+      <p style="margin: 0; font-size: 13px; color: #737373;">
+        If you've already made this payment, please disregard this reminder.
+      </p>
+    `, "To manage your email preferences, visit Settings in your portal."),
+  }),
+
+  // Invoice overdue reminder
+  invoiceOverdue: (recipientName: string, invoiceNumber: string, amount: string, dueDate: number, daysOverdue: number) => ({
+    subject: `🚨 Overdue: Invoice ${invoiceNumber} - ${daysOverdue} Day${daysOverdue === 1 ? "" : "s"} Past Due`,
+    html: baseTemplate(`
+      <h1 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600; color: #dc2626;">
+        Invoice Overdue
+      </h1>
+      <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #404040;">
+        Hi ${recipientName},
+      </p>
+      <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #404040;">
+        Your invoice is now <strong>${daysOverdue} day${daysOverdue === 1 ? "" : "s"}</strong> past due. Please arrange payment at your earliest convenience.
+      </p>
+      <div style="background-color: #fef2f2; border-radius: 6px; padding: 16px; margin-bottom: 24px; border-left: 4px solid #dc2626;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #991b1b;">Invoice Number</td>
+            <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #991b1b; text-align: right;">${invoiceNumber}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #991b1b;">Amount Due</td>
+            <td style="padding: 8px 0; font-size: 18px; font-weight: 600; color: #991b1b; text-align: right;">${amount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #991b1b;">Due Date</td>
+            <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #991b1b; text-align: right;">${new Date(dueDate).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" })}</td>
+          </tr>
+        </table>
+      </div>
+      <p style="margin: 0 0 24px 0;">
+        ${emailButton("Pay Now", `${BRAND.website}/invoices`)}
+      </p>
+      <p style="margin: 0; font-size: 13px; color: #737373;">
+        If you've already made this payment, please disregard this reminder. If you're experiencing difficulties, please contact us to discuss payment options.
+      </p>
+    `, "To manage your email preferences, visit Settings in your portal."),
+  }),
 };
 
 // ============================================
@@ -647,6 +723,74 @@ export const sendAnnouncementEmail = internalAction({
       args.recipientName,
       args.title,
       args.preview
+    );
+
+    return await ctx.runAction(internal.emails.send, {
+      to: args.recipientEmail,
+      subject: emailContent.subject,
+      html: emailContent.html,
+    });
+  },
+});
+
+// Send invoice due soon reminder email
+export const sendInvoiceDueSoonEmail = internalAction({
+  args: {
+    recipientId: v.string(),
+    recipientEmail: v.string(),
+    recipientName: v.string(),
+    invoiceNumber: v.string(),
+    amount: v.string(),
+    dueDate: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Check user preferences before sending
+    const shouldSend = await shouldSendEmail(ctx, args.recipientId, "invoices");
+    if (!shouldSend) {
+      console.log(`Skipping invoice due soon email - user ${args.recipientId} has disabled this notification`);
+      return { success: false, reason: "user_preference_disabled" };
+    }
+
+    const emailContent = templates.invoiceDueSoon(
+      args.recipientName,
+      args.invoiceNumber,
+      args.amount,
+      args.dueDate
+    );
+
+    return await ctx.runAction(internal.emails.send, {
+      to: args.recipientEmail,
+      subject: emailContent.subject,
+      html: emailContent.html,
+    });
+  },
+});
+
+// Send invoice overdue reminder email
+export const sendInvoiceOverdueEmail = internalAction({
+  args: {
+    recipientId: v.string(),
+    recipientEmail: v.string(),
+    recipientName: v.string(),
+    invoiceNumber: v.string(),
+    amount: v.string(),
+    dueDate: v.number(),
+    daysOverdue: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Check user preferences before sending
+    const shouldSend = await shouldSendEmail(ctx, args.recipientId, "invoices");
+    if (!shouldSend) {
+      console.log(`Skipping invoice overdue email - user ${args.recipientId} has disabled this notification`);
+      return { success: false, reason: "user_preference_disabled" };
+    }
+
+    const emailContent = templates.invoiceOverdue(
+      args.recipientName,
+      args.invoiceNumber,
+      args.amount,
+      args.dueDate,
+      args.daysOverdue
     );
 
     return await ctx.runAction(internal.emails.send, {

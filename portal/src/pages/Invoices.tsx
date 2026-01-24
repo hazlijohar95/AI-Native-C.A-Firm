@@ -30,6 +30,7 @@ import {
   Sparkles,
 } from "@/lib/icons";
 import { cn } from "@/lib/utils";
+import { generateInvoicePDF } from "@/lib/invoice-pdf";
 import type { Id } from "../../convex/_generated/dataModel";
 
 // Invoice status type
@@ -154,12 +155,7 @@ export function Invoices() {
   return (
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div
-        className="opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
+      <div className="motion-safe-slide-up">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f8f8] border border-black/5 mb-4">
           <Sparkles className="w-3.5 h-3.5 text-[#6b6b76]" />
           <span className="text-xs font-medium text-[#6b6b76]">Billing</span>
@@ -184,12 +180,7 @@ export function Invoices() {
           ))}
         </div>
       ) : (
-        <div
-          className="grid gap-4 sm:grid-cols-3 opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
-          }}
-        >
+        <div className="grid gap-4 sm:grid-cols-3 motion-safe-slide-up motion-safe-slide-up-delay-2">
           <div className="bg-white rounded-2xl border border-black/5 p-5 shadow-[0_0_0_1px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.02)]">
             <p className="text-xs font-medium text-[#9d9da6] uppercase tracking-wide">Pending</p>
             <p className="font-serif text-3xl text-[#0f0f12] mt-2">{invoiceCounts.pending}</p>
@@ -216,12 +207,7 @@ export function Invoices() {
       )}
 
       {/* Filters */}
-      <div
-        className="flex items-center gap-3 opacity-0"
-        style={{
-          animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards",
-        }}
-      >
+      <div className="flex items-center gap-3 motion-safe-slide-up motion-safe-slide-up-delay-3">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-[#9d9da6]" aria-hidden="true" />
           <label htmlFor="status-filter" className="sr-only">Filter by status</label>
@@ -249,12 +235,7 @@ export function Invoices() {
           </div>
         </div>
       ) : invoices.length === 0 ? (
-        <div
-          className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] opacity-0"
-          style={{
-            animation: "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
-          }}
-        >
+        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#e5e5e7] bg-[#fafafa] motion-safe-slide-up motion-safe-slide-up-delay-4">
           <div className="w-14 h-14 rounded-xl bg-[#e5e5e7] flex items-center justify-center mb-4">
             <Receipt className="h-6 w-6 text-[#6b6b76]" />
           </div>
@@ -275,12 +256,9 @@ export function Invoices() {
               <div
                 key={invoice._id}
                 className={cn(
-                  "group bg-white rounded-2xl border border-black/5 p-5 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] opacity-0",
+                  "group bg-white rounded-2xl border border-black/5 p-5 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.06)] motion-safe-slide-up motion-safe-slide-up-delay-4",
                   displayStatus === "overdue" && "border-red-200"
                 )}
-                style={{
-                  animation: `slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${0.2 + index * 0.03}s forwards`,
-                }}
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   {/* Invoice Info */}
@@ -455,9 +433,23 @@ export function Invoices() {
               {/* Actions */}
               <div className="flex justify-end gap-3 pt-5 border-t border-[#EBEBEB]">
                 <button
-                  disabled
-                  title="PDF download coming soon"
-                  className="h-10 px-5 rounded-lg border border-[#EBEBEB] text-sm font-medium text-[#9d9da6] bg-white cursor-not-allowed flex items-center gap-2"
+                  onClick={() => {
+                    generateInvoicePDF({
+                      invoiceNumber: selectedInvoiceData.invoiceNumber,
+                      description: selectedInvoiceData.description,
+                      organizationName: selectedInvoiceData.organizationName,
+                      lineItems: selectedInvoiceData.lineItems,
+                      amount: selectedInvoiceData.amount,
+                      currency: selectedInvoiceData.currency,
+                      status: selectedInvoiceData.displayStatus || selectedInvoiceData.status,
+                      issuedDate: selectedInvoiceData.issuedDate,
+                      dueDate: selectedInvoiceData.dueDate,
+                      paidAt: selectedInvoiceData.paidAt,
+                      notes: selectedInvoiceData.notes,
+                    });
+                    toast.success("Invoice PDF downloaded");
+                  }}
+                  className="h-10 px-5 rounded-lg border border-[#EBEBEB] text-sm font-medium text-[#3A3A3A] bg-white hover:bg-[#f8f8f8] transition-colors flex items-center gap-2"
                 >
                   <Download className="h-4 w-4" aria-hidden="true" />
                   Download PDF
@@ -488,12 +480,6 @@ export function Invoices() {
         </DialogContent>
       </Dialog>
 
-      <style>{`
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

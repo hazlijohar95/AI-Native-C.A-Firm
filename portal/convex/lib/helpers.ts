@@ -1,4 +1,4 @@
-import type { MutationCtx } from "../_generated/server";
+import type { MutationCtx, ActionCtx } from "../_generated/server";
 import type { Id, Doc } from "../_generated/dataModel";
 
 // ============================================
@@ -470,11 +470,55 @@ export async function validatePaymentAmount(
   const totalPaid = existingPayments.reduce((sum, p) => sum + p.amount, 0);
   
   if (totalPaid + paymentAmount > invoiceAmount) {
-    return { 
-      valid: false, 
-      error: `Payment would exceed invoice amount. Already paid: RM${(totalPaid / 100).toFixed(2)}, Invoice: RM${(invoiceAmount / 100).toFixed(2)}` 
+    return {
+      valid: false,
+      error: `Payment would exceed invoice amount. Already paid: RM${(totalPaid / 100).toFixed(2)}, Invoice: RM${(invoiceAmount / 100).toFixed(2)}`
     };
   }
 
   return { valid: true };
+}
+
+// ============================================
+// DOCUMENT HASH UTILITIES
+// ============================================
+
+/**
+ * Custom error class for document integrity failures
+ * Used to distinguish integrity errors from other errors in catch blocks
+ */
+export class DocumentIntegrityError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DocumentIntegrityError";
+    // Maintains proper stack trace for where error was thrown (V8 engines)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, DocumentIntegrityError);
+    }
+  }
+}
+
+/**
+ * Generate SHA-256 hash of document content from storage URL
+ * Used for document integrity verification in signature workflows
+ */
+export async function generateDocumentHash(url: string): Promise<string> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch document: ${response.status}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+
+    // Convert to hex string
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+    return hashHex;
+  } catch (error) {
+    console.error("Failed to generate document hash:", error);
+    throw new Error("Could not verify document integrity");
+  }
 }

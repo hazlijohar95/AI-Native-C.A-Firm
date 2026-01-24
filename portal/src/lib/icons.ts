@@ -48,6 +48,7 @@ export {
   Download,
   Trash,
   Trash2,
+  Image as ImageIcon,
 
   // Tasks & Status
   CheckSquare,
@@ -75,6 +76,7 @@ export {
   CreditCard,
   TrendingUp,
   Lightbulb,
+  Scale,
 
   // Actions & Tools
   Search,

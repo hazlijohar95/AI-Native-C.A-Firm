@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -443,7 +443,8 @@ interface CreateSignatureRequestDialogProps {
 }
 
 function CreateSignatureRequestDialog({ organizations, documents, onClose }: CreateSignatureRequestDialogProps) {
-  const createRequest = useMutation(api.signatures.create);
+  // Use action to create request with hash generation and email notifications
+  const createRequest = useAction(api.signatures.createWithNotifications);
 
   const [organizationId, setOrganizationId] = useState<string>("");
   const [documentId, setDocumentId] = useState<string>("");
@@ -687,7 +688,8 @@ function SignatureDetailsDialog({ request, orgName, onClose }: SignatureDetailsD
               <p className="text-xs text-muted-foreground">
                 Type: {signatureDetails.signature.signatureType}
               </p>
-              {signatureDetails.signature.signatureType === "draw" && (
+              {(signatureDetails.signature.signatureType === "draw" ||
+                signatureDetails.signature.signatureType === "upload") && (
                 <div className="mt-2 p-2 bg-white rounded border">
                   {/* Validate signature data is a proper base64 image data URL */}
                   {signatureDetails.signature.signatureData?.startsWith("data:image/") ? (

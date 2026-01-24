@@ -408,6 +408,12 @@ export default defineSchema({
     stripeCheckoutSessionId: v.optional(v.string()),
     // PDF document reference
     documentStorageKey: v.optional(v.string()),
+    // Payment reminder tracking
+    remindersSent: v.optional(v.object({
+      beforeDue: v.optional(v.number()),   // Sent 3 days before due date
+      oneDayOverdue: v.optional(v.number()), // Sent 1 day after due date
+      weeklyOverdue: v.optional(v.array(v.number())), // Weekly overdue reminders
+    })),
     // Metadata
     notes: v.optional(v.string()),
     createdBy: v.id("users"),
@@ -468,6 +474,9 @@ export default defineSchema({
     expiresAt: v.optional(v.number()),
     signedAt: v.optional(v.number()),
     signedBy: v.optional(v.id("users")),
+    // Document integrity verification
+    documentHash: v.optional(v.string()), // SHA-256 hash of document at time of request
+    signedDocumentHash: v.optional(v.string()), // SHA-256 hash verified at signing
   })
     .index("by_organization", ["organizationId"])
     .index("by_document", ["documentId"])

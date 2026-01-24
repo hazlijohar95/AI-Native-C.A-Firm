@@ -1,7 +1,7 @@
 # Client Portal Roadmap
 ## Amjad & Hazli - AI-Native Chartered Accounting Firm
 
-> **Status:** Enhancement Phase 2 Complete
+> **Status:** Enhancement Phase 3 Complete
 > **Last Updated:** 2026-01-24
 > **Current Phase:** Production with Enhancements
 
@@ -281,29 +281,105 @@ Major restructuring of document management with service-based organization.
 
 ---
 
-## Future Enhancements
+### Enhancement Phase 3: Invoice & Signature Improvements
+**Status:** Complete
 
-### Enhancement Phase 3 (Planned)
-- [ ] Task reminders & due date alerts (cron jobs)
-- [ ] Stripe payment integration (payment links, webhooks)
-- [ ] Document search (full-text on name/description)
+Security and functionality improvements for invoices and signatures.
+
+- [x] **IP Address Capture for Signatures** - Enhanced audit trail
+  - Fetches client IP via ipify.org before signing
+  - Stored alongside userAgent for complete audit record
+  - Best-effort (signing continues if IP fetch fails)
+
+- [x] **Document Hash Verification** - Integrity protection
+  - SHA-256 hash generated when signature request created
+  - Hash verified at signing time to detect tampering
+  - Custom `DocumentIntegrityError` class for robust error handling
+  - Prevents signing if document was modified after request
+
+- [x] **Upload Signature Option** - Third signature method
+  - Upload PNG/JPG signature image (max 500KB)
+  - Preview uploaded image before signing
+  - Remove and re-upload capability
+
+- [x] **Signature Request Email Notifications** - Automated alerts
+  - Email sent to all org users when signature requested
+  - Uses existing email preference system
+  - `createWithNotifications` action for complete workflow
+
+- [x] **PDF Invoice Generation** - Client-side download
+  - Professional branded PDF using jsPDF
+  - Company letterhead with logo placeholder
+  - Line items table with totals
+  - Bank payment details footer
+  - Download button enabled in invoice detail dialog
+
+- [x] **Stripe Payment Integration** - Online payments
+  - `createCheckoutSession` action creates Stripe checkout
+  - Webhook handler at `/stripe/webhook`
+  - Cryptographic signature verification (HMAC-SHA256)
+  - Automatic payment recording on successful checkout
+  - Graceful fallback when Stripe not configured
+
+- [x] **Automated Invoice Reminders** - Payment follow-up
+  - Daily cron job at 10 AM Malaysia time
+  - 3 days before due: "Invoice due soon" email
+  - 1 day overdue: First overdue reminder
+  - Weekly thereafter: Recurring overdue reminders
+  - Tracking in `remindersSent` field prevents duplicates
+
+- [x] **Security Hardening**
+  - Stripe webhook signature verification
+  - Custom error classes for type-safe error handling
+  - Document integrity checks before signing
+
+**Key Files Added/Modified:**
+- `convex/http.ts` - Stripe webhook handler with signature verification
+- `convex/invoices.ts` - Stripe checkout, reminder processing
+- `convex/signatures.ts` - Hash verification, email notifications, IP capture
+- `convex/emails.ts` - Invoice reminder email templates
+- `convex/crons.ts` - Daily reminder cron job
+- `convex/lib/helpers.ts` - `generateDocumentHash()`, `DocumentIntegrityError`
+- `src/pages/Signatures.tsx` - Upload UI, IP fetching
+- `src/pages/Invoices.tsx` - PDF download enabled
+- `src/lib/invoice-pdf.ts` - PDF generation using jsPDF
+
+**Schema Changes:**
+- Added `documentHash`, `signedDocumentHash` to `signatureRequests`
+- Added `remindersSent` tracking object to `invoices`
+
+**Environment Variables Required:**
+```bash
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+PORTAL_URL=https://portal.amjadhazli.com
+```
+
+---
+
+## Future Enhancements
 
 ### Enhancement Phase 4 (Planned)
 - [ ] Task templates for common workflows
 - [ ] Recurring tasks (weekly, monthly, quarterly)
 - [ ] Client financial summary dashboard
 - [ ] Multi-party signatures
+- [ ] Document search (full-text on name/description)
 
 ### Enhancement Phase 5 (Planned)
 - [ ] Advanced bulk operations (assign, update, status change)
 - [ ] Client onboarding templates
 - [ ] Activity analytics and reporting
+- [ ] Signature preview before final submit
+- [ ] Admin invoice table pagination
 
 ### Other Future Items
 - [ ] R2 direct upload with presigned URLs (when bucket configured)
 - [ ] Dark mode support
 - [ ] Mobile app (React Native)
 - [ ] Two-factor authentication
+- [ ] Recurring invoices
+- [ ] Signature certificate/receipt generation
 
 ---
 
@@ -311,6 +387,15 @@ Major restructuring of document management with service-based organization.
 
 | Date | Phase | Changes |
 |------|-------|---------|
+| 2026-01-24 | Enhancement 3 | Added IP address capture for signature audit trail |
+| 2026-01-24 | Enhancement 3 | Added document hash verification (SHA-256) for signature integrity |
+| 2026-01-24 | Enhancement 3 | Added upload signature option (third method alongside draw/type) |
+| 2026-01-24 | Enhancement 3 | Added signature request email notifications |
+| 2026-01-24 | Enhancement 3 | Added PDF invoice generation using jsPDF |
+| 2026-01-24 | Enhancement 3 | Implemented Stripe checkout session with webhook handler |
+| 2026-01-24 | Enhancement 3 | Added cryptographic Stripe webhook signature verification |
+| 2026-01-24 | Enhancement 3 | Added automated invoice payment reminders (cron job) |
+| 2026-01-24 | Enhancement 3 | Added custom DocumentIntegrityError for type-safe error handling |
 | 2026-01-24 | Enhancement 2 | Added service types system for document categorization |
 | 2026-01-24 | Enhancement 2 | Added client subscriptions linking clients to services |
 | 2026-01-24 | Enhancement 2 | Added folder organization with hierarchical navigation |
