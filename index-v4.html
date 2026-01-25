@@ -1,0 +1,2617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amjad & Hazli | Set Up Your Business in Malaysia</title>
+    <meta name="description" content="From company formation to ongoing compliance. Amjad & Hazli helps international businesses establish and operate in Malaysia.">
+
+    <!-- Fonts: Playfair Display for massive serif headlines -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+           LEGORA-INSPIRED DESIGN SYSTEM
+           Editorial minimalism with massive typography
+           ═══════════════════════════════════════════════════════════════ */
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e5e5e5;
+            --gray-300: #d4d4d4;
+            --gray-400: #a3a3a3;
+            --gray-500: #737373;
+            --gray-600: #525252;
+            --gray-700: #404040;
+            --gray-800: #262626;
+            --gray-900: #171717;
+
+            --sage-50: #f0f3f0;
+            --sage-100: #e8ece8;
+            --sage-200: #d1d9d1;
+
+            --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+            --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+            --nav-height: 64px;
+            --announce-height: 48px;
+            --container-max: 1440px;
+            --container-px: max(24px, env(safe-area-inset-left, 24px));
+
+            /* Safe area insets for notched devices */
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+
+            /* Touch target minimum */
+            --touch-min: 44px;
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--black);
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        img, video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        ::selection {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        /* Accessibility: Skip link */
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 0;
+            background: var(--black);
+            color: var(--white);
+            padding: 1rem 2rem;
+            z-index: 10000;
+            font-weight: 600;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Accessibility: Focus visible */
+        :focus-visible {
+            outline: 2px solid var(--black);
+            outline-offset: 2px;
+        }
+
+        .nav__cta:focus-visible,
+        .hero__cta-btn:focus-visible,
+        .cta__btn:focus-visible {
+            outline-color: var(--white);
+        }
+
+        .container {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 0 var(--container-px);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           NAVIGATION
+           ═══════════════════════════════════════════════════════════════ */
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--gray-200);
+            padding-top: var(--safe-top);
+        }
+
+        .nav__inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: var(--nav-height);
+        }
+
+        .nav__brand {
+            font-family: var(--font-display);
+            font-size: clamp(1.125rem, 4vw, 1.25rem);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            /* Touch target */
+            min-height: var(--touch-min);
+            display: flex;
+            align-items: center;
+        }
+
+        .nav__links {
+            display: none;
+            align-items: center;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        @media (min-width: 1024px) {
+            .nav__links { display: flex; }
+        }
+
+        .nav__link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            transition: color 0.2s ease;
+            /* Touch target */
+            min-height: var(--touch-min);
+            padding: 0 0.5rem;
+        }
+
+        .nav__link:hover {
+            color: var(--black);
+        }
+
+        .nav__link-icon {
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        .nav__cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            transition: color 0.2s ease;
+            /* Touch target */
+            min-height: var(--touch-min);
+            padding: 0 0.5rem;
+        }
+
+        .nav__cta:hover {
+            color: var(--black);
+        }
+
+        .nav__toggle {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            /* 44px touch target */
+            width: var(--touch-min);
+            height: var(--touch-min);
+            margin-right: -8px; /* Optical alignment */
+        }
+
+        .nav__toggle span {
+            width: 20px;
+            height: 1.5px;
+            background: var(--black);
+            transition: all 0.3s var(--ease-out);
+            will-change: transform, opacity;
+        }
+
+        @media (min-width: 1024px) {
+            .nav__toggle { display: none; }
+        }
+
+        .nav__toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .nav__toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .nav__toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Mobile Menu - Improved with transform-based animation */
+        .mobile-menu {
+            position: fixed;
+            top: calc(var(--nav-height) + var(--safe-top));
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white);
+            padding: 2rem var(--container-px);
+            padding-bottom: calc(2rem + var(--safe-bottom));
+            transform: translateY(-20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.4s var(--ease-out),
+                        opacity 0.4s var(--ease-out),
+                        visibility 0.4s;
+            z-index: 999;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu__links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mobile-menu__link {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 6vw, 1.75rem);
+            /* Touch target with padding */
+            display: block;
+            padding: 0.75rem 0;
+            min-height: var(--touch-min);
+        }
+
+        .mobile-menu__cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding: 1rem 1.75rem;
+            background: var(--black);
+            color: var(--white);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 2px;
+            min-height: var(--touch-min);
+            width: 100%;
+            max-width: 280px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ANNOUNCEMENT BAR
+           ═══════════════════════════════════════════════════════════════ */
+
+        .announce {
+            position: fixed;
+            top: calc(var(--nav-height) + var(--safe-top));
+            left: 0;
+            right: 0;
+            z-index: 998;
+            background: var(--gray-900);
+            color: var(--white);
+            height: var(--announce-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 calc(var(--container-px) + 2.5rem) 0 var(--container-px);
+        }
+
+        .announce__inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: clamp(0.75rem, 3vw, 0.875rem);
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .announce__badge {
+            font-weight: 600;
+            color: var(--gray-400);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .announce__divider {
+            color: var(--gray-600);
+            flex-shrink: 0;
+        }
+
+        .announce__text {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .announce__link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--gray-400);
+            margin-left: 0.5rem;
+            transition: color 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            /* Touch target */
+            min-height: var(--touch-min);
+            padding: 0 0.25rem;
+        }
+
+        .announce__link:hover {
+            color: var(--white);
+        }
+
+        .announce__link svg {
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .announce__link:hover svg {
+            transform: translateX(2px);
+        }
+
+        .announce__close {
+            position: absolute;
+            right: max(0.75rem, var(--safe-right));
+            background: none;
+            border: none;
+            color: var(--gray-500);
+            font-size: 1.25rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s ease;
+            /* Touch target */
+            width: var(--touch-min);
+            height: var(--touch-min);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .announce__close:hover {
+            color: var(--white);
+        }
+
+        .announce.hidden {
+            display: none;
+        }
+
+        /* Adjust hero padding when announcement is hidden */
+        .hero--no-announce {
+            padding-top: calc(var(--nav-height) + var(--safe-top));
+        }
+
+        /* Mobile announcement bar improvements */
+        @media (max-width: 480px) {
+            .announce__text {
+                max-width: 140px;
+            }
+            .announce__link span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 374px) {
+            .announce__divider,
+            .announce__text {
+                display: none;
+            }
+            .announce__inner {
+                gap: 0.75rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HERO SECTION
+           ═══════════════════════════════════════════════════════════════ */
+
+        .hero {
+            padding-top: calc(var(--nav-height) + var(--announce-height) + var(--safe-top));
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .hero__headline {
+            padding: clamp(2rem, 6vw, 5rem) 0 clamp(1.25rem, 4vw, 3rem);
+        }
+
+        .hero__line {
+            font-family: var(--font-display);
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            display: block;
+            overflow: hidden;
+            padding-bottom: 0.1em; /* Space for descenders */
+        }
+
+        .hero__line-inner {
+            display: block;
+            opacity: 0;
+            transform: translateY(100%);
+            animation: revealLine 1.2s var(--ease-out) forwards;
+            will-change: transform, opacity;
+        }
+
+        .hero__line--1 {
+            font-size: clamp(2.5rem, 10vw, 9rem);
+        }
+
+        .hero__line--2 {
+            font-size: clamp(2.5rem, 10vw, 9rem);
+            font-style: italic;
+            text-align: right;
+            padding-right: 5%;
+        }
+
+        .hero__line--2 .hero__line-inner {
+            animation-delay: 0.15s;
+        }
+
+        /* Small phone headline adjustments */
+        @media (max-width: 374px) {
+            .hero__line--1,
+            .hero__line--2 {
+                font-size: 2.25rem;
+            }
+            .hero__headline {
+                padding: 1.5rem 0 1rem;
+            }
+        }
+
+        @keyframes revealLine {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Video Section */
+        .hero__media {
+            position: relative;
+            margin: 0 var(--container-px);
+            border-radius: 2px;
+            overflow: hidden;
+            background: var(--gray-100);
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 1s var(--ease-out) 0.4s forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero__video-container {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+        }
+
+        /* More cinematic ratio on mobile */
+        @media (max-width: 640px) {
+            .hero__video-container {
+                aspect-ratio: 4 / 3;
+            }
+        }
+
+        @media (max-width: 374px) {
+            .hero__video-container {
+                aspect-ratio: 1 / 1;
+            }
+        }
+
+        .hero__video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Floating UI Cards */
+        .hero__overlays {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .ui-card {
+            position: absolute;
+            background: var(--white);
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02),
+                        0 8px 24px rgba(0,0,0,0.08);
+            pointer-events: auto;
+            opacity: 0;
+            animation: cardFade 0.8s var(--ease-out) forwards;
+        }
+
+        @keyframes cardFade {
+            to { opacity: 1; }
+        }
+
+        .ui-card--doc {
+            top: 8%;
+            left: 4%;
+            width: clamp(200px, 20vw, 280px);
+            padding: 1.25rem;
+            animation-delay: 0.8s;
+        }
+
+        .ui-card--portal {
+            bottom: 12%;
+            right: 4%;
+            width: clamp(240px, 22vw, 320px);
+            padding: 1.25rem;
+            animation-delay: 0.95s;
+        }
+
+        @media (max-width: 768px) {
+            .ui-card { display: none; }
+        }
+
+        .ui-card__header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .ui-card__dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-300);
+        }
+
+        .ui-card__dot--green { background: #22c55e; }
+        .ui-card__dot--yellow { background: #eab308; }
+
+        .ui-card__title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-500);
+        }
+
+        .ui-card__list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+
+        .ui-card__item {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            font-size: 0.8125rem;
+            color: var(--gray-700);
+        }
+
+        .ui-card__icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            background: var(--gray-100);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            color: var(--gray-500);
+        }
+
+        .ui-card__icon--success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .ui-card__icon--pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .ui-card__badge {
+            margin-left: auto;
+            font-size: 0.625rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 2px;
+            color: var(--white);
+        }
+
+        .ui-card__badge--success { background: #22c55e; }
+        .ui-card__badge--pending { background: #f59e0b; }
+
+        /* Floating CTA Bar */
+        .hero__cta-bar {
+            position: absolute;
+            bottom: clamp(1rem, 4vw, 2rem);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 0.625rem 0.625rem 0.625rem 1.75rem;
+            background: var(--black);
+            color: var(--white);
+            border-radius: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            animation: fadeUp 0.8s var(--ease-out) 1.1s forwards;
+            will-change: transform, opacity;
+            max-width: calc(100% - 2rem);
+        }
+
+        .hero__cta-text {
+            font-size: clamp(0.8125rem, 2.5vw, 0.9375rem);
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        .hero__cta-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--gray-600);
+            flex-shrink: 0;
+        }
+
+        .hero__cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.25rem;
+            background: var(--white);
+            color: var(--black);
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 100px;
+            transition: background 0.2s ease;
+            /* Touch target */
+            min-height: var(--touch-min);
+            min-width: var(--touch-min);
+            flex-shrink: 0;
+        }
+
+        .hero__cta-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .hero__cta-btn:active {
+            background: var(--gray-200);
+        }
+
+        .hero__cta-btn-mobile {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .hero__cta-text,
+            .hero__cta-divider {
+                display: none;
+            }
+            .hero__cta-bar {
+                padding: 0.375rem;
+                gap: 0;
+            }
+            .hero__cta-btn {
+                padding: 0.875rem 1.5rem;
+            }
+            .hero__cta-btn-desktop {
+                display: none;
+            }
+            .hero__cta-btn-mobile {
+                display: inline;
+            }
+        }
+
+        @media (max-width: 374px) {
+            .hero__cta-bar {
+                bottom: 0.75rem;
+            }
+            .hero__cta-btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.8125rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TRUST BAR - Legora-inspired minimal design
+           ═══════════════════════════════════════════════════════════════ */
+
+        .trust {
+            padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3rem, 6vw, 5rem);
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .trust__grid {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.25rem 2.5rem;
+        }
+
+        @media (min-width: 480px) {
+            .trust__grid {
+                gap: 1.5rem 3rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .trust__grid {
+                gap: 2rem 4rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .trust__grid {
+                gap: 2rem 5rem;
+            }
+        }
+
+        .trust__item {
+            font-family: var(--font-display);
+            font-size: clamp(0.9375rem, 3vw, 1.25rem);
+            font-weight: 500;
+            color: var(--gray-400);
+            letter-spacing: -0.01em;
+            transition: color 0.3s ease;
+        }
+
+        .trust__item:hover {
+            color: var(--black);
+        }
+
+        /* Small phones: 2 columns */
+        @media (max-width: 374px) {
+            .trust__grid {
+                gap: 1rem 1.5rem;
+            }
+            .trust__item {
+                flex: 0 0 calc(50% - 0.75rem);
+                text-align: center;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MID-PAGE CTA - Legora-inspired floating CTA
+           ═══════════════════════════════════════════════════════════════ */
+
+        .mid-cta {
+            padding: clamp(3rem, 8vw, 5rem) 0 clamp(4rem, 10vw, 7rem);
+            text-align: center;
+        }
+
+        .mid-cta__content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .mid-cta__text {
+            font-family: var(--font-display);
+            font-size: clamp(1.125rem, 4vw, 1.75rem);
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--gray-700);
+            margin-bottom: clamp(2rem, 5vw, 3rem);
+        }
+
+        .mid-cta__bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0.5rem 0.5rem 2rem;
+            background: var(--black);
+            color: var(--white);
+            border-radius: 100px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .mid-cta__label {
+            font-size: clamp(0.8125rem, 2.5vw, 0.9375rem);
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        .mid-cta__divider {
+            width: 1px;
+            height: 24px;
+            background: var(--gray-600);
+            flex-shrink: 0;
+        }
+
+        .mid-cta__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 1.5rem;
+            background: var(--white);
+            color: var(--black);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            border-radius: 100px;
+            transition: background 0.2s ease;
+            /* Touch target */
+            min-height: var(--touch-min);
+        }
+
+        .mid-cta__btn:hover {
+            background: var(--gray-100);
+        }
+
+        .mid-cta__btn:active {
+            background: var(--gray-200);
+        }
+
+        @media (max-width: 640px) {
+            .mid-cta__bar {
+                flex-direction: column;
+                padding: 1.5rem;
+                gap: 1rem;
+                border-radius: 2px;
+                width: 100%;
+                max-width: 320px;
+            }
+            .mid-cta__divider {
+                display: none;
+            }
+            .mid-cta__label {
+                white-space: normal;
+            }
+            .mid-cta__btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 374px) {
+            .mid-cta__bar {
+                padding: 1.25rem;
+            }
+            .mid-cta__text {
+                font-size: 1rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VALUE PROPOSITION - Legora-inspired large cards
+           ═══════════════════════════════════════════════════════════════ */
+
+        .value {
+            padding: 0 0 clamp(4rem, 10vw, 7rem);
+        }
+
+        .value__header {
+            max-width: 900px;
+            margin-bottom: clamp(2.5rem, 6vw, 4rem);
+        }
+
+        .value__eyebrow {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            margin-bottom: 1.25rem;
+        }
+
+        .value__headline {
+            font-family: var(--font-display);
+            font-size: clamp(1.375rem, 4vw, 2.75rem);
+            font-weight: 400;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+        }
+
+        .value__cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .value__cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+            /* Make the third card span full width on 2-column layout */
+            .value__cards .card:nth-child(3) {
+                grid-column: 1 / -1;
+                max-width: 50%;
+                margin: 0 auto;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .value__cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+            .value__cards .card:nth-child(3) {
+                grid-column: auto;
+                max-width: none;
+                margin: 0;
+            }
+        }
+
+        .card {
+            position: relative;
+            border-radius: 2px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.5s var(--ease-out);
+        }
+
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-4px);
+            }
+        }
+
+        /* Touch feedback on mobile */
+        @media (hover: none) {
+            .card:active {
+                transform: scale(0.98);
+            }
+        }
+
+        .card__image {
+            position: relative;
+            aspect-ratio: 4 / 5;
+            overflow: hidden;
+        }
+
+        @media (min-width: 480px) {
+            .card__image {
+                aspect-ratio: 1 / 1;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .card__image {
+                aspect-ratio: 3 / 4;
+            }
+        }
+
+        .card__image-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-50) 100%);
+        }
+
+        .card--1 .card__image-bg {
+            background: linear-gradient(135deg, #e8ece8 0%, #d4dbd4 100%);
+        }
+
+        .card--2 .card__image-bg {
+            background: linear-gradient(135deg, #dce4f0 0%, #c8d4e8 100%);
+        }
+
+        .card--3 .card__image-bg {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+        }
+
+        .card__ui {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .card__ui-inner {
+            background: var(--white);
+            border-radius: 2px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08),
+                        0 1px 2px rgba(0, 0, 0, 0.04);
+            padding: clamp(1rem, 3vw, 1.25rem);
+            width: 100%;
+            max-width: 280px;
+            transform: translateY(8px);
+            opacity: 0.95;
+            transition: transform 0.5s var(--ease-out),
+                        opacity 0.5s var(--ease-out);
+        }
+
+        @media (hover: hover) {
+            .card:hover .card__ui-inner {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* On touch devices, always show fully */
+        @media (hover: none) {
+            .card__ui-inner {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .card__ui-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .card__ui-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-300);
+        }
+
+        .card__ui-dot--green { background: #22c55e; }
+        .card__ui-dot--blue { background: #3b82f6; }
+
+        .card__ui-title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-500);
+        }
+
+        .card__ui-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+
+        .card__ui-item {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            font-size: 0.8125rem;
+            color: var(--gray-700);
+        }
+
+        .card__ui-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            background: var(--gray-100);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            color: var(--gray-500);
+        }
+
+        .card__ui-icon--pdf {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .card__ui-icon--doc {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .card__content {
+            padding: clamp(1rem, 3vw, 1.5rem) 0.5rem;
+        }
+
+        .card__title {
+            font-family: var(--font-display);
+            font-size: clamp(1rem, 2.5vw, 1.125rem);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .card__desc {
+            font-size: clamp(0.8125rem, 2.5vw, 0.875rem);
+            line-height: 1.6;
+            color: var(--gray-500);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CLIENTS SECTION
+           ═══════════════════════════════════════════════════════════════ */
+
+        .clients {
+            padding: clamp(4rem, 10vw, 7rem) 0;
+            background: var(--gray-50);
+        }
+
+        .clients__grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: clamp(2.5rem, 6vw, 4rem);
+        }
+
+        @media (min-width: 768px) {
+            .clients__grid {
+                grid-template-columns: 1fr 1.4fr;
+                gap: 3rem;
+                align-items: end;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .clients__grid {
+                grid-template-columns: 1fr 1.6fr;
+                gap: 4rem;
+            }
+        }
+
+        .clients__text {
+            font-size: clamp(0.9375rem, 2.5vw, 1rem);
+            line-height: 1.7;
+            color: var(--gray-600);
+        }
+
+        .clients__headline {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 4vw, 2.75rem);
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .clients__images {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 480px) {
+            .clients__images {
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .clients__images {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.25rem;
+            }
+        }
+
+        .client-type {
+            text-align: center;
+            transition: transform 0.3s var(--ease-out);
+        }
+
+        .client-type__img {
+            aspect-ratio: 3 / 4;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+            background: var(--gray-200);
+        }
+
+        @media (min-width: 480px) {
+            .client-type__img {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Slightly taller on mobile for better visual */
+        @media (max-width: 479px) {
+            .client-type__img {
+                aspect-ratio: 2 / 3;
+            }
+        }
+
+        .client-type__img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s var(--ease-out);
+        }
+
+        @media (hover: hover) {
+            .client-type:hover .client-type__img img {
+                transform: scale(1.05);
+            }
+            .client-type:hover {
+                transform: translateY(-4px);
+            }
+        }
+
+        .client-type__label {
+            font-size: clamp(0.6875rem, 2vw, 0.75rem);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--gray-600);
+        }
+
+        /* WhatsApp Floating Button */
+        .whatsapp-btn {
+            position: fixed;
+            bottom: calc(1.5rem + var(--safe-bottom));
+            right: max(1.5rem, var(--safe-right));
+            width: 56px;
+            height: 56px;
+            background: #25D366;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        @media (hover: hover) {
+            .whatsapp-btn:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .whatsapp-btn:active {
+            transform: scale(0.95);
+        }
+
+        .whatsapp-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        /* Smaller on very small screens */
+        @media (max-width: 374px) {
+            .whatsapp-btn {
+                width: 48px;
+                height: 48px;
+                bottom: calc(1rem + var(--safe-bottom));
+                right: 1rem;
+            }
+            .whatsapp-btn svg {
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VISION SECTION - Elegant Single Viewport Design
+           Refined, sophisticated editorial with beautiful balance
+           ═══════════════════════════════════════════════════════════════ */
+
+        .vision {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            padding: clamp(3rem, 8vw, 4rem) 0;
+            background: linear-gradient(180deg, var(--white) 0%, var(--sage-50) 30%, var(--sage-50) 70%, var(--white) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle paper texture */
+        .vision::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23fff' surfaceScale='2'%3E%3CfeDistantLight azimuth='45' elevation='60'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E");
+            opacity: 0.012;
+            pointer-events: none;
+        }
+
+        .vision__inner {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Centered eyebrow */
+        .vision__eyebrow {
+            text-align: center;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .vision__eyebrow::before,
+        .vision__eyebrow::after {
+            content: '';
+            width: clamp(24px, 6vw, 40px);
+            height: 1px;
+            background: var(--gray-300);
+        }
+
+        /* Hero Quote Block */
+        .vision__quote-block {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto clamp(2rem, 5vw, 3.5rem);
+            padding: 0 0.5rem;
+        }
+
+        .vision__quote {
+            font-family: var(--font-display);
+            font-size: clamp(1.25rem, 4vw, 2.25rem);
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            color: var(--black);
+            margin-bottom: 1rem;
+        }
+
+        .vision__attribution {
+            font-family: var(--font-display);
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
+            font-weight: 500;
+            color: var(--gray-500);
+            letter-spacing: 0.02em;
+        }
+
+        /* Main content layout */
+        .vision__layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        @media (min-width: 640px) {
+            .vision__layout {
+                grid-template-columns: 180px 1fr;
+                gap: 2.5rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .vision__layout {
+                grid-template-columns: 200px 1fr;
+                gap: 3rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .vision__layout {
+                grid-template-columns: 240px 1fr;
+                gap: 4rem;
+            }
+        }
+
+        /* Photo with elegant framing */
+        .vision__photo-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @media (min-width: 640px) {
+            .vision__photo-wrap {
+                align-items: flex-start;
+            }
+        }
+
+        .vision__photo {
+            width: 180px;
+            aspect-ratio: 4 / 5;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.08),
+                0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (min-width: 768px) {
+            .vision__photo {
+                width: 200px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .vision__photo {
+                width: 220px;
+            }
+        }
+
+        .vision__photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+            filter: sepia(12%) saturate(90%) contrast(1.02);
+            transition: filter 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+        }
+
+        .vision__photo:hover img {
+            filter: sepia(0%) saturate(100%) contrast(1);
+            transform: scale(1.02);
+        }
+
+        /* Body text area */
+        .vision__text {
+            max-width: 560px;
+        }
+
+        @media (min-width: 768px) {
+            .vision__text {
+                padding-right: 2rem;
+            }
+        }
+
+        .vision__body {
+            font-size: 1rem;
+            line-height: 1.85;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .vision__body {
+                font-size: 1.0625rem;
+            }
+        }
+
+        /* Thin decorative rule */
+        .vision__divider {
+            width: 60px;
+            height: 1px;
+            background: var(--gray-300);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Author info with signature */
+        .vision__author {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 480px) {
+            .vision__author {
+                flex-direction: row;
+                align-items: flex-end;
+                justify-content: flex-start;
+                gap: 2.5rem;
+            }
+        }
+
+        .vision__author-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .vision__name {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: var(--black);
+        }
+
+        .vision__credentials {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+        }
+
+        .vision__role {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            margin-top: 0.125rem;
+        }
+
+        /* Elegant handwritten signature */
+        .vision__signature {
+            flex-shrink: 0;
+            opacity: 0.75;
+            transition: opacity 0.3s ease;
+        }
+
+        .vision__signature:hover {
+            opacity: 1;
+        }
+
+        .vision__signature svg {
+            width: 140px;
+            height: auto;
+            display: block;
+        }
+
+        @media (min-width: 480px) {
+            .vision__signature svg {
+                width: 160px;
+            }
+        }
+
+        /* Scroll-triggered animations */
+        @keyframes visionFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes signatureReveal {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 0.75;
+                transform: translateX(0);
+            }
+        }
+
+        .vision [data-animate] {
+            opacity: 0;
+        }
+
+        .vision [data-animate="fade-up"].animated {
+            animation: visionFadeUp 0.8s var(--ease-out) forwards;
+        }
+
+        .vision [data-animate="signature"].animated {
+            animation: signatureReveal 1s var(--ease-out) 0.4s forwards;
+        }
+
+        .vision [data-animate-delay="1"] { animation-delay: 0.1s; }
+        .vision [data-animate-delay="2"] { animation-delay: 0.2s; }
+        .vision [data-animate-delay="3"] { animation-delay: 0.3s; }
+        .vision [data-animate-delay="4"] { animation-delay: 0.4s; }
+        .vision [data-animate-delay="5"] { animation-delay: 0.5s; }
+
+        /* Mobile-specific adjustments for 100vh */
+        @media (max-height: 700px) {
+            .vision {
+                min-height: auto;
+                padding: 3rem 0;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .vision {
+                min-height: auto;
+                padding: 4rem 0 5rem;
+            }
+
+            .vision__quote-block {
+                margin-bottom: 2.5rem;
+            }
+
+            .vision__photo-wrap {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           COMPLIANCE SECTION (Dark)
+           ═══════════════════════════════════════════════════════════════ */
+
+        .compliance {
+            padding: clamp(4rem, 10vw, 7rem) 0;
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .compliance__header {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto clamp(2.5rem, 6vw, 4rem);
+        }
+
+        .compliance__eyebrow {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            margin-bottom: 1.25rem;
+        }
+
+        .compliance__headline {
+            font-family: var(--font-display);
+            font-size: clamp(1.25rem, 3vw, 1.875rem);
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .compliance__grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 480px) {
+            .compliance__grid {
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .compliance__grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.25rem;
+            }
+        }
+
+        .cert {
+            text-align: center;
+            padding: clamp(1.25rem, 4vw, 2rem) clamp(0.75rem, 3vw, 1.25rem);
+            border: 1px solid var(--gray-800);
+            border-radius: 2px;
+            transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+        }
+
+        @media (hover: hover) {
+            .cert:hover {
+                border-color: var(--gray-700);
+                background: var(--gray-900);
+                transform: translateY(-4px);
+            }
+        }
+
+        .cert__icon {
+            width: clamp(40px, 8vw, 48px);
+            height: clamp(40px, 8vw, 48px);
+            margin: 0 auto clamp(0.75rem, 3vw, 1.25rem);
+            background: var(--gray-800);
+            border-radius: 2px;
+            display: grid;
+            place-items: center;
+            font-size: 1.25rem;
+        }
+
+        .cert__name {
+            font-family: var(--font-display);
+            font-size: clamp(0.9375rem, 2.5vw, 1.0625rem);
+            margin-bottom: 0.375rem;
+        }
+
+        .cert__desc {
+            font-size: clamp(0.6875rem, 2vw, 0.8125rem);
+            line-height: 1.5;
+            color: var(--gray-500);
+        }
+
+        @media (max-width: 374px) {
+            .cert__desc {
+                display: none;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FINAL CTA - Legora-inspired dark editorial style
+           ═══════════════════════════════════════════════════════════════ */
+
+        .cta {
+            padding: clamp(5rem, 12vw, 8rem) 0 clamp(6rem, 14vw, 10rem);
+            background: var(--black);
+            color: var(--white);
+            text-align: left;
+        }
+
+        .cta__headline {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 5vw, 2.75rem);
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.3;
+            max-width: 600px;
+            margin-bottom: 1rem;
+        }
+
+        .cta__subtext {
+            font-size: clamp(1rem, 2.5vw, 1.125rem);
+            line-height: 1.6;
+            color: var(--gray-500);
+            max-width: 520px;
+            margin-bottom: clamp(2rem, 5vw, 3rem);
+        }
+
+        .cta__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            background: transparent;
+            color: var(--white);
+            border: 1px solid var(--white);
+            border-radius: 999px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: background 0.3s ease, color 0.3s ease;
+            /* Touch target */
+            min-height: var(--touch-min);
+        }
+
+        @media (hover: hover) {
+            .cta__btn:hover {
+                background: var(--white);
+                color: var(--black);
+            }
+            .cta__btn:hover svg {
+                transform: translateX(3px);
+            }
+        }
+
+        .cta__btn:active {
+            background: var(--gray-200);
+            color: var(--black);
+        }
+
+        .cta__btn svg {
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 374px) {
+            .cta__btn {
+                width: 100%;
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FOOTER - Legora-inspired light footer with massive brand
+           ═══════════════════════════════════════════════════════════════ */
+
+        .footer {
+            padding: clamp(3rem, 8vw, 5rem) 0 0;
+            padding-bottom: var(--safe-bottom);
+            background: var(--white);
+            color: var(--black);
+            overflow: hidden;
+        }
+
+        .footer__top {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem 1.25rem;
+            padding-bottom: clamp(2.5rem, 6vw, 4rem);
+        }
+
+        @media (min-width: 640px) {
+            .footer__top {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2.5rem 1.5rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .footer__top {
+                grid-template-columns: 1.5fr repeat(5, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        .footer__brand-col {
+            grid-column: 1 / -1;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .footer__brand-col {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .footer__brand-col {
+                grid-column: auto;
+            }
+        }
+
+        .footer__logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--black);
+        }
+
+        .footer__tagline {
+            font-size: clamp(0.875rem, 2.5vw, 0.9375rem);
+            line-height: 1.6;
+            color: var(--gray-500);
+            max-width: 280px;
+            margin-top: 0.75rem;
+        }
+
+        .footer__col-heading {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            margin-bottom: 1rem;
+        }
+
+        .footer__links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer__link {
+            font-size: clamp(0.875rem, 2.5vw, 0.9375rem);
+            color: var(--black);
+            transition: color 0.2s ease;
+            /* Touch target with padding */
+            display: inline-block;
+            padding: 0.25rem 0;
+            min-height: calc(var(--touch-min) / 2);
+        }
+
+        @media (hover: hover) {
+            .footer__link:hover {
+                color: var(--gray-500);
+            }
+        }
+
+        /* Subtle legal line above brand */
+        .footer__legal-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.375rem 0.5rem;
+            padding: clamp(2rem, 6vw, 4rem) 0 1.25rem;
+            font-size: clamp(0.6875rem, 2vw, 0.75rem);
+            color: var(--gray-400);
+            letter-spacing: 0.05em;
+        }
+
+        .footer__legal-line a {
+            color: var(--gray-400);
+            transition: color 0.2s ease;
+            /* Touch target */
+            padding: 0.25rem;
+        }
+
+        @media (hover: hover) {
+            .footer__legal-line a:hover {
+                color: var(--black);
+            }
+        }
+
+        .footer__legal-line span {
+            color: var(--gray-300);
+        }
+
+        /* Massive full brand text - Reducto-inspired subtle effect */
+        .footer__brand-massive {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 8vw, 8rem);
+            font-weight: 500;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            text-align: center;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            white-space: nowrap;
+            user-select: none;
+            overflow: hidden;
+            /* Subtle gradient from darker to lighter - faded watermark effect */
+            background: linear-gradient(
+                180deg,
+                var(--gray-300) 0%,
+                var(--gray-200) 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.6;
+        }
+
+        /* Allow wrapping on very small screens */
+        @media (max-width: 374px) {
+            .footer__brand-massive {
+                white-space: normal;
+                word-break: break-word;
+                font-size: 1.5rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SCROLL ANIMATIONS
+           ═══════════════════════════════════════════════════════════════ */
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.8s var(--ease-out),
+                        transform 0.8s var(--ease-out);
+            will-change: opacity, transform;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal.d1 { transition-delay: 0.1s; }
+        .reveal.d2 { transition-delay: 0.2s; }
+        .reveal.d3 { transition-delay: 0.3s; }
+        .reveal.d4 { transition-delay: 0.4s; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ADDITIONAL MOBILE OPTIMIZATIONS
+           ═══════════════════════════════════════════════════════════════ */
+
+        /* Container padding adjustments for small screens */
+        @media (max-width: 374px) {
+            :root {
+                --container-px: 16px;
+            }
+        }
+
+        @media (min-width: 375px) and (max-width: 479px) {
+            :root {
+                --container-px: 20px;
+            }
+        }
+
+        /* Improve text rendering on small screens */
+        @media (max-width: 640px) {
+            body {
+                text-rendering: optimizeLegibility;
+            }
+        }
+
+        /* Ensure proper tap highlighting on iOS */
+        @media (hover: none) {
+            a, button {
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Print styles - hide fixed elements */
+        @media print {
+            .nav,
+            .announce,
+            .mobile-menu,
+            .whatsapp-btn {
+                display: none !important;
+            }
+            .hero {
+                padding-top: 2rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Accessibility: Skip link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav__inner">
+            <a href="#" class="nav__brand">Amjad & Hazli</a>
+            <ul class="nav__links">
+                <li><a href="#services" class="nav__link">Services</a></li>
+                <li><a href="#about" class="nav__link">About</a></li>
+                <li><a href="#credentials" class="nav__link">Credentials</a></li>
+                <li><a href="#contact" class="nav__link">Contact</a></li>
+                <li><a href="https://portal.amjadhazli.com" class="nav__cta">Log in</a></li>
+            </ul>
+            <button class="nav__toggle" id="navToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Announcement Bar -->
+    <div class="announce" id="announceBar">
+        <div class="announce__inner">
+            <span class="announce__badge">New guide</span>
+            <span class="announce__divider">|</span>
+            <span class="announce__text">Malaysia Market Entry: A complete guide for foreign investors</span>
+            <a href="#" class="announce__link">
+                <span>Read more</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+        <button class="announce__close" id="announceClose" aria-label="Dismiss announcement">&times;</button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul class="mobile-menu__links">
+            <li><a href="#services" class="mobile-menu__link">Services</a></li>
+            <li><a href="#about" class="mobile-menu__link">About</a></li>
+            <li><a href="#credentials" class="mobile-menu__link">Credentials</a></li>
+            <li><a href="#contact" class="mobile-menu__link">Contact</a></li>
+            <li><a href="https://portal.amjadhazli.com" class="mobile-menu__link mobile-menu__cta">Log in to Portal</a></li>
+        </ul>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero" id="main-content">
+        <div class="container">
+            <h1 class="hero__headline">
+                <span class="hero__line hero__line--1">
+                    <span class="hero__line-inner">Set up your business</span>
+                </span>
+                <span class="hero__line hero__line--2">
+                    <span class="hero__line-inner">in Malaysia.</span>
+                </span>
+            </h1>
+        </div>
+
+        <div class="hero__media">
+            <div class="hero__video-container" aria-hidden="true">
+                <!-- Hero video with stock fallback (decorative) -->
+                <video
+                    class="hero__video"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    poster="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&h=1080&fit=crop"
+                >
+                    <!-- Stock video fallback - Kuala Lumpur cityscape -->
+                    <source src="https://cdn.coverr.co/videos/coverr-kuala-lumpur-skyline-at-night-4418/1080p.mp4" type="video/mp4">
+                </video>
+                <!-- Static fallback if video fails -->
+                <img
+                    class="hero__video-fallback"
+                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&h=1080&fit=crop"
+                    alt="Modern business district skyline"
+                    style="display:none; position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"
+                >
+
+                <!-- Floating UI Cards -->
+                <div class="hero__overlays">
+                    <div class="ui-card ui-card--doc">
+                        <div class="ui-card__header">
+                            <span class="ui-card__dot ui-card__dot--green"></span>
+                            <span class="ui-card__title">Services</span>
+                        </div>
+                        <ul class="ui-card__list">
+                            <li class="ui-card__item">
+                                <span class="ui-card__icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg></span>
+                                Company Incorporation
+                            </li>
+                            <li class="ui-card__item">
+                                <span class="ui-card__icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                Work Permits
+                            </li>
+                            <li class="ui-card__item">
+                                <span class="ui-card__icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg></span>
+                                Accounting & Tax
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="ui-card ui-card--portal">
+                        <div class="ui-card__header">
+                            <span class="ui-card__dot"></span>
+                            <span class="ui-card__title">Client Portal</span>
+                        </div>
+                        <ul class="ui-card__list">
+                            <li class="ui-card__item">
+                                <span class="ui-card__icon ui-card__icon--success"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                                Certificate of Incorporation
+                                <span class="ui-card__badge ui-card__badge--success">Done</span>
+                            </li>
+                            <li class="ui-card__item">
+                                <span class="ui-card__icon ui-card__icon--success"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                                Business License
+                                <span class="ui-card__badge ui-card__badge--success">Done</span>
+                            </li>
+                            <li class="ui-card__item">
+                                <span class="ui-card__icon ui-card__icon--pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>
+                                Tax Registration
+                                <span class="ui-card__badge ui-card__badge--pending">Pending</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Floating CTA Bar -->
+                <div class="hero__cta-bar">
+                    <span class="hero__cta-text">From formation to operation</span>
+                    <span class="hero__cta-divider"></span>
+                    <a href="#contact" class="hero__cta-btn">
+                        <span class="hero__cta-btn-desktop">Book a demo</span>
+                        <span class="hero__cta-btn-mobile">Get Started</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Bar - Legora-inspired minimal country names -->
+    <section class="trust">
+        <div class="container">
+            <div class="trust__grid">
+                <span class="trust__item">Singapore</span>
+                <span class="trust__item">United States</span>
+                <span class="trust__item">United Kingdom</span>
+                <span class="trust__item">China</span>
+                <span class="trust__item">Australia</span>
+                <span class="trust__item">Japan</span>
+                <span class="trust__item">Germany</span>
+                <span class="trust__item">UAE</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mid-page CTA - Legora-inspired -->
+    <section class="mid-cta">
+        <div class="container">
+            <div class="mid-cta__content reveal">
+                <p class="mid-cta__text">Spend less time on paperwork, and more time on the work only founders can do. Amjad & Hazli frees you from admin so you can think clearer, move faster, and focus on growth.</p>
+                <div class="mid-cta__bar">
+                    <span class="mid-cta__label">From formation to operation</span>
+                    <span class="mid-cta__divider"></span>
+                    <a href="#contact" class="mid-cta__btn">Book a demo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Proposition - Legora-inspired large cards -->
+    <section class="value" id="services">
+        <div class="container">
+            <div class="value__header reveal">
+                <p class="value__eyebrow">End-to-end services</p>
+                <h2 class="value__headline">Amjad & Hazli handles everything from company setup to ongoing compliance — helping businesses spend less time managing process, and more time delivering value.</h2>
+            </div>
+            <div class="value__cards">
+                <!-- Card 1: Company Setup -->
+                <div class="card card--1 reveal d1">
+                    <div class="card__image">
+                        <div class="card__image-bg"></div>
+                        <div class="card__ui">
+                            <div class="card__ui-inner">
+                                <div class="card__ui-header">
+                                    <span class="card__ui-dot card__ui-dot--green"></span>
+                                    <span class="card__ui-title">Documents</span>
+                                </div>
+                                <ul class="card__ui-list">
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon card__ui-icon--doc"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></span>
+                                        Certificate_of_Incorporation.pdf
+                                    </li>
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon card__ui-icon--pdf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></span>
+                                        M&A_Constitution.pdf
+                                    </li>
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon card__ui-icon--doc"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></span>
+                                        Business_License_2024.pdf
+                                    </li>
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon card__ui-icon--pdf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></span>
+                                        Share_Certificate_001.pdf
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card__content">
+                        <h3 class="card__title">Company Setup</h3>
+                        <p class="card__desc">From Sdn Bhd incorporation to business licenses. We handle every step of establishing your Malaysian entity.</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Hiring & Permits -->
+                <div class="card card--2 reveal d2">
+                    <div class="card__image">
+                        <div class="card__image-bg"></div>
+                        <div class="card__ui">
+                            <div class="card__ui-inner">
+                                <div class="card__ui-header">
+                                    <span class="card__ui-dot card__ui-dot--blue"></span>
+                                    <span class="card__ui-title">Work Permits</span>
+                                </div>
+                                <ul class="card__ui-list">
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon" style="background: #dcfce7; color: #16a34a;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                                        Employment Pass — Approved
+                                    </li>
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon" style="background: #dcfce7; color: #16a34a;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                                        Dependent Pass — Approved
+                                    </li>
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon" style="background: #fef3c7; color: #d97706;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>
+                                        Tech Pass — Processing
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card__content">
+                        <h3 class="card__title">Hiring & Permits</h3>
+                        <p class="card__desc">Work permits, employment passes, and payroll setup. Build your Malaysian team with full compliance.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Accounting & Tax -->
+                <div class="card card--3 reveal d3">
+                    <div class="card__image">
+                        <div class="card__image-bg"></div>
+                        <div class="card__ui">
+                            <div class="card__ui-inner">
+                                <div class="card__ui-header">
+                                    <span class="card__ui-dot"></span>
+                                    <span class="card__ui-title">What can we help with?</span>
+                                </div>
+                                <ul class="card__ui-list">
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+                                        Monthly bookkeeping
+                                    </li>
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></span>
+                                        Tax filing & compliance
+                                    </li>
+                                    <li class="card__ui-item">
+                                        <span class="card__ui-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg></span>
+                                        Financial reporting
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card__content">
+                        <h3 class="card__title">Accounting & Tax</h3>
+                        <p class="card__desc">Monthly bookkeeping, annual audits, and tax compliance. Expert support for your financial obligations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clients Section -->
+    <section class="clients" id="about">
+        <div class="container">
+            <div class="clients__grid">
+                <p class="clients__text reveal">Whether you're a startup founder testing the Southeast Asian market, an established SME expanding operations, or a multinational setting up a regional hub — we've helped businesses at every stage navigate Malaysia's business landscape.</p>
+                <h2 class="clients__headline reveal d1">Amjad & Hazli meets businesses where they are.</h2>
+            </div>
+            <div class="clients__images">
+                <div class="client-type reveal d1">
+                    <div class="client-type__img"><img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=533&fit=crop&crop=faces" alt="Startups" loading="lazy"></div>
+                    <span class="client-type__label">Startups</span>
+                </div>
+                <div class="client-type reveal d2">
+                    <div class="client-type__img"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=533&fit=crop&crop=faces" alt="SMEs" loading="lazy"></div>
+                    <span class="client-type__label">SMEs</span>
+                </div>
+                <div class="client-type reveal d3">
+                    <div class="client-type__img"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=533&fit=crop" alt="Corporations" loading="lazy"></div>
+                    <span class="client-type__label">Corporations</span>
+                </div>
+                <div class="client-type reveal d4">
+                    <div class="client-type__img"><img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=400&h=533&fit=crop&crop=faces" alt="Family Offices" loading="lazy"></div>
+                    <span class="client-type__label">Family Offices</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision Section - Elegant Single Viewport -->
+    <section class="vision" id="vision">
+        <div class="container">
+            <div class="vision__inner">
+                <!-- Elegant eyebrow -->
+                <p class="vision__eyebrow reveal" data-animate="fade-up">Our Vision</p>
+
+                <!-- Hero Quote Block -->
+                <div class="vision__quote-block reveal" data-animate="fade-up" data-animate-delay="1">
+                    <h2 class="vision__quote">"We believe professional services shouldn't be a barrier to entry."</h2>
+                    <p class="vision__attribution">— Amjad Ahmad</p>
+                </div>
+
+                <!-- Main layout: Photo + Text -->
+                <div class="vision__layout">
+                    <!-- Circular photo -->
+                    <div class="vision__photo-wrap reveal" data-animate="fade-up" data-animate-delay="2">
+                        <div class="vision__photo">
+                            <img src="assets/amjad-ahmad.jpg" alt="Amjad Ahmad, Managing Partner" loading="lazy">
+                        </div>
+                    </div>
+
+                    <!-- Body text and author info -->
+                    <div class="vision__text reveal" data-animate="fade-up" data-animate-delay="3">
+                        <p class="vision__body">International business brings complexity — different jurisdictions, unfamiliar regulations, and the challenge of operating far from home. Our role is to handle that complexity so you can focus on what you do best: building and growing your business.</p>
+
+                        <div class="vision__divider"></div>
+
+                        <div class="vision__author">
+                            <div class="vision__author-info">
+                                <h3 class="vision__name">Amjad Ahmad</h3>
+                                <p class="vision__credentials">C.A(M), ACCA (UK)</p>
+                                <p class="vision__role">Managing Partner</p>
+                            </div>
+
+                            <!-- Elegant handwritten signature -->
+                            <div class="vision__signature" data-animate="signature">
+                                <svg viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 38C12 32 18 22 28 18C38 14 45 20 42 28C39 36 28 42 22 38C16 34 20 26 28 24C36 22 48 26 58 22C68 18 72 12 82 14C92 16 88 28 78 32C68 36 58 30 68 24C78 18 92 16 102 18C112 20 118 28 128 26C138 24 142 16 152 18C162 20 168 30 175 28C182 26 188 18 192 22" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                                    <path d="M175 28C172 34 168 38 165 36" stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compliance Section -->
+    <section class="compliance" id="credentials">
+        <div class="container">
+            <div class="compliance__header reveal">
+                <p class="compliance__eyebrow">Licensed & Compliant</p>
+                <h2 class="compliance__headline">We maintain the highest professional standards in accounting and corporate secretarial services.</h2>
+            </div>
+            <div class="compliance__grid">
+                <div class="cert reveal d1">
+                    <div class="cert__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></div>
+                    <h3 class="cert__name">MIA</h3>
+                    <p class="cert__desc">Malaysian Institute of Accountants — Chartered Accountants</p>
+                </div>
+                <div class="cert reveal d2">
+                    <div class="cert__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
+                    <h3 class="cert__name">SSM</h3>
+                    <p class="cert__desc">Licensed Company Secretaries under SSM regulations</p>
+                </div>
+                <div class="cert reveal d3">
+                    <div class="cert__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg></div>
+                    <h3 class="cert__name">ACCA</h3>
+                    <p class="cert__desc">Association of Chartered Certified Accountants qualified</p>
+                </div>
+                <div class="cert reveal d4">
+                    <div class="cert__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg></div>
+                    <h3 class="cert__name">CTIM</h3>
+                    <p class="cert__desc">Chartered Tax Institute of Malaysia — Tax Consultants</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA - Legora-inspired dark editorial style -->
+    <section class="cta" id="contact">
+        <div class="container">
+            <h2 class="cta__headline reveal">Ready to learn more?<br>Just say the word.</h2>
+            <p class="cta__subtext reveal d1">Discover how Amjad & Hazli can simplify your entry into Malaysia, so you can focus on what matters most.</p>
+            <a href="#" class="cta__btn reveal d2">
+                Book a Consultation
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer - Legora-inspired light footer with massive brand -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__top">
+                <div class="footer__brand-col">
+                    <div class="footer__logo">A&H</div>
+                    <p class="footer__tagline">Chartered Accountants helping international businesses establish and thrive in Malaysia.</p>
+                </div>
+                <div>
+                    <h4 class="footer__col-heading">Services</h4>
+                    <ul class="footer__links">
+                        <li><a href="#" class="footer__link">Incorporation</a></li>
+                        <li><a href="#" class="footer__link">Company Secretary</a></li>
+                        <li><a href="#" class="footer__link">Accounting</a></li>
+                        <li><a href="#" class="footer__link">Tax Advisory</a></li>
+                        <li><a href="#" class="footer__link">Work Permits</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer__col-heading">Industries</h4>
+                    <ul class="footer__links">
+                        <li><a href="#" class="footer__link">Technology</a></li>
+                        <li><a href="#" class="footer__link">E-commerce</a></li>
+                        <li><a href="#" class="footer__link">Consulting</a></li>
+                        <li><a href="#" class="footer__link">Trading</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer__col-heading">Resources</h4>
+                    <ul class="footer__links">
+                        <li><a href="#" class="footer__link">Guides</a></li>
+                        <li><a href="#" class="footer__link">FAQ</a></li>
+                        <li><a href="#" class="footer__link">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer__col-heading">Company</h4>
+                    <ul class="footer__links">
+                        <li><a href="#" class="footer__link">About</a></li>
+                        <li><a href="#" class="footer__link">Careers</a></li>
+                        <li><a href="#" class="footer__link">Contact</a></li>
+                        <li><a href="#" class="footer__link">LinkedIn</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer__col-heading">Legal</h4>
+                    <ul class="footer__links">
+                        <li><a href="#" class="footer__link">Terms</a></li>
+                        <li><a href="#" class="footer__link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer__legal-line">
+            <span>&copy; 2025</span>
+            <span>·</span>
+            <a href="#">Privacy</a>
+            <span>·</span>
+            <a href="#">Terms</a>
+            <span>·</span>
+            <span>Kuala Lumpur, Malaysia</span>
+        </div>
+        <div class="footer__brand-massive">AMJAD & HAZLI</div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/60123456789?text=Hi%2C%20I%27m%20interested%20in%20setting%20up%20a%20business%20in%20Malaysia." class="whatsapp-btn" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </a>
+
+    <script>
+        // Mobile menu toggle
+        const toggle = document.getElementById('navToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        toggle.addEventListener('click', () => {
+            toggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                toggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Scroll reveal
+        const reveals = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+        reveals.forEach(el => revealObserver.observe(el));
+
+        // Vision section animations
+        const visionSection = document.querySelector('.vision');
+        if (visionSection) {
+            // Animate elements with data-animate attribute
+            const animatedElements = visionSection.querySelectorAll('[data-animate]');
+            const visionObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                    }
+                });
+            }, { threshold: 0.2, rootMargin: '0px 0px -50px 0px' });
+
+            animatedElements.forEach(el => visionObserver.observe(el));
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', e => {
+                const href = anchor.getAttribute('href');
+                if (href === '#' || href.length <= 1) return; // Skip empty anchors
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 112,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Video fallback handling
+        const heroVideo = document.querySelector('.hero__video');
+        const videoFallback = document.querySelector('.hero__video-fallback');
+        if (heroVideo && videoFallback) {
+            heroVideo.addEventListener('error', () => {
+                heroVideo.style.display = 'none';
+                videoFallback.style.display = 'block';
+            });
+        }
+
+        // Dynamic footer year
+        const footerYear = document.querySelector('.footer__legal-line span:first-child');
+        if (footerYear) {
+            footerYear.textContent = `© ${new Date().getFullYear()}`;
+        }
+
+        // Dismissible announcement bar
+        const announceBar = document.getElementById('announceBar');
+        const announceClose = document.getElementById('announceClose');
+        const hero = document.querySelector('.hero');
+
+        // Check if already dismissed
+        if (localStorage.getItem('announceDismissed') === 'true') {
+            announceBar.classList.add('hidden');
+            hero.classList.add('hero--no-announce');
+        }
+
+        announceClose.addEventListener('click', () => {
+            announceBar.classList.add('hidden');
+            hero.classList.add('hero--no-announce');
+            localStorage.setItem('announceDismissed', 'true');
+        });
+    </script>
+</body>
+</html>
